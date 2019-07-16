@@ -1,4 +1,5 @@
 from .base import BaseRequest
+from ..utils import raise_for_status
 
 
 class AuthorizedRequest(BaseRequest):
@@ -23,8 +24,7 @@ class AuthorizedRequest(BaseRequest):
                                       headers=headers,
                                       auth=auth)
 
-        # TODO: raise an instance of the custom exception class
-        response.raise_for_status()
+        raise_for_status(response)
 
         return response.json()['access_token']
 
