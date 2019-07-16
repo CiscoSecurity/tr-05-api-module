@@ -14,7 +14,7 @@ class LoggedRequest(BaseRequest):
 
         try:
             response = self._request.perform(method, url, **kwargs)
-        except:
+        except Exception:
             # The same as .error(), but also includes the current traceback
             self._logger.exception(message)
             raise
