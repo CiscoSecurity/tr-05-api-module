@@ -3,3 +3,19 @@
 ### Threat Response Python API Module:
 
 Python module for working with the Threat Response APIs
+
+### Installation:
+
+* Local:
+
+```bash
+python setup.py install
+pip show tr-api-client
+```
+
+* GitHub:
+
+```bash
+pip install git+https://github.com/CiscoSecurity/tr-05-api-module.git
+pip show tr-api-client
+```
