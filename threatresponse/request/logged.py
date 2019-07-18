@@ -25,7 +25,7 @@ class LoggedRequest(BaseRequest):
         return response
 
     @classmethod
-    def build_message(cls, method, url, response=None):
+    def _format(cls, method, url, response=None):
         return cls.MESSAGE_FORMAT.format(
             method=method.upper(),
             url=url,
@@ -40,11 +40,11 @@ class LoggedRequest(BaseRequest):
         ).rstrip()
 
     def _log_success(self, method, url, response):
-        message = self.build_message(method, url, response)
+        message = self._format(method, url, response)
         self._logger.info(message)
 
     def _log_error(self, method, url, response=None):
-        message = self.build_message(method, url, response)
+        message = self._format(method, url, response)
         if response is None:
             # The same as .error(), but also includes the current traceback
             self._logger.exception(message)
