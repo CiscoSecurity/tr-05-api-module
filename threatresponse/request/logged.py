@@ -4,31 +4,49 @@ from .base import BaseRequest
 
 
 class LoggedRequest(BaseRequest):
+    MESSAGE_FORMAT = '{method} {url} {status_code} {reason_phrase}'
 
     def __init__(self, request, logger):
         self._request = request
         self._logger = logger
 
     def perform(self, method, url, **kwargs):
-        message = '{} {}'.format(method.upper(), url)
-
         try:
             response = self._request.perform(method, url, **kwargs)
         except Exception:
-            # The same as .error(), but also includes the current traceback
-            self._logger.exception(message)
+            self._log_error(method, url)
             raise
 
+        if response.ok:  # 100 <= code < 400
+            self._log_success(method, url, response)
+        else:  # 400 <= code < 600
+            self._log_error(method, url, response)
+
+        return response
+
+    @classmethod
+    def build_message(cls, method, url, response=None):
+        return cls.MESSAGE_FORMAT.format(
+            method=method.upper(),
+            url=url,
+            status_code=(
+                '' if response is None else
+                str(response.status_code)
+            ),
+            reason_phrase=(
+                '' if response is None else
+                six.moves.http_client.responses[response.status_code]
+            ),
+        ).rstrip()
+
+    def _log_success(self, method, url, response):
+        message = self.build_message(method, url, response)
+        self._logger.info(message)
+
+    def _log_error(self, method, url, response=None):
+        message = self.build_message(method, url, response)
+        if response is None:
+            # The same as .error(), but also includes the current traceback
+            self._logger.exception(message)
         else:
-            code = response.status_code
-            description = six.moves.http_client.responses[code]
-
-            # Extend the message with the actual status code and description
-            message = '{} {} {}'.format(message, code, description)
-
-            if response.ok:  # 100 <= code < 400
-                self._logger.info(message)
-            else:  # 400 <= code < 600
-                self._logger.error(message)
-
-            return response
+            self._logger.error(message)

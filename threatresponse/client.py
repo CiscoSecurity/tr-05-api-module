@@ -13,13 +13,13 @@ class ThreatResponse(object):
             request = LoggedRequest(request, options['logger'])
         request = AuthorizedRequest(request, client_id, client_password)
 
-        self._enrich = EnrichAPI(request)
         self._inspect = InspectAPI(request)
-
-    @property
-    def enrich(self):
-        return self._enrich
+        self._enrich = EnrichAPI(request)
 
     @property
     def inspect(self):
         return self._inspect
+
+    @property
+    def enrich(self):
+        return self._enrich

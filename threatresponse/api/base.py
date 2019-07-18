@@ -8,6 +8,5 @@ class BaseAPI(object):
         self._request = request
 
     @classmethod
-    def build_full_url(cls, endpoint_path_template, *args, **kwargs):
-        endpoint_path = endpoint_path_template.format(*args, **kwargs)
-        return urljoin(cls.BASE_URL, endpoint_path)
+    def absolute_url(cls, endpoint):
+        return urljoin(cls.BASE_URL, endpoint)
