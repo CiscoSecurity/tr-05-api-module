@@ -15,4 +15,3 @@ install:
 
 script:
   - pytest threatresponse --pep8
-  - pytest tests/
