@@ -1,4 +1,4 @@
-from base_test import BaseTestCase
+from .base_test import BaseTestCase
 from threatresponse.api.base import BaseAPI
 
 
