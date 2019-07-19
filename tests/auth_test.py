@@ -15,9 +15,9 @@ class AuthTestCase(BaseTestCase):
                 client_password='ssZi617xy1O-sf_Jlcw',
             )
         except Exception as e:
-            self.assertEqual({u'error_uri': u'https://tools.ietf.org/html/rfc6749#section-5.2',
-                              u'error_description': u'unknown client',
-                              u'error': u'invalid_client'},
+            self.assertEqual({'error_uri': 'https://tools.ietf.org/html/rfc6749#section-5.2',
+                              'error_description': 'unknown client',
+                              'error': 'invalid_client'},
                                         e.response.json())
 
 
