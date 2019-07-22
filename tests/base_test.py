@@ -9,11 +9,3 @@ class BaseTestCase(unittest.TestCase):
 
     def tearDown(self):
         pass
-
-    def dict_response(self, response):
-        """
-
-        :param response: response object after request
-        :return: dict from response
-        """
-        return json.loads(response)
