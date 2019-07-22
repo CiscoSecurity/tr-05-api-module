@@ -1,5 +1,4 @@
 from .base import BaseAPI
-from ..utils import raise_for_status
 
 
 class InspectAPI(BaseAPI):
@@ -14,5 +13,5 @@ class InspectAPI(BaseAPI):
 
         url = self.absolute_url('/iroh/iroh-inspect/inspect')
         response = self._request.post(url, json=payload)
-        raise_for_status(response)
+
         return response.json()

@@ -1,7 +1,6 @@
 import six
 
 from .base import BaseRequest
-from ..utils import raise_for_status
 
 
 class AuthorizedRequest(BaseRequest):
@@ -38,15 +37,11 @@ class AuthorizedRequest(BaseRequest):
                                       headers=headers,
                                       auth=auth)
 
-        raise_for_status(response)
-
         return response.json()['access_token']
 
     @property
     def _headers(self):
-        return {
-            'Authorization': 'Bearer {}'.format(self._token),
-        }
+        return {'Authorization': 'Bearer {}'.format(self._token)}
 
     def _perform(self, method, url, headers, **kwargs):
         headers.update(self._headers)
