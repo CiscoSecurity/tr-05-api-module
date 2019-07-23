@@ -1,5 +1,5 @@
 from .base import BaseAPI
-from ..api.deliberate import DeliberateAPI
+from .deliberate import DeliberateAPI
 
 
 class EnrichAPI(BaseAPI):
