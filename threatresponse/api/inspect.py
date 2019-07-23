@@ -11,7 +11,4 @@ class InspectAPI(BaseAPI):
         :return: JSON
         """
 
-        url = self.absolute_url('/iroh/iroh-inspect/inspect')
-        response = self._request.post(url, json=payload)
-
-        return response.json()
+        return self._post('/iroh/iroh-inspect/inspect', payload)
