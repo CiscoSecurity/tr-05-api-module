@@ -1,9 +1,9 @@
 import six
 
-from .base import BaseRequest
+from .base import Request
 
 
-class LoggedRequest(BaseRequest):
+class LoggedRequest(Request):
     MESSAGE_FORMAT = '{method} {url} {status_code} {reason_phrase}'
 
     def __init__(self, request, logger):

@@ -1,10 +1,10 @@
 import json
 import requests
 
-from .base import BaseRequest
+from .base import Request
 
 
-class ValidatedRequest(BaseRequest):
+class ValidatedRequest(Request):
     def __init__(self, request):
         self._request = request
 

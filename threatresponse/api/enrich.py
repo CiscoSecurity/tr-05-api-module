@@ -1,8 +1,8 @@
-from .base import BaseAPI
+from .base import API
 from .deliberate import DeliberateAPI
 
 
-class EnrichAPI(BaseAPI):
+class EnrichAPI(API):
     def __init__(self, request):
         super(EnrichAPI, self).__init__(request)
 

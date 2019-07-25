@@ -1,7 +1,7 @@
-from .base import BaseAPI
+from .base import API
 
 
-class InspectAPI(BaseAPI):
+class InspectAPI(API):
 
     def inspect(self, payload):
         """

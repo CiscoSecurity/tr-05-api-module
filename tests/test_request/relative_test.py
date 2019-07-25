@@ -6,7 +6,7 @@ from mock import patch
 
 class RelativeTestCase(BaseTestCase):
 
-    @patch('threatresponse.request.base.BaseRequest')
+    @patch('threatresponse.request.base.Request')
     def test_that_relative_request_builds_correct_parameters(self, mock):
         mock.perform.side_effect = lambda *args, **kwargs: None
 
@@ -15,7 +15,7 @@ class RelativeTestCase(BaseTestCase):
 
         mock.perform.assert_called_once_with('POST', 'http://one.com/two', json={'some': 'data'})
 
-    @patch('threatresponse.request.base.BaseRequest')
+    @patch('threatresponse.request.base.Request')
     def test_that_relative_request_returns_correct_response(self, mock):
         mock.perform.side_effect = lambda *args, **kwargs: 'duck'
 

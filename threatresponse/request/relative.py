@@ -1,9 +1,9 @@
 from six.moves.urllib.parse import urljoin
 
-from .base import BaseRequest
+from .base import Request
 
 
-class RelativeRequest(BaseRequest):
+class RelativeRequest(Request):
     def __init__(self, inner, path):
         self._request = inner
         self._path = path

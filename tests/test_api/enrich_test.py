@@ -6,7 +6,7 @@ from threatresponse.api.enrich import EnrichAPI
 
 class EnrichTestCase(TestCase):
 
-    @patch('threatresponse.request.base.BaseRequest')
+    @patch('threatresponse.request.base.Request')
     def test_health_api(self, request):
         request.post.side_effect = lambda *args, **kwargs: MagicMock()
 
