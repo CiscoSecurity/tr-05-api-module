@@ -1,7 +1,7 @@
 from threatresponse import ThreatResponse
 from tests.base_test import BaseTestCase
 from requests.exceptions import HTTPError
-import mock as mock
+import mock
 
 
 class AuthTestCase(BaseTestCase):
