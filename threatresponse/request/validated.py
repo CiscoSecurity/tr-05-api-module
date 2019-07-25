@@ -10,16 +10,17 @@ class ValidatedRequest(BaseRequest):
 
     def perform(self, method, url, **kwargs):
         response = self._request.perform(method, url, **kwargs)
+        extended = self._extended
 
         try:
             response.raise_for_status()
         except requests.HTTPError as error:
-            raise self.extended(error)
+            raise extended(error)
 
         return response
 
     @staticmethod
-    def extended(error):
+    def _extended(error):
         # Try to extend the default error message with the response payload
         # in order to give the user more insight about what went wrong.
 
