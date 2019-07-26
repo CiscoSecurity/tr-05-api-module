@@ -1,5 +1,6 @@
-from .base import API
+from threatresponse.api.base import API
 from .deliberate import DeliberateAPI
+from .observe import ObserveAPI
 
 
 class EnrichAPI(API):
@@ -7,10 +8,15 @@ class EnrichAPI(API):
         super(EnrichAPI, self).__init__(request)
 
         self._deliberate = DeliberateAPI(request)
+        self._observe = ObserveAPI(request)
 
     @property
     def deliberate(self):
         return self._deliberate
+
+    @property
+    def observe(self):
+        return self._observe
 
     def health(self):
         """
