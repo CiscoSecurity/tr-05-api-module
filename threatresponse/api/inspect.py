@@ -1,8 +1,7 @@
-from .base import BaseAPI
-from ..utils import raise_for_status
+from .base import API
 
 
-class InspectAPI(BaseAPI):
+class InspectAPI(API):
 
     def inspect(self, payload):
         """
@@ -12,7 +11,5 @@ class InspectAPI(BaseAPI):
         :return: JSON
         """
 
-        url = self.absolute_url('/iroh/iroh-inspect/inspect')
-        response = self._request.post(url, json=payload)
-        raise_for_status(response)
-        return response.json()
+        return self._request.post('/iroh/iroh-inspect/inspect',
+                                  json=payload).json()

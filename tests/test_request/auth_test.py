@@ -1,10 +1,12 @@
 from threatresponse import ThreatResponse
 from tests.base_test import BaseTestCase
 from requests.exceptions import HTTPError
-import mock as mock
+import mock
 
 
+# TODO: Provide tests for `AuthorizedRequest` and renamed this file to `authorized_test.py`.
 class AuthTestCase(BaseTestCase):
+
     @mock.patch('requests.Session.request')
     def test_create_instance_with_invalid_credentials(self, request_mock):
         # Testing creation of ThreatResponse instance with invalid credentials.

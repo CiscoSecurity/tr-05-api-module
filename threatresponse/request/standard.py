@@ -1,9 +1,9 @@
 import requests
 
-from .base import BaseRequest
+from .base import Request
 
 
-class StandardRequest(BaseRequest):
+class StandardRequest(Request):
 
     def __init__(self):
         self._session = requests.Session()

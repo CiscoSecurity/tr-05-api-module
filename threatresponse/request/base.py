@@ -1,9 +1,8 @@
 import abc
-
 import six
 
 
-class BaseRequest(six.with_metaclass(abc.ABCMeta, object)):
+class Request(six.with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def perform(self, method, url, **kwargs):
