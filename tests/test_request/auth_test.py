@@ -33,7 +33,7 @@ class AuthTestCase(BaseTestCase):
         request_mock.assert_called_once_with(
             'POST',
             'https://visibility.amp.cisco.com/iroh/oauth2/token',
-            auth=('y', 'x'),
+            auth=('x', 'y'),
             data={'grant_type': 'client_credentials'},
             headers={'Content-Type': 'application/x-www-form-urlencoded',
                      'Accept': 'application/json'},
