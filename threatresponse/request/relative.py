@@ -4,11 +4,11 @@ from .base import Request
 
 
 class RelativeRequest(Request):
-    def __init__(self, inner, path):
-        self._request = inner
-        self._path = path
+    def __init__(self, request, prefix):
+        self._request = request
+        self._prefix = prefix
 
     def perform(self, method, url, **kwargs):
-        url = urljoin(self._path, url)
+        url = urljoin(self._prefix, url)
 
         return self._request.perform(method, url, **kwargs)
