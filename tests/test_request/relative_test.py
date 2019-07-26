@@ -1,7 +1,7 @@
+from mock import patch
+
 from tests.base_test import BaseTestCase
 from threatresponse.request.relative import RelativeRequest
-
-from mock import patch
 
 
 class RelativeTestCase(BaseTestCase):
