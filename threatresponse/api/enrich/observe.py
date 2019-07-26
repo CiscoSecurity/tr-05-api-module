@@ -11,7 +11,8 @@ class ObserveAPI(API):
         :return: JSON
         """
 
-        return self._request.post('/iroh/iroh-enrich/observe/observables', payload).json()
+        return self._request.post('/iroh/iroh-enrich/observe/observables',
+                                  payload).json()
 
     def sighting(self, payload):
         """
@@ -21,7 +22,8 @@ class ObserveAPI(API):
         :return: JSON
         """
 
-        return self._request.post('/iroh/iroh-enrich/observe/sighting', payload).json()
+        return self._request.post('/iroh/iroh-enrich/observe/sighting',
+                                  payload).json()
 
     def sighting_ref(self, payload):
         """
@@ -31,4 +33,5 @@ class ObserveAPI(API):
         :return: JSON
         """
 
-        return self._request.post('/iroh/iroh-enrich/observe/sighting_ref', payload).json()
+        return self._request.post('/iroh/iroh-enrich/observe/sighting_ref',
+                                  payload).json()
