@@ -4,7 +4,7 @@ import requests
 from .base import Request
 
 
-class ValidatedRequest(Request):
+class StrictRequest(Request):
     def __init__(self, request):
         self._request = request
 

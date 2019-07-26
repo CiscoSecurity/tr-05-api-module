@@ -3,14 +3,14 @@ from .api.inspect import InspectAPI
 from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.standard import StandardRequest
-from .request.validated import ValidatedRequest
+from .request.strict import StrictRequest
 from .request.relative import RelativeRequest
 
 
 class ThreatResponse(object):
     def __init__(self, client_id, client_password, **options):
         request = StandardRequest()
-        request = ValidatedRequest(request)
+        request = StrictRequest(request)
 
         if options.get('logger'):
             request = LoggedRequest(request, options['logger'])

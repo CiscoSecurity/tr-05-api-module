@@ -3,7 +3,7 @@ from mock import patch
 
 
 # TODO.
-class ValidatedTestCase(TestCase):
+class StrictTestCase(TestCase):
 
     @patch('threatresponse.request.base.Request')
     def test(self, mock):
