@@ -5,8 +5,6 @@ from threatresponse.request.relative import RelativeRequest
 
 @patch('threatresponse.request.base.Request')
 def test_that_relative_request_builds_correct_parameters(mock):
-    mock.perform.side_effect = lambda *args, **kwargs: None
-
     request = RelativeRequest(mock, 'http://one.com')
     request.post('/two', json={'some': 'data'})
 
@@ -15,7 +13,7 @@ def test_that_relative_request_builds_correct_parameters(mock):
 
 @patch('threatresponse.request.base.Request')
 def test_that_relative_request_returns_correct_response(mock):
-    mock.perform.side_effect = lambda *args, **kwargs: 'duck'
+    mock.perform.return_value = 'duck'
 
     request = RelativeRequest(mock, 'http://one.com')
     response = request.post('/two')
