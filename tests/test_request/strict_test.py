@@ -31,6 +31,8 @@ def test_that_strict_request_raises_error_when_responded_with_error_code(request
         strict = StrictRequest(request)
         strict.post('/some')
 
+    response.raise_for_status.assert_called_once()
+
 
 @patch(Request)
 def test_that_strict_request_not_raises_error_when_responded_ok(request):
@@ -40,5 +42,9 @@ def test_that_strict_request_not_raises_error_when_responded_ok(request):
     response = Mock()
     response.raise_for_status.side_effect = raise_for_status
 
+    request.perform.return_value = response
+
     strict = StrictRequest(request)
     strict.post('/some')
+
+    response.raise_for_status.assert_called_once()
