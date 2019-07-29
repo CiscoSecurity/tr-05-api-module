@@ -1,9 +1,13 @@
 import six
 
-from .base import BaseRequest
+from .base import Request
 
 
-class LoggedRequest(BaseRequest):
+class LoggedRequest(Request):
+    """
+    Logs every response of inner request.
+    """
+
     MESSAGE_FORMAT = '{method} {url} {status_code} {reason_phrase}'
 
     def __init__(self, request, logger):
@@ -17,9 +21,9 @@ class LoggedRequest(BaseRequest):
             self._log_error(method, url)
             raise
 
-        if response.ok:  # 100 <= code < 400
+        if response.ok:  # 100 <= code < 400.
             self._log_success(method, url, response)
-        else:  # 400 <= code < 600
+        else:  # 400 <= code < 600.
             self._log_error(method, url, response)
 
         return response
@@ -41,12 +45,14 @@ class LoggedRequest(BaseRequest):
 
     def _log_success(self, method, url, response):
         message = self._format(method, url, response)
+
         self._logger.info(message)
 
     def _log_error(self, method, url, response=None):
         message = self._format(method, url, response)
+
         if response is None:
-            # The same as .error(), but also includes the current traceback
+            # The same as .error(), but also includes the current traceback.
             self._logger.exception(message)
         else:
             self._logger.error(message)

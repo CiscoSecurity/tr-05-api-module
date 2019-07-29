@@ -1,9 +1,12 @@
 import requests
 
-from .base import BaseRequest
+from .base import Request
 
 
-class StandardRequest(BaseRequest):
+class StandardRequest(Request):
+    """
+    Performs plain HTTP requests using the `requests` library.
+    """
 
     def __init__(self):
         self._session = requests.Session()
