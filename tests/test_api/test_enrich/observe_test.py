@@ -15,7 +15,7 @@ class ObserveTestCase(TestCase):
         api.observables(payload)
 
         request.post.assert_called_once_with(
-            '/iroh/iroh-enrich/observe/observables', payload)
+            '/iroh/iroh-enrich/observe/observables', json=payload)
 
     @patch('threatresponse.request.base.Request')
     def test_sighting(self, request):
@@ -26,7 +26,7 @@ class ObserveTestCase(TestCase):
         api.sighting(payload)
 
         request.post.assert_called_once_with(
-            '/iroh/iroh-enrich/observe/sighting', payload)
+            '/iroh/iroh-enrich/observe/sighting', json=payload)
 
     @patch('threatresponse.request.base.Request')
     def test_sighting_ref(self, request):
@@ -37,4 +37,4 @@ class ObserveTestCase(TestCase):
         api.sighting_ref(payload)
 
         request.post.assert_called_once_with(
-            '/iroh/iroh-enrich/observe/sighting_ref', payload)
+            '/iroh/iroh-enrich/observe/sighting_ref', json=payload)

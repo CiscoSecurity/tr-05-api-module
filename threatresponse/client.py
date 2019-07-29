@@ -1,4 +1,4 @@
-from .api.enrich import EnrichAPI
+from threatresponse.api.enrich import EnrichAPI
 from .api.inspect import InspectAPI
 from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest

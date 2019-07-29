@@ -1,4 +1,4 @@
-from threatresponse.api.base import API
+from ...api.base import API
 
 
 class ObserveAPI(API):
@@ -12,7 +12,7 @@ class ObserveAPI(API):
         """
 
         return self._request.post('/iroh/iroh-enrich/observe/observables',
-                                  payload).json()
+                                  json=payload).json()
 
     def sighting(self, payload):
         """
@@ -23,7 +23,7 @@ class ObserveAPI(API):
         """
 
         return self._request.post('/iroh/iroh-enrich/observe/sighting',
-                                  payload).json()
+                                  json=payload).json()
 
     def sighting_ref(self, payload):
         """
@@ -34,4 +34,4 @@ class ObserveAPI(API):
         """
 
         return self._request.post('/iroh/iroh-enrich/observe/sighting_ref',
-                                  payload).json()
+                                  json=payload).json()

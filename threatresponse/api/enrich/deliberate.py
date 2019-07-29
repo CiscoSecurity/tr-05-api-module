@@ -1,4 +1,4 @@
-from threatresponse.api.base import API
+from ...api.base import API
 
 
 class DeliberateAPI(API):
