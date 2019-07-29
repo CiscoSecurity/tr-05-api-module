@@ -1,4 +1,4 @@
-from mock import MagicMock, Mock
+from mock import MagicMock
 from six.moves.http_client import UNAUTHORIZED
 
 from threatresponse.request.authorized import AuthorizedRequest
@@ -23,6 +23,7 @@ def test_that_authorized_request_provides_header_with_token():
 
 def test_that_authorized_request_retrieves_token_on_init():
     request = MagicMock()
+
     AuthorizedRequest(request, 'x', 'y')
 
     request.post.assert_called_once_with(
@@ -37,7 +38,7 @@ def test_that_authorized_request_retrieves_token_on_init():
 
 
 def test_that_authorized_request_retrieves_token_on_expiration():
-    response = Mock()
+    response = MagicMock()
     response.status_code = UNAUTHORIZED
 
     request = MagicMock()
@@ -55,7 +56,7 @@ def test_that_authorized_request_retrieves_token_on_expiration():
 
 
 def token(bearer):
-    mocked = Mock()
+    mocked = MagicMock()
     mocked.json.return_value = {'access_token': bearer}
 
     return mocked

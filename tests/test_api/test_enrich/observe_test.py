@@ -4,9 +4,9 @@ from threatresponse.api.enrich.observe import ObserveAPI
 
 
 def test_observables():
+    request = MagicMock()
     payload = [{'foo': 'bar'}]
 
-    request = MagicMock()
     api = ObserveAPI(request)
     api.observables(payload)
 
@@ -15,9 +15,9 @@ def test_observables():
 
 
 def test_sighting():
+    request = MagicMock()
     payload = {'foo': 'bar'}
 
-    request = MagicMock()
     api = ObserveAPI(request)
     api.sighting(payload)
 
@@ -26,9 +26,9 @@ def test_sighting():
 
 
 def test_sighting_ref():
+    request = MagicMock()
     payload = 'foo'
 
-    request = MagicMock()
     api = ObserveAPI(request)
     api.sighting_ref(payload)
 

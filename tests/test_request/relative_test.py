@@ -5,6 +5,7 @@ from threatresponse.request.relative import RelativeRequest
 
 def test_that_relative_request_invokes_inner_request():
     inner_request = MagicMock()
+
     request = RelativeRequest(inner_request, 'http://one.com')
     request.post('/two')
 
@@ -13,6 +14,7 @@ def test_that_relative_request_invokes_inner_request():
 
 def test_that_relative_request_builds_correct_parameters():
     inner_request = MagicMock()
+
     request = RelativeRequest(inner_request, 'http://one.com')
     request.post('/two', json={'some': 'data'})
 
