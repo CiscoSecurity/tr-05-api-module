@@ -4,6 +4,10 @@ from .base import Request
 
 
 class LoggedRequest(Request):
+    """
+    Logs every response of inner request.
+    """
+
     MESSAGE_FORMAT = '{method} {url} {status_code} {reason_phrase}'
 
     def __init__(self, request, logger):

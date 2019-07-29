@@ -4,6 +4,9 @@ from .base import Request
 
 
 class StandardRequest(Request):
+    """
+    Performs plain HTTP requests using the `requests` library.
+    """
 
     def __init__(self):
         self._session = requests.Session()

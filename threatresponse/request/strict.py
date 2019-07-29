@@ -5,6 +5,10 @@ from .base import Request
 
 
 class StrictRequest(Request):
+    """
+    Raises `HTTPError` in case if inner request returns a response with an error code.
+    """
+
     def __init__(self, request):
         self._request = request
 
