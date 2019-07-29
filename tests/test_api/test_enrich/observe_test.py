@@ -1,38 +1,36 @@
-from unittest import TestCase
+from mock import MagicMock
 
 from threatresponse.api.enrich.observe import ObserveAPI
-from threatresponse.request.base import Request
-from ...common import patch
 
 
-class ObserveTestCase(TestCase):
+def test_observables():
+    payload = [{'foo': 'bar'}]
 
-    @patch(Request)
-    def test_observables(self, request):
-        payload = [{'foo': 'bar'}]
+    request = MagicMock()
+    api = ObserveAPI(request)
+    api.observables(payload)
 
-        api = ObserveAPI(request)
-        api.observables(payload)
+    request.post.assert_called_once_with(
+        '/iroh/iroh-enrich/observe/observables', json=payload)
 
-        request.post.assert_called_once_with(
-            '/iroh/iroh-enrich/observe/observables', json=payload)
 
-    @patch(Request)
-    def test_sighting(self, request):
-        payload = {'foo': 'bar'}
+def test_sighting():
+    payload = {'foo': 'bar'}
 
-        api = ObserveAPI(request)
-        api.sighting(payload)
+    request = MagicMock()
+    api = ObserveAPI(request)
+    api.sighting(payload)
 
-        request.post.assert_called_once_with(
-            '/iroh/iroh-enrich/observe/sighting', json=payload)
+    request.post.assert_called_once_with(
+        '/iroh/iroh-enrich/observe/sighting', json=payload)
 
-    @patch(Request)
-    def test_sighting_ref(self, request):
-        payload = 'foo'
 
-        api = ObserveAPI(request)
-        api.sighting_ref(payload)
+def test_sighting_ref():
+    payload = 'foo'
 
-        request.post.assert_called_once_with(
-            '/iroh/iroh-enrich/observe/sighting_ref', json=payload)
+    request = MagicMock()
+    api = ObserveAPI(request)
+    api.sighting_ref(payload)
+
+    request.post.assert_called_once_with(
+        '/iroh/iroh-enrich/observe/sighting_ref', json=payload)

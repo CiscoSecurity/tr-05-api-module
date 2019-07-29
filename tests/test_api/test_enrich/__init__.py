@@ -1,10 +1,10 @@
+from mock import MagicMock
+
 from threatresponse.api.enrich import EnrichAPI
-from threatresponse.request.base import Request
-from ...common import patch
 
 
-@patch(Request)
-def test_health_api(request):
+def test_health_api():
+    request = MagicMock()
     api = EnrichAPI(request)
     api.health()
 
