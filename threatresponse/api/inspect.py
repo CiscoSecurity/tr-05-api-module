@@ -2,6 +2,7 @@ from .base import API
 
 
 class InspectAPI(API):
+
     def inspect(self, payload):
         """
         https://visibility.amp.cisco.com/iroh/iroh-inspect/index.html#!/INSPECT/post_iroh_iroh_inspect_inspect

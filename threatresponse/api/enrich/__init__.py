@@ -4,6 +4,7 @@ from .observe import ObserveAPI
 
 
 class EnrichAPI(API):
+
     def __init__(self, request):
         super(EnrichAPI, self).__init__(request)
 
