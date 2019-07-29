@@ -1,4 +1,4 @@
-from .base import API
+from ..base import API
 
 
 class DeliberateAPI(API):
