@@ -17,7 +17,7 @@ def test_that_strict_request_invokes_inner_request(request):
 
 
 @patch(Request)
-def test_that_strict_request_raises_error_when_responded_error(request):
+def test_that_strict_request_raises_error_when_responded_with_error_code(request):
     def raise_for_status():
         raise HTTPError('Error message.', response=response)
 
