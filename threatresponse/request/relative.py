@@ -4,6 +4,10 @@ from .base import Request
 
 
 class RelativeRequest(Request):
+    """
+    Performs requests relative to provided `prefix`.
+    """
+
     def __init__(self, request, prefix):
         self._request = request
         self._prefix = prefix

@@ -4,6 +4,10 @@ from .base import Request
 
 
 class AuthorizedRequest(Request):
+    """
+    Provides authorization header for inner request.
+    """
+
     TOKEN_URL = 'https://visibility.amp.cisco.com/iroh/oauth2/token'
 
     def __init__(self, request, client_id, client_password):

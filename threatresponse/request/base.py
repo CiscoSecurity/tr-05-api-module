@@ -4,6 +4,9 @@ import six
 
 
 class Request(six.with_metaclass(abc.ABCMeta, object)):
+    """
+    Interface for performing HTTP requests.
+    """
 
     @abc.abstractmethod
     def perform(self, method, url, **kwargs):

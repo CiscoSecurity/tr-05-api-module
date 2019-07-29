@@ -1,25 +1,30 @@
-from mock import patch
+from ..common import patch
 
-from tests.base_test import BaseTestCase
+from threatresponse.request.base import Request
 from threatresponse.request.relative import RelativeRequest
 
 
-class RelativeTestCase(BaseTestCase):
+@patch(Request)
+def test_that_relative_request_invokes_inner_request(mock):
+    request = RelativeRequest(mock, 'http://one.com')
+    request.post('/two')
 
-    @patch('threatresponse.request.base.Request')
-    def test_that_relative_request_builds_correct_parameters(self, mock):
-        mock.perform.side_effect = lambda *args, **kwargs: None
+    mock.perform.assert_called_once()
 
-        request = RelativeRequest(mock, 'http://one.com')
-        request.post('/two', json={'some': 'data'})
 
-        mock.perform.assert_called_once_with('POST', 'http://one.com/two', json={'some': 'data'})
+@patch(Request)
+def test_that_relative_request_builds_correct_parameters(mock):
+    request = RelativeRequest(mock, 'http://one.com')
+    request.post('/two', json={'some': 'data'})
 
-    @patch('threatresponse.request.base.Request')
-    def test_that_relative_request_returns_correct_response(self, mock):
-        mock.perform.side_effect = lambda *args, **kwargs: 'duck'
+    mock.perform.assert_called_once_with('POST', 'http://one.com/two', json={'some': 'data'})
 
-        request = RelativeRequest(mock, 'http://one.com')
-        response = request.post('/two')
 
-        self.assertEqual(response, 'duck')
+@patch(Request)
+def test_that_relative_request_returns_correct_response(mock):
+    mock.perform.return_value = 'duck'
+
+    request = RelativeRequest(mock, 'http://one.com')
+    response = request.post('/two')
+
+    assert response == 'duck'
