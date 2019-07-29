@@ -1,16 +1,11 @@
-from unittest import TestCase
-from mock import patch, MagicMock
-
 from threatresponse.api.enrich import EnrichAPI
+from threatresponse.request.base import Request
+from ...common import patch
 
 
-class EnrichTestCase(TestCase):
+@patch(Request)
+def test_health_api(request):
+    api = EnrichAPI(request)
+    api.health()
 
-    @patch('threatresponse.request.base.Request')
-    def test_health_api(self, request):
-        request.post.side_effect = lambda *args, **kwargs: MagicMock()
-
-        api = EnrichAPI(request)
-        api.health()
-
-        request.post.assert_called_once_with('/iroh/iroh-enrich/health')
+    request.post.assert_called_once_with('/iroh/iroh-enrich/health')

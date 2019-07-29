@@ -1,11 +1,10 @@
 import pytest
-from requests import HTTPError
 from mock import Mock
-
-from ..common import patch
+from requests import HTTPError
 
 from threatresponse.request.base import Request
 from threatresponse.request.strict import StrictRequest
+from ..common import patch
 
 
 @patch(Request)

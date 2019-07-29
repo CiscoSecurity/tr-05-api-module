@@ -1,10 +1,9 @@
-from six.moves.http_client import UNAUTHORIZED
 from mock import Mock
+from six.moves.http_client import UNAUTHORIZED
 
-from ..common import patch
-
-from threatresponse.request.base import Request
 from threatresponse.request.authorized import AuthorizedRequest
+from threatresponse.request.base import Request
+from ..common import patch
 
 
 @patch(Request)

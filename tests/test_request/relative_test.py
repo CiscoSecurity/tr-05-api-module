@@ -1,7 +1,6 @@
-from ..common import patch
-
 from threatresponse.request.base import Request
 from threatresponse.request.relative import RelativeRequest
+from ..common import patch
 
 
 @patch(Request)
