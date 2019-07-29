@@ -10,7 +10,8 @@ class ReferAPI(API):
         :param payload: JSON
         :return: JSON
         """
-        return self._request.post('/iroh/iroh-enrich/refer/observables', json=payload).json()
+        return self._request.post('/iroh/iroh-enrich/refer/observables',
+                                  json=payload).json()
 
     def sighting(self, payload):
         """
@@ -19,7 +20,8 @@ class ReferAPI(API):
         :param payload: JSON
         :return: JSON
         """
-        return self._request.post('/iroh/iroh-enrich/refer/sighting', json=payload).json()
+        return self._request.post('/iroh/iroh-enrich/refer/sighting',
+                                  json=payload).json()
 
     def sighting_ref(self, payload):
         """
@@ -28,4 +30,5 @@ class ReferAPI(API):
         :param payload: JSON
         :return: JSON
         """
-        return self._request.post('/iroh/iroh-enrich/refer/sighting_ref', json=payload).json()
+        return self._request.post('/iroh/iroh-enrich/refer/sighting_ref',
+                                  json=payload).json()
