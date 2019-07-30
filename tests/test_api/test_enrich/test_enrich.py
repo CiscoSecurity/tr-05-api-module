@@ -4,6 +4,7 @@ from threatresponse.api.enrich import (
     EnrichAPI,
     DeliberateAPI,
     ObserveAPI,
+    ReferAPI,
 )
 
 
@@ -14,6 +15,7 @@ def test_composite_structure():
 
     assert isinstance(api.deliberate, DeliberateAPI)
     assert isinstance(api.observe, ObserveAPI)
+    assert isinstance(api.refer, ReferAPI)
 
 
 def test_health():
