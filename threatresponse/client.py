@@ -11,11 +11,11 @@ class ThreatResponse(object):
 
     def __init__(self, client_id, client_password, **options):
         request = StandardRequest()
-        request = StrictRequest(request)
 
         if options.get('logger'):
             request = LoggedRequest(request, options['logger'])
 
+        request = StrictRequest(request)
         request = AuthorizedRequest(request, client_id, client_password)
         request = RelativeRequest(request, 'https://visibility.amp.cisco.com/')
 
