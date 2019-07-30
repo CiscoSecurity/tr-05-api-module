@@ -18,7 +18,9 @@ def test_that_relative_request_builds_correct_parameters():
     request = RelativeRequest(inner_request, 'http://one.com')
     request.post('/two', json={'some': 'data'})
 
-    inner_request.perform.assert_called_once_with('POST', 'http://one.com/two', json={'some': 'data'})
+    inner_request.perform.assert_called_once_with(
+        'POST', 'http://one.com/two', json={'some': 'data'}
+    )
 
 
 def test_that_relative_request_returns_correct_response():
