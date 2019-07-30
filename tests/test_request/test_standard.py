@@ -4,16 +4,17 @@ from threatresponse.request.standard import StandardRequest
 
 
 @patch('requests.Session.request')
-def test_perform(mock):
+def test_that_standard_request_simply_wraps_session(inner_session_request):
     request = StandardRequest()
-    request.perform(
-        'POST', '/foo/bar',
+    request.post(
+        '/foo/bar',
         json={'spam': 'eggs'},
         headers={'Threat': 'Response'},
     )
 
-    mock.assert_called_once_with(
-        'POST', '/foo/bar',
+    inner_session_request.assert_called_once_with(
+        'POST',
+        '/foo/bar',
         json={'spam': 'eggs'},
         headers={'Threat': 'Response'},
     )
