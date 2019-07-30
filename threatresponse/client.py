@@ -8,6 +8,7 @@ from .request.relative import RelativeRequest
 
 
 class ThreatResponse(object):
+
     def __init__(self, client_id, client_password, **options):
         request = StandardRequest()
         request = StrictRequest(request)
