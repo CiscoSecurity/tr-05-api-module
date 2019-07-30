@@ -1,5 +1,6 @@
 from .deliberate import DeliberateAPI
 from .observe import ObserveAPI
+from .refer import ReferAPI
 from ..base import API
 
 
@@ -10,6 +11,7 @@ class EnrichAPI(API):
 
         self._deliberate = DeliberateAPI(request)
         self._observe = ObserveAPI(request)
+        self._refer = ReferAPI(request)
 
     @property
     def deliberate(self):
@@ -18,6 +20,10 @@ class EnrichAPI(API):
     @property
     def observe(self):
         return self._observe
+
+    @property
+    def refer(self):
+        return self._refer
 
     def health(self):
         """
