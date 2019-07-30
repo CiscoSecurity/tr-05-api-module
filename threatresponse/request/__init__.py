@@ -1,0 +1,6 @@
+# Make the classes below importable from the `.request` subpackage directly.
+from .authorized import AuthorizedRequest
+from .logged import LoggedRequest
+from .relative import RelativeRequest
+from .standard import StandardRequest
+from .strict import StrictRequest
