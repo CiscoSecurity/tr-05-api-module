@@ -1,7 +1,8 @@
-from .base import API
+from ...api.base import API
 
 
 class DeliberateAPI(API):
+
     def observables(self, payload):
         """
         https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Deliberate/post_iroh_iroh_enrich_deliberate_observables

@@ -1,30 +1,28 @@
 import pytest
+from mock import MagicMock
 from requests import HTTPError
-from mock import Mock
 
-from ..common import patch
-
-from threatresponse.request.base import Request
 from threatresponse.request.strict import StrictRequest
 
 
-@patch(Request)
-def test_that_strict_request_invokes_inner_request(request):
+def test_that_strict_request_invokes_inner_request():
+    request = MagicMock()
+
     strict = StrictRequest(request)
     strict.post('/some')
 
     request.perform.assert_called_once_with('POST', '/some')
 
 
-@patch(Request)
-def test_that_strict_request_raises_error_when_responded_with_error_code(request):
+def test_that_strict_request_raises_error_when_responded_with_error_code():
     def raise_for_status():
         raise HTTPError('Error message.', response=response)
 
-    response = Mock()
+    response = MagicMock()
     response.raise_for_status.side_effect = raise_for_status
     response.json.return_value = {'error': 'occurred'}
 
+    request = MagicMock()
     request.perform.return_value = response
 
     with pytest.raises(HTTPError):
@@ -34,14 +32,14 @@ def test_that_strict_request_raises_error_when_responded_with_error_code(request
     response.raise_for_status.assert_called_once()
 
 
-@patch(Request)
-def test_that_strict_request_not_raises_error_when_responded_ok(request):
+def test_that_strict_request_not_raises_error_when_responded_ok():
     def raise_for_status():
         return
 
-    response = Mock()
+    response = MagicMock()
     response.raise_for_status.side_effect = raise_for_status
 
+    request = MagicMock()
     request.perform.return_value = response
 
     strict = StrictRequest(request)
