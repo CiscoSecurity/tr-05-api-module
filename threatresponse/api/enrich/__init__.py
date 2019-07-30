@@ -1,6 +1,6 @@
-from ...api.base import API
 from .deliberate import DeliberateAPI
 from .observe import ObserveAPI
+from ..base import API
 
 
 class EnrichAPI(API):
