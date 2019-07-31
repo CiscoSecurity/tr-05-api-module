@@ -8,7 +8,7 @@ from threatresponse.api.enrich import (
 )
 
 
-def test_composite_structure():
+def test_types_of_inner_apis():
     request = MagicMock()
 
     api = EnrichAPI(request)

@@ -10,12 +10,20 @@ from threatresponse.client import ThreatResponse
 
 
 @patch('requests.Session.request')
+def test_types_of_inner_apis(_):
+    client = ThreatResponse('CLIENT_ID', 'CLIENT_PASSWORD')
+
+    assert isinstance(client.inspect, InspectAPI)
+    assert isinstance(client.enrich, EnrichAPI)
+
+
+@patch('requests.Session.request')
 def test_that_client_with_valid_credentials_succeeds(inner_session_request):
     inner_session_request.return_value = auth_response(200)
 
     logger = MagicMock()
 
-    client = ThreatResponse(
+    ThreatResponse(
         client_id='CLIENT_ID',
         client_password='CLIENT_PASSWORD',
         logger=logger,
@@ -29,9 +37,6 @@ def test_that_client_with_valid_credentials_succeeds(inner_session_request):
     logger.info.assert_called_once_with(
         'POST https://visibility.amp.cisco.com/iroh/oauth2/token 200 OK'
     )
-
-    assert isinstance(client.inspect, InspectAPI)
-    assert isinstance(client.enrich, EnrichAPI)
 
 
 @patch('requests.Session.request')
@@ -67,9 +72,9 @@ def auth_response(status_code):
         mocked.json.return_value = {'access_token': 'ACCESS_TOKEN'}
 
     else:
-        mocked.json.return_value = {'error': 'ERROR'}
-
         error = HTTPError('Some error message here.', response=mocked)
+
+        mocked.json.return_value = {'error': 'ERROR'}
         mocked.raise_for_status.side_effect = error
 
     return mocked
