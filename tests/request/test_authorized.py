@@ -37,7 +37,7 @@ def test_that_authorized_request_retrieves_token_on_init():
     )
 
 
-def test_that_authorized_request_retrieves_token_on_expiration():
+def test_that_authorized_request_retrieves_token_on_expiration_and_retries():
     response = MagicMock()
     response.status_code = UNAUTHORIZED
 
@@ -52,6 +52,12 @@ def test_that_authorized_request_retrieves_token_on_expiration():
     assert (
         request.post.call_args_list[0] ==
         request.post.call_args_list[1]
+    )
+
+    assert request.perform.call_count == 2
+    assert (
+        request.perform.call_args_list[0] ==
+        request.perform.call_args_list[1]
     )
 
 
