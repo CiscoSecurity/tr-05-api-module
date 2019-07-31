@@ -13,7 +13,9 @@ def test_observables():
     api = ReferAPI(request)
     api.observables(payload)
 
-    request.post.assert_called_once_with('/iroh/iroh-enrich/refer/observables', json=payload)
+    request.post.assert_called_once_with(
+        '/iroh/iroh-enrich/refer/observables', json=payload
+    )
 
 
 def test_sighting():
@@ -23,7 +25,9 @@ def test_sighting():
     api = ReferAPI(request)
     api.sighting(payload)
 
-    request.post.assert_called_once_with('/iroh/iroh-enrich/refer/sighting', json=payload)
+    request.post.assert_called_once_with(
+        '/iroh/iroh-enrich/refer/sighting', json=payload
+    )
 
 
 def test_sighting_ref():
@@ -33,4 +37,6 @@ def test_sighting_ref():
     api = ReferAPI(request)
     api.sighting_ref(payload)
 
-    request.post.assert_called_once_with('/iroh/iroh-enrich/refer/sighting_ref', json=payload)
+    request.post.assert_called_once_with(
+        '/iroh/iroh-enrich/refer/sighting_ref', json=payload
+    )
