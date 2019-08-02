@@ -1,5 +1,5 @@
 # Make the main class importable from the root package directly.
 from .client import ThreatResponse
 
-
-__version__ = '0.1.0'
+# Load the current version meta-attribute into the package.
+from .version import __version__

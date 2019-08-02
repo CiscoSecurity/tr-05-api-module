@@ -1,6 +1,13 @@
+import re
 import setuptools
 
-import threatresponse
+
+def read_version():
+    with open('threatresponse/version.py', 'r') as fin:
+        return re.search(
+            r"^__version__ = '(?P<version>.+)'$",
+            fin.read().strip(),
+        ).group('version')
 
 
 def read_requirements():
@@ -22,11 +29,11 @@ AUTHOR = 'Cisco'
 
 URL = 'https://github.com/CiscoSecurity/tr-05-api-module'
 
-VERSION = threatresponse.__version__
+VERSION = read_version()
 
 INSTALL_REQUIRES = read_requirements()
 
-PACKAGES = setuptools.find_packages()
+PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'])
 
 KEYWORDS = ['python', 'threat', 'response', 'api', 'client']
 
