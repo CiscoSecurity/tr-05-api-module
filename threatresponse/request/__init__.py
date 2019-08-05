@@ -2,5 +2,5 @@
 from .authorized import AuthorizedRequest
 from .logged import LoggedRequest
 from .relative import RelativeRequest
+from .response import Response
 from .standard import StandardRequest
-from .strict import StrictRequest
