@@ -17,7 +17,9 @@ class Response(object):
         return getattr(self._response, key)
 
     def __setattr__(self, key, value):
-        # Antidote against infinite recursion.
+        # This is an antidote against infinite recursion:
+        # in order to use self._response for redirecting calls,
+        # make sure to set the '_response' attribute directly first.
         if key == '_response':
             super(Response, self).__setattr__(key, value)
         else:
