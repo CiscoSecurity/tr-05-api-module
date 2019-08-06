@@ -1,4 +1,5 @@
 import pytest
+import six
 from mock import MagicMock
 from requests import HTTPError
 
@@ -34,7 +35,7 @@ def test_that_raise_for_status_extends_error_message():
     assert error.args == (
         'Something went wrong.\n'
         '{\n'
-        '    "foo": "bar",\n'
+        '    "foo": "bar",' + (' ' if six.PY2 else '') + '\n'
         '    "spam": [\n'
         '        "eggs"\n'
         '    ]\n'
