@@ -44,7 +44,7 @@ class Response(object):
             return error
 
         message = error.args[0]  # 1-element tuple.
-        message += '\n' + json.dumps(payload, indent=4)
+        message += '\n' + json.dumps(payload, indent=4, sort_keys=True)
 
         error.args = (message,)
 
