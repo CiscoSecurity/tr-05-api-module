@@ -1,6 +1,7 @@
 import requests
 
 from .base import Request
+from .response import Response
 
 
 class StandardRequest(Request):
@@ -12,4 +13,4 @@ class StandardRequest(Request):
         self._session = requests.Session()
 
     def perform(self, method, url, **kwargs):
-        return self._session.request(method, url, **kwargs)
+        return Response(self._session.request(method, url, **kwargs))

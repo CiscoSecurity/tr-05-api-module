@@ -41,7 +41,9 @@ class AuthorizedRequest(Request):
                                       headers=headers,
                                       auth=auth)
 
-        return response.json()['access_token']
+        response.raise_for_status()
+
+        return response.json()['access_token']  # OK
 
     @property
     def _headers(self):

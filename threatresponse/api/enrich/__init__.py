@@ -9,9 +9,9 @@ class EnrichAPI(API):
     def __init__(self, request):
         super(EnrichAPI, self).__init__(request)
 
-        self._deliberate = DeliberateAPI(request)
-        self._observe = ObserveAPI(request)
-        self._refer = ReferAPI(request)
+        self._deliberate = DeliberateAPI(self._request)
+        self._observe = ObserveAPI(self._request)
+        self._refer = ReferAPI(self._request)
 
     @property
     def deliberate(self):
@@ -30,4 +30,6 @@ class EnrichAPI(API):
         https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Health/post_iroh_iroh_enrich_health
         """
 
-        return self._request.post('/iroh/iroh-enrich/health').json()
+        response = self._request.post('/iroh/iroh-enrich/health')
+        response.raise_for_status()
+        return response.json()
