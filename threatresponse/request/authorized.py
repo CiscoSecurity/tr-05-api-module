@@ -8,8 +8,6 @@ class AuthorizedRequest(Request):
     Provides authorization header for inner request.
     """
 
-    TOKEN_URL = 'https://visibility.amp.cisco.com/iroh/oauth2/token'
-
     def __init__(self, request, client_id, client_password):
         self._request = request
         self._client_id = client_id
@@ -36,7 +34,7 @@ class AuthorizedRequest(Request):
                    'Accept': 'application/json'}
         auth = (self._client_id, self._client_password)  # HTTP Basic Auth
 
-        response = self._request.post(self.TOKEN_URL,
+        response = self._request.post('/iroh/oauth2/token',
                                       data=data,
                                       headers=headers,
                                       auth=auth)
