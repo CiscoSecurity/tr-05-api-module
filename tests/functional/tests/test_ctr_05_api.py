@@ -1,16 +1,16 @@
 import pytest
 
 from ctrlibrary.core import settings
-from tests.functional.framework import token
+from ctrlibrary.threatresponse import token
 from ctrlibrary.core.datafactory import gen_sha256, gen_string
 from ctrlibrary.core.utils import get_observables
-from tests.functional.framework.inspect import inspect
-from tests.functional.framework.enrich import (
+from ctrlibrary.threatresponse.inspect import inspect
+from ctrlibrary.threatresponse.enrich import (
     enrich_deliberate_observables,
     enrich_observe_observables,
     enrich_refer_observables
 )
-from tests.functional.framework.tr_client import PythonModuleClient
+from threatresponse import ThreatResponse
 
 
 @pytest.fixture(scope='module')
@@ -26,8 +26,10 @@ def module_headers(module_token):
 
 @pytest.fixture(scope='module')
 def module_tool_client():
-    return PythonModuleClient(
-        settings.server.ctr_client_id, settings.server.ctr_client_password)
+    return ThreatResponse(
+        client_id=settings.server.ctr_client_id,
+        client_password=settings.server.ctr_client_password
+    )
 
 
 def test_ctr_positive_smoke_inspect(module_headers):
@@ -76,7 +78,8 @@ def test_ctr_positive_tool_inspect(module_headers, module_tool_client):
         payload={'content': request_content},
         **{'headers': module_headers}
     )
-    tool_response = module_tool_client.inspect(request_content)
+    tool_response = module_tool_client.inspect.inspect(
+        {'content': request_content})
     assert direct_response[0]['value'] == tool_response[0]['value']
     assert direct_response[0]['type'] == tool_response[0]['type']
     assert tool_response[0]['value'] == request_content
@@ -107,7 +110,7 @@ def test_ctr_positive_tool_enrich_observe_observables(
         payload=[{'type': 'sha256', 'value': data}],
         **{'headers': module_headers}
     )['data']
-    tool_response = module_tool_client.enrich_observe_observables(
+    tool_response = module_tool_client.enrich.observe.observables(
         [{'type': 'sha256', 'value': data}])['data']
     direct_observables = get_observables(response, 'VirusTotal')
     tool_observables = get_observables(tool_response, 'VirusTotal')
@@ -145,7 +148,7 @@ def test_ctr_positive_tool_enrich_deliberate_observables(
         payload=[{'type': 'sha256', 'value': data}],
         **{'headers': module_headers}
     )['data']
-    tool_response = module_tool_client.enrich_deliberate_observables(
+    tool_response = module_tool_client.enrich.deliberate.observables(
         [{'type': 'sha256', 'value': data}])['data']
     direct_observables = get_observables(response, 'VirusTotal')
     tool_observables = get_observables(tool_response, 'VirusTotal')
@@ -182,7 +185,7 @@ def test_ctr_positive_tool_enrich_refer_observables(
         payload=[{'type': 'domain', 'value': request_content}],
         **{'headers': module_headers}
     )['data'][0]
-    tool_response = module_tool_client.enrich_refer_observables(
+    tool_response = module_tool_client.enrich.refer.observables(
         [{'type': 'domain', 'value': request_content}])['data'][0]
     assert tool_response['module']
     assert tool_response['title'] == 'Search for this domain'
