@@ -14,5 +14,7 @@ script:
 - pytest threatresponse --pep8
 - pytest -v
 before_install:
-- openssl aes-256-cbc -K $encrypted_2f6fb0cb339e_key -iv $encrypted_2f6fb0cb339e_iv
-  -in id_rsa.enc -out ~/.ssh/id_rsa -d
+- openssl aes-256-cbc -k "$travis_key_password" -d -md sha256 -a -in travis_key.enc -out ~/.ssh/id_rsa
+- chmod 400 ~/.ssh/id_rsa
+env:
+  secure: YEZ1yR/Cqz6Sev2RkLO5yClsp5IINfl36sw9qfTaSKdaQGpSxD8zpvBi+RGKDHBDScUFLhNxtTgCnDJ93n1v4DisFF8jH0IEFud2RfPWnvYLl4qTeBfTB348amKjPfixiY3I8QQefVNWMCQS587dr1FpVoAastjwHWAk1TZrN/d/laDr9nPQBMdtfXu9XEfUlxvlMCmLkfdXALjq4hq1SZgrGoJb6UiYH3CyfECnbE++8/aHJ8ENL2EbJ0Rli2r34Jwdm0J0hGuoSRMCHuamT6r/NUMK2GcokPxA/hcGGvrAJ/C6CoAI84ysqWmdtYak9KTpq6IXfqUR0l/Y9+dgJzlesqanbvc/B11z4lwznXvgP1Kak67RCxDxTILaPocPMzPSguPvGxff83h6REzhJ5iTzFmT9exyiiZGvYTEodlEZgOc9iA/wSWPpNwpl/TceXPbGAyQ5Jg0o33+QYDSZVIitT6X5ZkcFPugzxU6NLDdB5W+L9vPpVm58Zykd7kCVgAcpA6xwKU27XHJJ7VfWfQmAPKOrCynWj96VFapEQDhxjvlSN/cnHnfCp5kWbobOs1d+ArwQSZPxKpYN+yKzwGfWbWNXru8PGfljK1X9Sa5CWS2JOpzLc8PblnKf2Ce4BaBYuNYe4kSXdnDj9+KVWDVr/SgvMxiwIH8e0G/i0I=
