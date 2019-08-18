@@ -5,15 +5,14 @@ python:
 - '3.5'
 - '3.6'
 - '3.7'
-env:
-  global:
-    secure: BDhKARhJlzcrgDZadS/ddXNu5/zY62lQi1s0d5gx0qs3M0swJS2zeSAnVYi2txDMEWsXKV++8mUlQ29RS95CkBxlCcOQbcPBRiWZXELyijUUUwWnevfbhorb+ZjMiSSSMfo9WnJHxn8Xir9TyIfVG36tudjCIGOkrsUmERvzwKkG1MLpy6+zyYq954KqOkKla8N+lYKg0UcGuKyZUs8dAzeYjWXFiLG8vazQcoDTce27RpkKCP0fDvjguTkOfnTqM03eQxByvGISILpL5zUTd/hdup+C0iOjT4sQXKkDGuxqFZLd6sI2j+0uBzpfmsb0fQPHAdjgO6sGKiSChTfXrBApGcDjCkal+TyLG2pQai3eynek3HjybkqHFZK7duBodW5YIUhSoJ+VT7bemudbRSF8e5m0y4vW42lV8IfTJBhCkJeCqdQkUlNR8uoC+DOmDv8X34v6m0DRdaES5rN+xPGwBW4wCjSB90hmR5ukMm0zcqgKUkEgeoWXZx3GsIeXhxSlmhcoSPJ3qeF4Lflvq0DHGL6m2nz0af/B+TiZms3Uup1lRC9H8yslrw2zMG5WC1VJl2JCIVmXkZQc/BxWc7Ge3b7CQnyBujci5YdsQd0rQJxmX5HG2YzYnE/xmHqUKskJQHErSk8kJXobFJ/g3HQYQwwI67+BxpDapeK1FcQ=
 install:
 - pip install -r requirements.txt
 - python setup.py install
 - pip install -r test-requirements.txt
-- pip install git+https://$CI_TOKEN@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary
+- pip install git+ssh://git@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary
 script:
 - pytest threatresponse --pep8
 - pytest -v
-
+before_install:
+- openssl aes-256-cbc -K $encrypted_2f6fb0cb339e_key -iv $encrypted_2f6fb0cb339e_iv
+  -in id_rsa.enc -out ~/.ssh/id_rsa -d
