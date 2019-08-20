@@ -1,0 +1,21 @@
+[general]
+# Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+verbosity=INFO
+
+# Path to the log file
+log_path=
+
+# use w mode - to overwrite file, a mode - to append data
+log_mode=
+
+
+[servers]
+# CTR server data
+# Hostname of CTR server
+ctr_hostname=https://visibility.amp.cisco.com
+
+# Client ID for token authentication
+ctr_client_id=
+
+# Client Password for token authentication
+ctr_client_password=
