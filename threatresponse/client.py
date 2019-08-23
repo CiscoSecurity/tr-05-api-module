@@ -14,11 +14,12 @@ class ThreatResponse(object):
 
         logger = options.get('logger')
         if logger is not None:
-            request = LoggedRequest(request, options['logger'])
+            request = LoggedRequest(request, logger)
 
         region = options.get('region')
 
-        request = AuthorizedRequest(request, client_id, client_password, region)
+        request = AuthorizedRequest(request, client_id, client_password,
+                                    region)
 
         urls = urls_for_region(region)
 
