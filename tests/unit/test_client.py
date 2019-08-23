@@ -7,7 +7,7 @@ from threatresponse.api import (
     EnrichAPI,
 )
 from threatresponse.client import ThreatResponse
-from threatresponse.exceptions import UnsupportedRegionError
+from threatresponse.exceptions import InvalidRegionError
 
 
 @patch('requests.Session.request')
@@ -20,17 +20,14 @@ def test_types_of_inner_apis(_):
 
 @patch('requests.Session.request')
 def test_different_regions(_):
-    # Define some auxiliary builder parameterized only by region.
     def TR(region):
         return ThreatResponse('CLIENT_ID', 'CLIENT_PASSWORD', region=region)
 
-    # The region is optional and considered empty by default.
-    # When it is specified and not empty, it may also omit a leading dot.
-    for region in [None, '', 'eu', '.eu', 'apjc', '.apjc']:
+    for region in [None, '', 'eu', 'apjc']:
         TR(region)
 
-    for region in ['foo', 'bar', '.', 'eu.', '.eu.', 'apjc.', '.apjc.']:
-        with pytest.raises(UnsupportedRegionError):
+    for region in ['foo', 'bar']:
+        with pytest.raises(InvalidRegionError):
             TR(region)
 
 

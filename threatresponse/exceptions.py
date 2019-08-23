@@ -1,2 +1,2 @@
-class UnsupportedRegionError(ValueError):
+class InvalidRegionError(ValueError):
     pass

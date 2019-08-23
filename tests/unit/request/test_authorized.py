@@ -27,7 +27,7 @@ def test_that_authorized_request_retrieves_token_on_init():
     AuthorizedRequest(request, 'x', 'y')
 
     request.post.assert_called_once_with(
-        AuthorizedRequest.TOKEN_URL,
+        'https://visibility.amp.cisco.com/iroh/oauth2/token',
         auth=('x', 'y'),
         data={'grant_type': 'client_credentials'},
         headers={
