@@ -1,0 +1,2 @@
+class InvalidRegionError(ValueError):
+    pass

@@ -2,8 +2,9 @@ from .api.enrich import EnrichAPI
 from .api.inspect import InspectAPI
 from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest
-from .request.standard import StandardRequest
 from .request.relative import RelativeRequest
+from .request.standard import StandardRequest
+from .urls import urls_for_region
 
 
 class ThreatResponse(object):
@@ -11,11 +12,18 @@ class ThreatResponse(object):
     def __init__(self, client_id, client_password, **options):
         request = StandardRequest()
 
-        if options.get('logger'):
-            request = LoggedRequest(request, options['logger'])
+        logger = options.get('logger')
+        if logger is not None:
+            request = LoggedRequest(request, logger)
 
-        request = AuthorizedRequest(request, client_id, client_password)
-        request = RelativeRequest(request, 'https://visibility.amp.cisco.com/')
+        region = options.get('region')
+
+        request = AuthorizedRequest(request, client_id, client_password,
+                                    region)
+
+        urls = urls_for_region(region)
+
+        request = RelativeRequest(request, urls['visibility'])
 
         self._inspect = InspectAPI(request)
         self._enrich = EnrichAPI(request)

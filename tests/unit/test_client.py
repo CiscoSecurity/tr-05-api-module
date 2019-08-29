@@ -7,6 +7,7 @@ from threatresponse.api import (
     EnrichAPI,
 )
 from threatresponse.client import ThreatResponse
+from threatresponse.exceptions import InvalidRegionError
 
 
 @patch('requests.Session.request')
@@ -15,6 +16,19 @@ def test_types_of_inner_apis(_):
 
     assert isinstance(client.inspect, InspectAPI)
     assert isinstance(client.enrich, EnrichAPI)
+
+
+@patch('requests.Session.request')
+def test_different_regions(_):
+    def TR(region):
+        return ThreatResponse('CLIENT_ID', 'CLIENT_PASSWORD', region=region)
+
+    for region in [None, '', 'eu', 'apjc']:
+        TR(region)
+
+    for region in ['foo', 'bar']:
+        with pytest.raises(InvalidRegionError):
+            TR(region)
 
 
 @patch('requests.Session.request')
