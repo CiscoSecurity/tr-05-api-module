@@ -1,4 +1,4 @@
-from .routing import Resolution, Routes
+from .routing import Resolution, Router
 
 
 class API(object):
@@ -6,46 +6,29 @@ class API(object):
 
     def __init__(self, request):
         self._request = request
+        self._resolution = None
 
     def __getattr__(self, item):
-        resolution = self._resolution()
+        if self._resolution is None:
+            self._resolution = self._build_resolution()
 
-        if resolution is None:
+        return self._resolution.__getattr__(item)
+
+    def _build_resolution(self):
+        """ Traverses the MRO and merges values of
+        `__router` attributes to build a single `Resolution`. """
+
+        router = None
+
+        for cls in type(self).mro():
+            attribute = '_{}__{}'.format(cls.__name__, 'router')
+
+            if hasattr(cls, attribute):
+                router = Router.merged(router, getattr(cls, attribute))
+
+        if router is None:
             raise Exception(
                 "Couldn't build a resolution for {}.".format(type(self))
             )
 
-        return resolution.__getattr__(item)
-
-    def _resolution(self):
-        """ Traverses the MRO and merges `__routes` attributes
-        to build a single `Resolution`. """
-
-        resolution = None
-
-        for x in type(self).mro():
-            attribute = '_{}__{}'.format(x.__name__, 'routes')
-
-            if hasattr(x, attribute):
-                if resolution is None:
-                    resolution = Resolution(self, getattr(x, attribute))
-                else:
-                    resolution.merge(getattr(x, attribute))
-
-        return resolution
-
-    @staticmethod
-    def routes():
-        """ Returns a tuple of `(routes, routes.register)`.
-        Usage example:
-            class SomeAPI(API):
-                __routes, route = API.routes()
-
-                @route('a.b.c')
-                def _perform(self, ...):
-                    ...
-        """
-
-        routes = Routes()
-
-        return routes, routes.register
+        return Resolution(self, router)

@@ -1,8 +1,9 @@
+from .routing import Router
 from .base import API
 
 
 class EnrichAPI(API):
-    __routes, route = API.routes()
+    __router, route = Router.new()
 
     @route('health')
     def _perform(self):

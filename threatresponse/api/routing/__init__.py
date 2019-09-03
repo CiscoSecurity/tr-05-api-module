@@ -1,2 +1,2 @@
-from .routes import Routes
+from .router import Router
 from .resolution import Resolution
