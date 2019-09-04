@@ -4,26 +4,21 @@ from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.relative import RelativeRequest
 from .request.standard import StandardRequest
-from .urls import urls_for_region
+from .urls import url_for
 
 
 class ThreatResponse(object):
 
     def __init__(self, client_id, client_password, **options):
-        request = StandardRequest()
+        credentials = (client_id, client_password)
 
         logger = options.get('logger')
-        if logger is not None:
-            request = LoggedRequest(request, logger)
-
         region = options.get('region')
 
-        request = AuthorizedRequest(request, client_id, client_password,
-                                    region)
-
-        urls = urls_for_region(region)
-
-        request = RelativeRequest(request, urls['visibility'])
+        request = StandardRequest()
+        request = LoggedRequest(request, logger) if logger else request
+        request = AuthorizedRequest(request, *credentials, region=region)
+        request = RelativeRequest(request, url_for(region, 'visibility'))
 
         self._inspect = InspectAPI(request)
         self._enrich = EnrichAPI(request)
