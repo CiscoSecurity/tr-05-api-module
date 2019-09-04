@@ -24,7 +24,7 @@ _urls_by_region = {
 }
 
 
-def urls_for_region(region=None):
+def url_for(region, family):
     if region is None:
         region = ''
 
@@ -37,4 +37,4 @@ def urls_for_region(region=None):
             )
         )
 
-    return _urls_by_region[region]
+    return _urls_by_region[region][family]

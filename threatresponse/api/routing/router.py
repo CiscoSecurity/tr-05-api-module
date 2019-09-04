@@ -10,7 +10,7 @@ class Router(object):
     def register(self, route):
         """ Returns a function to register a method by a specified `route`. """
 
-        def registration(method):
+        def register(method):
             if route in self._routes:
                 raise ValueError(
                     "Route {} has already been registered.".format(repr(route))
@@ -18,7 +18,11 @@ class Router(object):
 
             self._routes[route] = method
 
-        return registration
+            # We do not return anything
+            # to set the decorated method to `None`.
+            return None
+
+        return register
 
     def resolve(self, route):
         """ Returns a method by the specified route. """

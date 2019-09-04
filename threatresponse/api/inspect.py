@@ -1,9 +1,12 @@
+from .routing import Router
 from .base import API
 
 
 class InspectAPI(API):
+    __router, route = Router.new()
 
-    def inspect(self, payload):
+    @route('inspect')
+    def _perform(self, payload):
         """
         https://visibility.amp.cisco.com/iroh/iroh-inspect/index.html#!/INSPECT/post_iroh_iroh_inspect_inspect
         """

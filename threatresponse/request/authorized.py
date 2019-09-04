@@ -2,7 +2,7 @@ from six.moves.http_client import UNAUTHORIZED
 from six.moves.urllib.parse import urljoin
 
 from .base import Request
-from ..urls import urls_for_region
+from ..urls import url_for
 
 
 class AuthorizedRequest(Request):
@@ -16,7 +16,7 @@ class AuthorizedRequest(Request):
         self._client_password = client_password
 
         self._token_url = urljoin(
-            urls_for_region(region)['visibility'],
+            url_for(region, 'visibility'),
             '/iroh/oauth2/token',
         )
 
