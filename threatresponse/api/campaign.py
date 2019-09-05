@@ -27,16 +27,16 @@ class CampaignAPI(API):
         """
         if fields and query:
             response = self._request.get(
-                '/ctia/campaign/external_id/{}'.format(id_) + '?'
-                + array_for_url(fields) +
+                '/ctia/campaign/external_id/{}'.format(id_) + '?' + array_for_url(fields) +
                 urlencode(query))
         elif fields:
             response = self._request.get(
-                '/ctia/campaign/external_id/{}'.format(id_)+ '?'
-                + array_for_url(fields))
+                '/ctia/campaign/external_id/{}'.format(id_) + '?' +
+                array_for_url(fields))
         elif query:
             response = self._request.get(
-                '/ctia/campaign/external_id/{}'.format(id_) + '?' + urlencode(query))
+                '/ctia/campaign/external_id/{}'.format(id_) + '?' +
+                urlencode(query))
         else:
             response = self._request.get(
                 '/ctia/campaign/external_id/{}'.format(id_))
@@ -50,24 +50,24 @@ class CampaignAPI(API):
         """
         if fields and search_after:
             response = self._request.get(
-                '/ctia/campaign/search' + '?'
-                + array_for_url(fields) + '?'
-                + array_for_url(search_after) + '?'
-                + urlencode(query))
+                '/ctia/campaign/search' + '?'+
+                array_for_url(fields) + '?'+
+                array_for_url(search_after) + '?' +
+                urlencode(query))
         elif fields:
             response = self._request.get(
-                '/ctia/campaign/search' + '?'
-                + array_for_url(fields) + '?'
-                + urlencode(query))
+                '/ctia/campaign/search' + '?' +
+                array_for_url(fields) + '?' +
+                urlencode(query))
         elif search_after:
             response = self._request.get(
-                '/ctia/campaign/search' + '?'
-                + array_for_url(search_after) + '?'
-                + urlencode(query))
+                '/ctia/campaign/search' + '?' +
+                array_for_url(search_after) + '?' +
+                urlencode(query))
         else:
             response = self._request.get(
-                '/ctia/campaign/search' + '?'
-                + urlencode(query))
+                '/ctia/campaign/search' + '?' +
+                urlencode(query))
         response.raise_for_status()
         return response.json()
 
