@@ -57,12 +57,12 @@ def test_campaign_by_external_id_succeeds():
     )
 
 
-# def test_campaign_search_succeeds():
-#     assert_succeeds_with_get(
-#         lambda api, id_: api.campaign.search(id_),
-#         id_=12,
-#         url='/ctia/campaign/12'
-#     )
+def test_campaign_search_succeeds_with_query():
+    assert_succeeds_with_get(
+        lambda api, query: api.campaign.search(query),
+        query={'query':12},
+        url='/ctia/campaign/search?query=12'
+    )
 
 
 # def test_campaign_by_id_with_fields_succeeds():
@@ -120,11 +120,14 @@ def assert_succeeds_with_get(invoke, url, id_=None, fields=None, query=None):
 
     api = CampaignAPI(request)
     if fields and query:
-        invoke(api, id_,fields,query)
+        invoke(api, id_, fields, query)
     elif fields:
         invoke(api, id_, fields)
     elif query:
-        invoke(api, id_, query)
+        if id_ is None:
+            invoke(api, query)
+        else:
+            invoke(api, id_, query)
     else:
         invoke(api, id_)
     request.get.assert_called_once_with(url)

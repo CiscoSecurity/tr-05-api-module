@@ -13,7 +13,7 @@ class CampaignAPI(API):
         """
         if fields:
             response = self._request.get(
-                '/ctia/campaign/{}'.format(id_) + '?' + ''.join('fields='+field+'&' for field in fields))
+                '/ctia/campaign/{}'.format(id_) + '?' + array_for_url(fields))
         else:
             response = self._request.get(
                 '/ctia/campaign/{}'.format(id_))
@@ -28,36 +28,46 @@ class CampaignAPI(API):
         if fields and query:
             response = self._request.get(
                 '/ctia/campaign/external_id/{}'.format(id_) + '?'
-                + ''.join('fields='+field+'&' for field in fields) +
+                + array_for_url(fields) +
                 urlencode(query))
         elif fields:
             response = self._request.get(
                 '/ctia/campaign/external_id/{}'.format(id_)+ '?'
-                + ''.join('fields='+field+'&' for field in fields))
+                + array_for_url(fields))
         elif query:
             response = self._request.get(
                 '/ctia/campaign/external_id/{}'.format(id_) + '?' + urlencode(query))
         else:
             response = self._request.get(
-                '/ctia/campaign/external_id/{}'.format(id_)
-            )
+                '/ctia/campaign/external_id/{}'.format(id_))
         response.raise_for_status()
         return response.json()
 
     @route('campaign.search')
-    def _perform(self, query):
+    def _perform(self, query, fields=None, search_after=None):
         """
         !!!https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Refer/post_iroh_iroh_enrich_refer_observables
         """
-        if query:
+        if fields and search_after:
             response = self._request.get(
-                '/ctia/campaign/search',
-                params=query
-            )
+                '/ctia/campaign/search' + '?'
+                + array_for_url(fields) + '?'
+                + array_for_url(search_after) + '?'
+                + urlencode(query))
+        elif fields:
+            response = self._request.get(
+                '/ctia/campaign/search' + '?'
+                + array_for_url(fields) + '?'
+                + urlencode(query))
+        elif search_after:
+            response = self._request.get(
+                '/ctia/campaign/search' + '?'
+                + array_for_url(search_after) + '?'
+                + urlencode(query))
         else:
             response = self._request.get(
-                '/ctia/campaign/search',
-            )
+                '/ctia/campaign/search' + '?'
+                + urlencode(query))
         response.raise_for_status()
         return response.json()
 
@@ -96,3 +106,5 @@ class CampaignAPI(API):
         response.raise_for_status()
         return response.json()
 
+def array_for_url(array):
+    return ''.join('fields=' + element + '&' for element in array)
