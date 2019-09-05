@@ -1,5 +1,6 @@
 from .api.enrich import EnrichAPI
 from .api.inspect import InspectAPI
+from .api.campaign import CampaignAPI
 from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.relative import RelativeRequest
@@ -22,6 +23,7 @@ class ThreatResponse(object):
 
         self._inspect = InspectAPI(request)
         self._enrich = EnrichAPI(request)
+        self._campaign = CampaignAPI(request)
 
     @property
     def inspect(self):
