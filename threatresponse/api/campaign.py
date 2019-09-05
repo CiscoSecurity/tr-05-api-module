@@ -46,7 +46,7 @@ class CampaignAPI(API):
     @route('campaign.search')
     def _perform(self, query, fields=None, search_after=None):
         """
-        !!!https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Refer/post_iroh_iroh_enrich_refer_observables
+        https://private.intel.amp.cisco.com/index.html#!/Campaign/get_ctia_campaign_search
         """
         if fields and search_after:
             response = self._request.get(
@@ -74,7 +74,7 @@ class CampaignAPI(API):
     @route('campaign')
     def _perform(self, payload):
         """
-        !!!https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Health/post_iroh_iroh_enrich_health
+        https://private.intel.amp.cisco.com/index.html#!/Campaign/post_ctia_campaign
         """
 
         response = self._request.post('/ctia/campaign', json=payload)
@@ -84,7 +84,7 @@ class CampaignAPI(API):
     @route('campaign_delete')
     def _perform(self, id_):
         """
-        !!!https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Deliberate/post_iroh_iroh_enrich_deliberate_observables
+        https://private.intel.amp.cisco.com/index.html#!/Campaign/delete_ctia_campaign_id
         """
 
         response = self._request.delete(
@@ -96,7 +96,7 @@ class CampaignAPI(API):
     @route('campaign_update')
     def _perform(self, id_, payload):
         """
-        !!!https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Refer/post_iroh_iroh_enrich_refer_observables
+        https://private.intel.amp.cisco.com/index.html#!/Campaign/put_ctia_campaign_id
         """
 
         response = self._request.put(
