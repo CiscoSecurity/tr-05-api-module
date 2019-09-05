@@ -13,7 +13,8 @@ class CampaignAPI(API):
         """
         if fields:
             response = self._request.get(
-                '/ctia/campaign/{}'.format(id_) + '?' + array_for_url(fields))
+                '/ctia/campaign/{}'.format(id_) + '?' +
+                array_for_url(fields))
         else:
             response = self._request.get(
                 '/ctia/campaign/{}'.format(id_))
@@ -27,7 +28,8 @@ class CampaignAPI(API):
         """
         if fields and query:
             response = self._request.get(
-                '/ctia/campaign/external_id/{}'.format(id_) + '?' + array_for_url(fields) +
+                '/ctia/campaign/external_id/{}'.format(id_) + '?' +
+                array_for_url(fields) +
                 urlencode(query))
         elif fields:
             response = self._request.get(
@@ -50,8 +52,8 @@ class CampaignAPI(API):
         """
         if fields and search_after:
             response = self._request.get(
-                '/ctia/campaign/search' + '?'+
-                array_for_url(fields) + '?'+
+                '/ctia/campaign/search' + '?' +
+                array_for_url(fields) + '?' +
                 array_for_url(search_after) + '?' +
                 urlencode(query))
         elif fields:
