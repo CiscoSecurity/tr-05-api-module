@@ -109,31 +109,6 @@ def assert_succeeds_with_get(invoke, url, id_=None, fields=None, query=None):
     response.json.assert_called_once_with()
 
 
-def assert_fails_with_get(invoke, url, id_=None, fields=None, query=None):
-    class TestError(Exception):
-        pass
-    response, request, api = response_request_and_api()
-
-    response.raise_for_status.side_effect = TestError('Oops!')
-    request.post.return_value = response
-
-    with pytest.raises(TestError):
-        if fields and query:
-            invoke(api, id_, fields, query)
-        elif fields:
-            invoke(api, id_, fields)
-        elif query:
-            if id_ is None:
-                invoke(api, query)
-            else:
-                invoke(api, id_, query)
-        else:
-            invoke(api, id_)
-
-    request.get.assert_called_once_with(url)
-    response.raise_for_status.assert_called_once_with()
-
-
 def assert_succeeds_with_post(invoke, url, payload=None):
     response, request, api = response_request_and_api()
     request.post.return_value = response
