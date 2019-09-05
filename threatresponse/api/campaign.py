@@ -72,16 +72,16 @@ class CampaignAPI(API):
         return response.json()
 
     @route('campaign')
-    def _perform(self):
+    def _perform(self, payload):
         """
         !!!https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Health/post_iroh_iroh_enrich_health
         """
 
-        response = self._request.post('/ctia/campaign')
+        response = self._request.post('/ctia/campaign', json=payload)
         response.raise_for_status()
         return response.json()
 
-    @route('delete_campaign')
+    @route('campaign_delete')
     def _perform(self, id_):
         """
         !!!https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Deliberate/post_iroh_iroh_enrich_deliberate_observables
@@ -105,6 +105,7 @@ class CampaignAPI(API):
         )
         response.raise_for_status()
         return response.json()
+
 
 def array_for_url(array):
     return ''.join('fields=' + element + '&' for element in array)

@@ -59,66 +59,41 @@ def test_campaign_by_external_id_succeeds():
 
 def test_campaign_search_succeeds_with_query():
     assert_succeeds_with_get(
-        lambda api, query: api.campaign.search(query),
-        query={'query':12},
+    lambda api, query: api.campaign.search(query),
+    query={'query':12},
         url='/ctia/campaign/search?query=12'
     )
 
 
-# def test_campaign_by_id_with_fields_succeeds():
-#     assert_succeeds_with_get(
-#         lambda api, id_, fields: api.delete_campaign(id_, fields),
-#         id_=12,
-#         fields={'data[]': ['schema_version', 'revision']},
-#         url='/ctia/campaign'
-#     )
-# def test_deliberate_observables_fails():
-#     assert_fails(
-#         lambda api, payload: api.deliberate.observables(payload),
-#         payload=[{'ham': 'egg'}],
-#         url='/iroh/iroh-enrich/deliberate/observables'
-#     )
-#
-#
-# def test_observe_observables_succeeds():
-#     assert_succeeds(
-#         lambda api, payload: api.observe.observables(payload),
-#         payload=[{'ham': 'egg'}],
-#         url='/iroh/iroh-enrich/observe/observables'
-#     )
-#
-#
-# def test_observe_observables_fails():
-#     assert_fails(
-#         lambda api, payload: api.observe.observables(payload),
-#         payload=[{'ham': 'egg'}],
-#         url='/iroh/iroh-enrich/observe/observables'
-#     )
-#
-#
-# def test_refer_observables_succeeds():
-#     assert_succeeds(
-#         lambda api, payload: api.refer.observables(payload),
-#         payload=[{'ham': 'egg'}],
-#         url='/iroh/iroh-enrich/refer/observables'
-#     )
-#
-#
-# def test_refer_observables_fails():
-#     assert_fails(
-#         lambda api, payload: api.refer.observables(payload),
-#         payload=[{'ham': 'egg'}],
-#         url='/iroh/iroh-enrich/refer/observables'
-#     )
+def test_create_campaign_success():
+    assert_succeeds_with_post(
+        lambda api, payload: api.campaign(payload),
+        payload={'ham': 'egg'},
+        url='/ctia/campaign'
+    )
+
+
+def test_delete_campaign_success():
+    assert_succeeds_with_delete(
+        lambda api, id_: api.campaign_delete(id_),
+        id_=12,
+        url='/ctia/campaign/12'
+    )
+
+
+def test_update_campaign_success():
+    assert_succeeds_with_put(
+        lambda api, id_, payload: api.campaign_update(id_, payload),
+        id_=12,
+        url='/ctia/campaign/12',
+        payload={'ham': 'egg'},
+    )
 
 
 def assert_succeeds_with_get(invoke, url, id_=None, fields=None, query=None):
-    response = MagicMock()
-
-    request = MagicMock()
+    response, request, api = response_request_and_api()
     request.get.return_value = response
 
-    api = CampaignAPI(request)
     if fields and query:
         invoke(api, id_, fields, query)
     elif fields:
@@ -134,20 +109,69 @@ def assert_succeeds_with_get(invoke, url, id_=None, fields=None, query=None):
     response.json.assert_called_once_with()
 
 
-def assert_fails_with_get(invoke, url, id_=None, fields=None):
+def assert_fails_with_get(invoke, url, id_=None, fields=None, query=None):
     class TestError(Exception):
         pass
+    response, request, api = response_request_and_api()
 
-    response = MagicMock()
     response.raise_for_status.side_effect = TestError('Oops!')
-
-    request = MagicMock()
     request.post.return_value = response
 
-    api = CampaignAPI(request)
-    invoke(api)
+    with pytest.raises(TestError):
+        if fields and query:
+            invoke(api, id_, fields, query)
+        elif fields:
+            invoke(api, id_, fields)
+        elif query:
+            if id_ is None:
+                invoke(api, query)
+            else:
+                invoke(api, id_, query)
+        else:
+            invoke(api, id_)
+
     request.get.assert_called_once_with(url)
     response.raise_for_status.assert_called_once_with()
 
-if __name__ == '__main__':
-    test_campaign_by_id_succeeds()
+
+def assert_succeeds_with_post(invoke, url, payload=None):
+    response, request, api = response_request_and_api()
+    request.post.return_value = response
+
+    if payload is not None:
+        invoke(api, payload)
+    else:
+        invoke(api)
+
+    if payload is not None:
+        request.post.assert_called_once_with(url, json=payload)
+    else:
+        request.post.assert_called_once_with(url)
+
+    response.json.assert_called_once_with()
+
+
+def assert_succeeds_with_delete(invoke, url, id_):
+    response, request, api = response_request_and_api()
+    request.delete.return_value = response
+    invoke(api, id_)
+
+    request.delete.assert_called_once_with(url)
+    response.json.assert_called_once_with()
+
+
+def assert_succeeds_with_put(invoke, url, id_, payload):
+    response, request, api = response_request_and_api()
+    request.put.return_value = response
+    invoke(api, id_, payload)
+
+    request.put.assert_called_once_with(url, json=payload)
+    response.json.assert_called_once_with()
+
+
+def response_request_and_api():
+    response = MagicMock()
+    request = MagicMock()
+    api = CampaignAPI(request)
+
+    return response, request, api
