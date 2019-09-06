@@ -189,7 +189,7 @@ class IntelAPI(API):
 
     # Bundle
 
-    @route('attack_pattern.search')
+    @route('bundle.export.get')
     @search_entity('/ctia/bundle/export')
     def _perform(self, *args, **kwargs):
         """
@@ -197,7 +197,7 @@ class IntelAPI(API):
         """
         pass
 
-    @route('attack_pattern.search')
+    @route('bundle.export.post')
     @create_entity('/ctia/bundle/export')
     def _perform(self, *args, **kwargs):
         """
@@ -205,7 +205,7 @@ class IntelAPI(API):
         """
         pass
 
-    @route('attack_pattern.search')
+    @route('bundle.import')
     @create_entity('/ctia/bundle/import')
     def _perform(self, *args, **kwargs):
         """
