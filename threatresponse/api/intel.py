@@ -2,7 +2,7 @@ from .routing import Router
 from .base import API
 
 
-class CtiaAPI(API):
+class IntelAPI(API):
     __router, route = Router.new()
 
     @route('actor.post')
@@ -70,12 +70,10 @@ class CtiaAPI(API):
         return response.json()
 
     @route('actor.search')
-    def _perform(self, query, **params):
+    def _perform(self, **params):
         """
         https://private.intel.amp.cisco.com/index.html#!/Actor/get_ctia_actor_search
         """
-
-        params.update({'query': query})
 
         response = self._request.get(
             '/ctia/actor/search',

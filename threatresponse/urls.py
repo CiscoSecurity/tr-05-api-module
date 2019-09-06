@@ -3,7 +3,8 @@ from .exceptions import InvalidRegionError
 
 _url_patterns_by_api_family = {
     'visibility': 'https://visibility{region}.amp.cisco.com',
-    'private_intel': 'http://private.intel{region}amp.cisco.com',
+    'private_intel': 'https://private.intel{region}.amp.cisco.com',
+    'global_intel': 'https://intel{region}.amp.cisco.com)',
 }
 
 
