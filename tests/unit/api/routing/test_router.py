@@ -70,3 +70,6 @@ def test_merged():
 
     z = Router.merged(x, y)
     assert z._routes == {'a': a_x, 'b': b_x, 'c': c_y}
+
+    z = Router.merged(y, x)
+    assert z._routes == {'a': a_x, 'b': b_y, 'c': c_y}
