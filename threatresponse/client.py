@@ -1,5 +1,6 @@
 from .api.enrich import EnrichAPI
 from .api.inspect import InspectAPI
+from .api.response import ResponseAPI
 from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.relative import RelativeRequest
@@ -22,6 +23,7 @@ class ThreatResponse(object):
 
         self._inspect = InspectAPI(request)
         self._enrich = EnrichAPI(request)
+        self._response = ResponseAPI(request)
 
     @property
     def inspect(self):
@@ -30,3 +32,7 @@ class ThreatResponse(object):
     @property
     def enrich(self):
         return self._enrich
+
+    @property
+    def response(self):
+        return self._response
