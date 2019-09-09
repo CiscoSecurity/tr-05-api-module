@@ -2,3 +2,5 @@
 from .enrich import EnrichAPI
 from .inspect import InspectAPI
 from .campaign import CampaignAPI
+from .coa import COAAPI
+from .data_table import DataTableAPI
