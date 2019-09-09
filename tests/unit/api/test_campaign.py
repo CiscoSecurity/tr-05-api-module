@@ -6,48 +6,37 @@ from threatresponse.api import CampaignAPI
 
 def test_campaign_by_id_succeeds():
     assert_succeeds_with_get(
-        lambda api, id_: api.campaign_by_id(id_),
+        lambda api, id_: api.campaign.get(id_),
         id_=12,
-        url='/ctia/campaign/12'
+        url='/ctia/campaign/12',
     )
 
 
 def test_campaign_by_id_with_fields_succeeds():
     assert_succeeds_with_get(
-        lambda api, id_, fields: api.campaign_by_id(id_, fields),
+        lambda api, id_, query: api.campaign.get(id_, **query),
         id_=12,
-        fields=['schema_version', 'revision'],
-        url='/ctia/campaign/12?fields=schema_version&fields=revision&'
+        query={'fields': ['schema_version', 'revision']},
+        url='/ctia/campaign/12'
     )
 
 
 def test_campaign_by_external_id_with_fields_succeeds():
     assert_succeeds_with_get(
-        lambda api, id_, fields: api.campaign.external_id(id_,fields),
+        lambda api, id_, fields: api.campaign.external_id(id_, **fields),
         id_=12,
-        fields=['schema_version', 'revision'],
-        url='/ctia/campaign/external_id/12?fields=schema_version&fields=revision&'
+        query={'fields': ['schema_version', 'revision']},
+        url='/ctia/campaign/external_id/12'
     )
 
 
 def test_campaign_by_external_id_with_fields_and_query_succeeds():
     assert_succeeds_with_get(
-        lambda api, id_, fields, query: api.campaign.external_id(id_,fields, query),
+        lambda api, id_, query: api.campaign.external_id(id_, **query),
         id_=12,
-        fields=['schema_version', 'revision'],
-        url='/ctia/campaign/external_id/12?fields=schema_version&fields=revision&limit=12&offset=1',
-        query={'limit': 12, 'offset': 1}
+        url='/ctia/campaign/external_id/12',
+        query={'limit': 12, 'offset': 1, 'fields': ['schema_version', 'revision']}
     )
-
-
-def test_campaign_by_external_id_with_query_succeeds():
-    assert_succeeds_with_get(
-        lambda api, id_, query: api.campaign.external_id(id_, query=query),
-        id_=12,
-        url='/ctia/campaign/external_id/12?limit=12&offset=1',
-        query={'limit': 12, 'offset': 1}
-    )
-
 
 def test_campaign_by_external_id_succeeds():
     assert_succeeds_with_get(
@@ -59,15 +48,15 @@ def test_campaign_by_external_id_succeeds():
 
 def test_campaign_search_succeeds_with_query():
     assert_succeeds_with_get(
-    lambda api, query: api.campaign.search(query),
-    query={'query':12},
-        url='/ctia/campaign/search?query=12'
-    )
+        lambda api, query: api.campaign.search(**query),
+        query={'id': 12},
+        url='/ctia/campaign/search'
+        )
 
 
 def test_create_campaign_success():
     assert_succeeds_with_post(
-        lambda api, payload: api.campaign(payload),
+        lambda api, payload: api.campaign.post(payload),
         payload={'ham': 'egg'},
         url='/ctia/campaign'
     )
@@ -75,7 +64,7 @@ def test_create_campaign_success():
 
 def test_delete_campaign_success():
     assert_succeeds_with_delete(
-        lambda api, id_: api.campaign_delete(id_),
+        lambda api, id_: api.campaign.delete(id_),
         id_=12,
         url='/ctia/campaign/12'
     )
@@ -83,29 +72,23 @@ def test_delete_campaign_success():
 
 def test_update_campaign_success():
     assert_succeeds_with_put(
-        lambda api, id_, payload: api.campaign_update(id_, payload),
+        lambda api, id_, payload: api.campaign.put(id_, payload),
         id_=12,
         url='/ctia/campaign/12',
         payload={'ham': 'egg'},
     )
 
 
-def assert_succeeds_with_get(invoke, url, id_=None, fields=None, query=None):
+def assert_succeeds_with_get(invoke, url, id_=None, **query):
     response, request, api = response_request_and_api()
     request.get.return_value = response
-
-    if fields and query:
-        invoke(api, id_, fields, query)
-    elif fields:
-        invoke(api, id_, fields)
-    elif query:
-        if id_ is None:
-            invoke(api, query)
-        else:
-            invoke(api, id_, query)
+    if id_ and query:
+        invoke(api, id_, query)
+    elif id_ is None:
+        invoke(api, query)
     else:
         invoke(api, id_)
-    request.get.assert_called_once_with(url)
+    request.get.assert_called_once_with(url,params=query)
     response.json.assert_called_once_with()
 
 

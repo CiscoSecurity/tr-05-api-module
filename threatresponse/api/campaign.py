@@ -1,79 +1,44 @@
 from .routing import Router
 from .base import API
-from urllib import urlencode
 
 
 class CampaignAPI(API):
     __router, route = Router.new()
 
-    @route('campaign_by_id')
-    def _perform(self, id_, fields=None):
+    @route('campaign.get')
+    def _perform(self, id_, **query):
         """
         https://private.intel.amp.cisco.com/index.html#!/Campaign/get_ctia_campaign_id
         """
-        if fields:
-            response = self._request.get(
-                '/ctia/campaign/{}'.format(id_) + '?' +
-                array_for_url(fields))
-        else:
-            response = self._request.get(
-                '/ctia/campaign/{}'.format(id_))
+
+        response = self._request.get(
+                '/ctia/campaign/{}'.format(id_), params=query)
         response.raise_for_status()
         return response.json()
 
     @route('campaign.external_id')
-    def _perform(self, id_, fields=None, query=None):
+    def _perform(self, id_, **query):
         """
-        https://private.intel.amp.cisco.com/index.html#!/Campaign/get_ctia_campaign_external_id_external_id
+        https://private.intel.amp.cisco.com/index.html#!/Campaign/get_ctia_campaign_id
         """
-        if fields and query:
-            response = self._request.get(
-                '/ctia/campaign/external_id/{}'.format(id_) + '?' +
-                array_for_url(fields) +
-                urlencode(query))
-        elif fields:
-            response = self._request.get(
-                '/ctia/campaign/external_id/{}'.format(id_) + '?' +
-                array_for_url(fields))
-        elif query:
-            response = self._request.get(
-                '/ctia/campaign/external_id/{}'.format(id_) + '?' +
-                urlencode(query))
-        else:
-            response = self._request.get(
-                '/ctia/campaign/external_id/{}'.format(id_))
+
+        response = self._request.get(
+                '/ctia/campaign/external_id/{}'.format(id_), params=query)
         response.raise_for_status()
         return response.json()
 
     @route('campaign.search')
-    def _perform(self, query, fields=None, search_after=None):
+    def _perform(self, **query):
         """
-        https://private.intel.amp.cisco.com/index.html#!/Campaign/get_ctia_campaign_search
+        https://private.intel.amp.cisco.com/index.html#!/Campaign/get_ctia_campaign_id
         """
-        if fields and search_after:
-            response = self._request.get(
-                '/ctia/campaign/search' + '?' +
-                array_for_url(fields) + '?' +
-                array_for_url(search_after) + '?' +
-                urlencode(query))
-        elif fields:
-            response = self._request.get(
-                '/ctia/campaign/search' + '?' +
-                array_for_url(fields) + '?' +
-                urlencode(query))
-        elif search_after:
-            response = self._request.get(
-                '/ctia/campaign/search' + '?' +
-                array_for_url(search_after) + '?' +
-                urlencode(query))
-        else:
-            response = self._request.get(
-                '/ctia/campaign/search' + '?' +
-                urlencode(query))
+
+        response = self._request.get(
+                '/ctia/campaign/search', params=query)
         response.raise_for_status()
         return response.json()
 
-    @route('campaign')
+    @route('campaign.post')
     def _perform(self, payload):
         """
         https://private.intel.amp.cisco.com/index.html#!/Campaign/post_ctia_campaign
@@ -83,7 +48,7 @@ class CampaignAPI(API):
         response.raise_for_status()
         return response.json()
 
-    @route('campaign_delete')
+    @route('campaign.delete')
     def _perform(self, id_):
         """
         https://private.intel.amp.cisco.com/index.html#!/Campaign/delete_ctia_campaign_id
@@ -95,7 +60,7 @@ class CampaignAPI(API):
         response.raise_for_status()
         return response.json()
 
-    @route('campaign_update')
+    @route('campaign.put')
     def _perform(self, id_, payload):
         """
         https://private.intel.amp.cisco.com/index.html#!/Campaign/put_ctia_campaign_id
@@ -107,7 +72,3 @@ class CampaignAPI(API):
         )
         response.raise_for_status()
         return response.json()
-
-
-def array_for_url(array):
-    return ''.join('fields=' + element + '&' for element in array)
