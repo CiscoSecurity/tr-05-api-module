@@ -17,7 +17,6 @@ class ResponseAPI(API):
             '/iroh/iroh-response/respond/observables',
             json=payload,
         )
-        print('URL', response.request.url)
         response.raise_for_status()
         return response.json()
 
