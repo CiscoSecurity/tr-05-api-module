@@ -31,7 +31,7 @@ class ResponseAPI(API):
         https://visibility.amp.cisco.com/iroh/iroh-response/index.html#!/Response/post_iroh_iroh_response_respond_trigger_module_name_action_id
         """
 
-        endpoint = '/iroh/iroh-response/respond/trigger/{}/{}'.format(
+        url = '/iroh/iroh-response/respond/trigger/{}/{}'.format(
             quote(module_name),
             quote(action_id),
         )
@@ -42,9 +42,6 @@ class ResponseAPI(API):
             'observable_value': observable_value,
         })
 
-        response = self._request.post(
-            endpoint,
-            params=query,
-        )
+        response = self._request.post(url, params=query)
         response.raise_for_status()
         return response.json()
