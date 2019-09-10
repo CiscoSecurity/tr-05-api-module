@@ -20,23 +20,13 @@ class ThreatResponse(object):
         request = LoggedRequest(request, logger) if logger else request
         request = AuthorizedRequest(request, *credentials, region=region)
 
-        visibility_request = RelativeRequest(
-            request,
-            url_for(region, 'visibility')
-        )
-        private_intel_request = RelativeRequest(
-            request,
-            url_for(region, 'private_intel')
-        )
-        global_intel_request = RelativeRequest(
-            request,
-            url_for(region, 'global_intel')
-        )
+        def request_for(family):
+            return RelativeRequest(request, url_for(region, family))
 
-        self._inspect = InspectAPI(visibility_request)
-        self._enrich = EnrichAPI(visibility_request)
-        self._private_intel = IntelAPI(private_intel_request)
-        self._global_intel = IntelAPI(global_intel_request)
+        self._inspect = InspectAPI(request_for('visibility'))
+        self._enrich = EnrichAPI(request_for('visibility'))
+        self._private_intel = IntelAPI(request_for('private_intel'))
+        self._global_intel = IntelAPI(request_for('global_intel'))
 
     @property
     def inspect(self):
