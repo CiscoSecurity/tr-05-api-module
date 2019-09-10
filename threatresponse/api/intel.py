@@ -9,11 +9,11 @@ class IntelAPI(API):
     def __init__(self, request):
         super(IntelAPI, self).__init__(request)
 
-        self._actor = EntityAPI(request, '/ctia/actor/')
+        self._actor = EntityAPI(request, '/ctia/actor')
         self._actor.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/Actor/"
+            "https://private.intel.amp.cisco.com/index.html#!/Actor"
 
-        self._attack_pattern = EntityAPI(request, '/ctia/attack-pattern/')
+        self._attack_pattern = EntityAPI(request, '/ctia/attack-pattern')
         self._attack_pattern.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Attack_Pattern"
 
