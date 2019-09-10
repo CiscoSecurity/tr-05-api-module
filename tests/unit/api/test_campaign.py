@@ -1,7 +1,6 @@
-import pytest
 from mock import MagicMock
 
-from threatresponse.api import CampaignAPI
+from threatresponse.api import IntelAPI
 
 
 def test_campaign_by_id_succeeds():
@@ -130,6 +129,6 @@ def assert_succeeds_with_put(invoke, url, id_, payload):
 def response_request_and_api():
     response = MagicMock()
     request = MagicMock()
-    api = CampaignAPI(request)
+    api = IntelAPI(request)
 
     return response, request, api

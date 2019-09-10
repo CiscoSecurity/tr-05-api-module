@@ -1,6 +1,6 @@
 from mock import MagicMock
 
-from threatresponse.api import DataTableAPI
+from threatresponse.api import IntelAPI
 
 
 def test_data_table_by_id_succeeds():
@@ -104,6 +104,6 @@ def assert_succeeds_with_delete(invoke, url, id_):
 def response_request_and_api():
     response = MagicMock()
     request = MagicMock()
-    api = DataTableAPI(request)
+    api = IntelAPI(request)
 
     return response, request, api

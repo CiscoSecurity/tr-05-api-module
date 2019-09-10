@@ -1,8 +1,7 @@
+from .api.intel import IntelAPI
 from .api.enrich import EnrichAPI
 from .api.inspect import InspectAPI
-from .api.campaign import CampaignAPI
-from .api.coa import COAAPI
-from .api.data_table import DataTableAPI
+from .api.response import ResponseAPI
 from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.relative import RelativeRequest
@@ -21,25 +20,15 @@ class ThreatResponse(object):
         request = StandardRequest()
         request = LoggedRequest(request, logger) if logger else request
         request = AuthorizedRequest(request, *credentials, region=region)
-        visibility_request = RelativeRequest(
-            request,
-            url_for(region, 'visibility')
-        )
-        self._inspect = InspectAPI(visibility_request)
-        self._enrich = EnrichAPI(visibility_request)
 
-        private_intel_request = RelativeRequest(
-            request,
-            url_for(region, 'private_intel')
-        )
-        # global_intel_request = RelativeRequest(
-        #     request,
-        #     url_for(region, 'global_intel')
-        # )
+        def request_for(family):
+            return RelativeRequest(request, url_for(region, family))
 
-        self._campaign = CampaignAPI(private_intel_request)
-        self._COA = COAAPI(private_intel_request)
-        self._data_table = DataTableAPI(private_intel_request)
+        self._inspect = InspectAPI(request_for('visibility'))
+        self._enrich = EnrichAPI(request_for('visibility'))
+        self._response = ResponseAPI(request_for('visibility'))
+        self._private_intel = IntelAPI(request_for('private_intel'))
+        self._global_intel = IntelAPI(request_for('global_intel'))
 
     @property
     def inspect(self):
@@ -50,14 +39,13 @@ class ThreatResponse(object):
         return self._enrich
 
     @property
-    def campaign(self):
-        return self._campaign
+    def response(self):
+        return self._response
 
     @property
-    def coa(self):
-        return self._COA
+    def private_intel(self):
+        return self._private_intel
 
     @property
-    def data_table(self):
-        return self._data_table
-
+    def global_intel(self):
+        return self._global_intel

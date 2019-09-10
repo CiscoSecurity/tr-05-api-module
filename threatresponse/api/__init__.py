@@ -1,6 +1,5 @@
 # Make the classes below importable from the `.api` subpackage directly.
 from .enrich import EnrichAPI
 from .inspect import InspectAPI
-from .campaign import CampaignAPI
-from .coa import COAAPI
-from .data_table import DataTableAPI
+from .response import ResponseAPI
+from .intel import IntelAPI

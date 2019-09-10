@@ -1,6 +1,6 @@
 from mock import MagicMock
 
-from threatresponse.api import COAAPI
+from threatresponse.api import IntelAPI
 
 
 def test_coa_by_id_succeeds():
@@ -130,6 +130,6 @@ def assert_succeeds_with_put(invoke, url, id_, payload):
 def response_request_and_api():
     response = MagicMock()
     request = MagicMock()
-    api = COAAPI(request)
+    api = IntelAPI(request)
 
     return response, request, api

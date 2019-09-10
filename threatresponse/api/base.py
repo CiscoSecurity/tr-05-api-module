@@ -28,7 +28,7 @@ class API(object):
 
         if router is None:
             raise Exception(
-                "Couldn't build a resolution for {}.".format(type(self))
+                'Could not build a resolution for {}.'.format(type(self))
             )
 
         return Resolution(self, router)
