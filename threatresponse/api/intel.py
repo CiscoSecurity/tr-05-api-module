@@ -51,7 +51,7 @@ class IntelAPI(API):
 
         return response.json()
 
-    @route('bundle.import')
+    @route('bundle.import.post')
     def _perform(self, payload, **params):
         """
         https://private.intel.amp.cisco.com/index.html#!/Bundle/post_ctia_bundle_import
