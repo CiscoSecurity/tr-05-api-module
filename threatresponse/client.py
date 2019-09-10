@@ -1,6 +1,7 @@
 from .api.intel import IntelAPI
 from .api.enrich import EnrichAPI
 from .api.inspect import InspectAPI
+from .api.response import ResponseAPI
 from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.relative import RelativeRequest
@@ -20,24 +21,14 @@ class ThreatResponse(object):
         request = LoggedRequest(request, logger) if logger else request
         request = AuthorizedRequest(request, *credentials, region=region)
 
-        visibility_request = RelativeRequest(
-            request,
-            url_for(region, 'visibility')
-        )
-        self._inspect = InspectAPI(visibility_request)
-        self._enrich = EnrichAPI(visibility_request)
+        def request_for(family):
+            return RelativeRequest(request, url_for(region, family))
 
-        private_intel_request = RelativeRequest(
-            request,
-            url_for(region, 'private_intel')
-        )
-        self._private_intel = IntelAPI(private_intel_request)
-
-        global_intel_request = RelativeRequest(
-            request,
-            url_for(region, 'global_intel')
-        )
-        self._global_intel = IntelAPI(global_intel_request)
+        self._inspect = InspectAPI(request_for('visibility'))
+        self._enrich = EnrichAPI(request_for('visibility'))
+        self._response = ResponseAPI(request_for('visibility'))
+        self._private_intel = IntelAPI(request_for('private_intel'))
+        self._global_intel = IntelAPI(request_for('global_intel'))
 
     @property
     def inspect(self):
@@ -46,6 +37,10 @@ class ThreatResponse(object):
     @property
     def enrich(self):
         return self._enrich
+
+    @property
+    def response(self):
+        return self._response
 
     @property
     def private_intel(self):

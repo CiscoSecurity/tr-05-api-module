@@ -5,8 +5,6 @@ python:
 - '3.5'
 - '3.6'
 - '3.7'
-env:
-- travis_key_password=992a9493d43ebef17ad6d6d768d0c5649223ba898d8e62c29ec0c72b4ba0b83a
 before_install:
 - openssl aes-256-cbc -k "$travis_key_password" -d -md sha256 -a -in travis_key.enc -out ~/.ssh/id_rsa
 - chmod 400 ~/.ssh/id_rsa
