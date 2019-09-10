@@ -1,6 +1,6 @@
 from six.moves.urllib.parse import urljoin
 
-from threatresponse.api.base import API
+from .base import API
 
 
 class EntityAPI(API):
@@ -41,8 +41,7 @@ class EntityAPI(API):
         return response.json()
 
     def external_id(self, id_, **params):
-        url = urljoin(self._url, 'external_id/')
-        url = urljoin(url, str(id_))
+        url = urljoin(self._url, 'external_id/%s' % id_)
 
         response = self._request.get(url, params=params)
         response.raise_for_status()
