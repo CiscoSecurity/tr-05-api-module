@@ -24,19 +24,18 @@ class ThreatResponse(object):
             request,
             url_for(region, 'visibility')
         )
-        self._inspect = InspectAPI(visibility_request)
-        self._enrich = EnrichAPI(visibility_request)
-
         private_intel_request = RelativeRequest(
             request,
             url_for(region, 'private_intel')
         )
-        self._private_intel = IntelAPI(private_intel_request)
-
         global_intel_request = RelativeRequest(
             request,
             url_for(region, 'global_intel')
         )
+
+        self._inspect = InspectAPI(visibility_request)
+        self._enrich = EnrichAPI(visibility_request)
+        self._private_intel = IntelAPI(private_intel_request)
         self._global_intel = IntelAPI(global_intel_request)
 
     @property
