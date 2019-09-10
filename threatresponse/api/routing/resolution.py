@@ -5,8 +5,8 @@ class Resolution(object):
 
     def __init__(self, owner, router, route=None):
         self._owner = owner
-        self._route = route or []
         self._router = router
+        self._route = route or []
 
     def __call__(self, *args, **kwargs):
         """ Invokes a method by the built route. """

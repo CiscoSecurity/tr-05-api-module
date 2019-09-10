@@ -1,5 +1,5 @@
-from .routing import Router
 from .base import API
+from .routing import Router
 
 
 class EnrichAPI(API):
