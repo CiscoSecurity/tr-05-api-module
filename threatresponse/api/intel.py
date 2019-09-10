@@ -13,9 +13,9 @@ class IntelAPI(API):
         self._actor.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#!/Actor/"
 
-        self._attack_pattern = EntityAPI(request, '/ctia/attack_pattern/')
+        self._attack_pattern = EntityAPI(request, '/ctia/attack-pattern/')
         self._attack_pattern.__doc__ = \
-            "..."
+            "https://private.intel.amp.cisco.com/index.html#/Attack_Pattern"
 
     @property
     def actor(self):
