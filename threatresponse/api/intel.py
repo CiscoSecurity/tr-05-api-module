@@ -13,6 +13,18 @@ class IntelAPI(API):
         self._actor.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#!/Actor"
 
+        self._campaign = EntityAPI(request, '/ctia/campaign')
+        self._campaign.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#!/Campaign/"
+
+        self._coa = EntityAPI(request, '/ctia/coa')
+        self._coa.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#!/COA/"
+
+        self._data_table = EntityAPI(request, '/ctia/data_table')
+        self._data_table.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#!/DataTable/"
+
         self._attack_pattern = EntityAPI(request, '/ctia/attack-pattern')
         self._attack_pattern.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Attack_Pattern"
@@ -20,6 +32,18 @@ class IntelAPI(API):
     @property
     def actor(self):
         return self._actor
+
+    @property
+    def campaign(self):
+        return self._campaign
+
+    @property
+    def coa(self):
+        return self._coa
+
+    @property
+    def data_table(self):
+        return self._data_table
 
     @property
     def attack_pattern(self):
