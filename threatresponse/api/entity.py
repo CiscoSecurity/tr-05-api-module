@@ -1,5 +1,3 @@
-from six.moves.urllib.parse import urljoin
-
 from .base import API
 
 
