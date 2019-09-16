@@ -38,6 +38,14 @@ class EntityAPI(API):
 
         return response.json()
 
+    def patch(self, id_, payload):
+        url = '%s/%s' % (self._url, id_)
+
+        response = self._request.patch(url, json=payload)
+        response.raise_for_status()
+
+        return response.json()
+
     def external_id(self, id_, **params):
         url = '%s/external_id/%s' % (self._url, id_)
 
