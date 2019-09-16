@@ -27,7 +27,7 @@ class API(object):
         response = self._request.perform(url, *args, **kwargs)
         response.raise_for_status()
 
-        return response
+        return response.json()
 
     def __getattr__(self, item):
         if self._resolution is None:
