@@ -1,4 +1,4 @@
-from assertions import *
+from .assertions import *
 
 
 def test_feedback_without_id_succeeds():

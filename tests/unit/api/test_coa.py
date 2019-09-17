@@ -1,4 +1,4 @@
-from assertions import *
+from .assertions import *
 
 
 def test_coa_by_id_succeeds():
