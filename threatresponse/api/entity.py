@@ -8,9 +8,11 @@ class EntityAPI(API):
 
         self._url = url
 
-    def get(self, id_, **params):
-        url = '%s/%s' % (self._url, id_)
-
+    def get(self, id_=None, **params):
+        if id_:
+            url = '%s/%s' % (self._url, id_)
+        else:
+            url = self._url
         response = self._request.get(url, params=params)
         response.raise_for_status()
 

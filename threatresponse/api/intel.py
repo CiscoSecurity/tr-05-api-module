@@ -29,6 +29,18 @@ class IntelAPI(API):
         self._attack_pattern.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Attack_Pattern"
 
+        self._feedback = EntityAPI(request, '/ctia/feedback')
+        self._feedback.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Feedback"
+
+        self._graphql = EntityAPI(request, '/ctia/graphql')
+        self._graphql.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/GraphQL"
+
+        self._event = EntityAPI(request, '/ctia/event')
+        self._event.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Event"
+
     @property
     def actor(self):
         return self._actor
@@ -48,6 +60,18 @@ class IntelAPI(API):
     @property
     def attack_pattern(self):
         return self._attack_pattern
+
+    @property
+    def feedback(self):
+        return self._feedback
+
+    @property
+    def graphql(self):
+        return self._graphql
+
+    @property
+    def event(self):
+        return self._event
 
     @route('bundle.export.get')
     def _perform(self, **params):
