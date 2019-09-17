@@ -31,6 +31,9 @@ def module_tool_client():
         client_password=settings.server.ctr_client_password
     )
 
+# TODO Add some test coverage for VirusTotal module once we can get stable
+# TODO response from CTR server
+
 
 def test_ctr_positive_smoke_inspect(module_headers):
     """Perform testing for inspect end point of threat response application
@@ -112,8 +115,8 @@ def test_ctr_positive_tool_enrich_observe_observables(
     )['data']
     tool_response = module_tool_client.enrich.observe.observables(
         [{'type': 'sha256', 'value': data}])['data']
-    direct_observables = get_observables(response, 'VirusTotal')
-    tool_observables = get_observables(tool_response, 'VirusTotal')
+    direct_observables = get_observables(response, 'AMP File Reputation')
+    tool_observables = get_observables(tool_response, 'AMP File Reputation')
     assert tool_observables['data']['verdicts']['count'] > 0, (
         'No observables returned from server. Check hash value')
     assert tool_observables['data']['judgements']['count'] > 0, (
@@ -150,8 +153,8 @@ def test_ctr_positive_tool_enrich_deliberate_observables(
     )['data']
     tool_response = module_tool_client.enrich.deliberate.observables(
         [{'type': 'sha256', 'value': data}])['data']
-    direct_observables = get_observables(response, 'VirusTotal')
-    tool_observables = get_observables(tool_response, 'VirusTotal')
+    direct_observables = get_observables(response, 'AMP File Reputation')
+    tool_observables = get_observables(tool_response, 'AMP File Reputation')
     assert tool_observables['data']['verdicts']['count'] > 0, (
         'No observables returned from server. Check hash value')
     assert 'judgements' not in tool_observables['data'].keys()
