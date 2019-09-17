@@ -23,4 +23,3 @@ class IndicatorAPI(EntityAPI):
             '/ctia/%s/%s/sightings/indicators' %
             (observable_type, observable_value)
         )
-
