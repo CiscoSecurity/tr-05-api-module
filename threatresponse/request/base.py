@@ -21,5 +21,8 @@ class Request(six.with_metaclass(abc.ABCMeta, object)):
     def put(self, url, **kwargs):
         return self.perform('PUT', url, **kwargs)
 
+    def patch(self, url, **kwargs):
+        return self.perform('PATCH', url, **kwargs)
+
     def delete(self, url, **kwargs):
         return self.perform('DELETE', url, **kwargs)

@@ -8,6 +8,27 @@ class API(object):
         self._request = request
         self._resolution = None
 
+    def _get(self, *args, **kwargs):
+        return self.__perform('GET', *args, **kwargs)
+
+    def _post(self, *args, **kwargs):
+        return self.__perform('POST', *args, **kwargs)
+
+    def _put(self, *args, **kwargs):
+        return self.__perform('PUT', *args, **kwargs)
+
+    def _patch(self, *args, **kwargs):
+        return self.__perform('PATCH', *args, **kwargs)
+
+    def _delete(self, *args, **kwargs):
+        return self.__perform('DELETE', *args, **kwargs)
+
+    def __perform(self, url, *args, **kwargs):
+        response = self._request.perform(url, *args, **kwargs)
+        response.raise_for_status()
+
+        return response.json()
+
     def __getattr__(self, item):
         if self._resolution is None:
             self._resolution = self._build_resolution()
