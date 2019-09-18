@@ -5,6 +5,7 @@ from .bundle import BundleAPI
 from .incident import IncidentAPI
 from .indicator import IndicatorAPI
 from .judgement import JudgementAPI
+from .event import EventAPI
 
 
 class IntelAPI(API):
@@ -35,7 +36,16 @@ class IntelAPI(API):
         self._attack_pattern.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Attack_Pattern"
 
+        self._feedback = EntityAPI(request, '/ctia/feedback')
+        self._feedback.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Feedback"
+
+        self._graphql = EntityAPI(request, '/ctia/graphql')
+        self._graphql.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/GraphQL"
+
         self._bundle = BundleAPI(request)
+        self._event = EventAPI(request)
         self._incident = IncidentAPI(request)
         self._indicator = IndicatorAPI(request)
         self._judgement = JudgementAPI(request)
@@ -63,6 +73,18 @@ class IntelAPI(API):
     @property
     def attack_pattern(self):
         return self._attack_pattern
+
+    @property
+    def feedback(self):
+        return self._feedback
+
+    @property
+    def graphql(self):
+        return self._graphql
+
+    @property
+    def event(self):
+        return self._event
 
     @property
     def incident(self):
