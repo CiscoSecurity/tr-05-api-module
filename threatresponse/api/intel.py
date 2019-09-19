@@ -44,6 +44,14 @@ class IntelAPI(API):
         self._graphql.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/GraphQL"
 
+        self._malware = EntityAPI(request, '/ctia/malware')
+        self._malware.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Malware"
+
+        self._relationship = EntityAPI(request, '/ctia/relationship')
+        self._relationship.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Relationship"
+
         self._bundle = BundleAPI(request)
         self._event = EventAPI(request)
         self._incident = IncidentAPI(request)
@@ -97,3 +105,19 @@ class IntelAPI(API):
     @property
     def judgement(self):
         return self._judgement
+
+    @property
+    def malware(self):
+        return self._malware
+
+    @property
+    def relationship(self):
+        return self._relationship
+
+    @route('properties.get')
+    def _perform(self):
+        """
+        https://private.intel.amp.cisco.com/index.html#!/Properties/get_ctia_properties
+        """
+
+        return self._get('/ctia/properties')
