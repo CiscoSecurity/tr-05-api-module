@@ -6,6 +6,8 @@ from .incident import IncidentAPI
 from .indicator import IndicatorAPI
 from .judgement import JudgementAPI
 from .event import EventAPI
+from .sighting import SightingAPI
+from .casebook import CasebookAPI
 
 
 class IntelAPI(API):
@@ -44,11 +46,17 @@ class IntelAPI(API):
         self._graphql.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/GraphQL"
 
+        self._bulk = EntityAPI(request, '/ctia/bulk')
+        self._bulk.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Bulk"
+
         self._bundle = BundleAPI(request)
         self._event = EventAPI(request)
         self._incident = IncidentAPI(request)
         self._indicator = IndicatorAPI(request)
         self._judgement = JudgementAPI(request)
+        self._casebook = CasebookAPI(request)
+        self._sighting = SightingAPI
 
     @property
     def actor(self):
@@ -97,3 +105,15 @@ class IntelAPI(API):
     @property
     def judgement(self):
         return self._judgement
+
+    @property
+    def casebook(self):
+        return self._casebook
+
+    @property
+    def sightings(self):
+        return self._sightings
+
+    @property
+    def bulk(self):
+        return self._bulk
