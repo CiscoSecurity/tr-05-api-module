@@ -56,7 +56,7 @@ class IntelAPI(API):
         self._indicator = IndicatorAPI(request)
         self._judgement = JudgementAPI(request)
         self._casebook = CasebookAPI(request)
-        self._sighting = SightingAPI
+        self._sighting = SightingAPI(request)
 
     @property
     def actor(self):
@@ -111,8 +111,8 @@ class IntelAPI(API):
         return self._casebook
 
     @property
-    def sightings(self):
-        return self._sightings
+    def sighting(self):
+        return self._sighting
 
     @property
     def bulk(self):
