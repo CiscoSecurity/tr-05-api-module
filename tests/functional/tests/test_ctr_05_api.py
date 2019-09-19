@@ -10,6 +10,7 @@ from ctrlibrary.threatresponse.enrich import (
     enrich_observe_observables,
     enrich_refer_observables
 )
+from ctrlibrary.threatresponse.response import response_respond_observables
 from threatresponse import ThreatResponse
 
 
@@ -35,6 +36,10 @@ def module_tool_client():
 # TODO response from CTR server
 
 
+SHA256_HASH = (
+    '01f30887a828344f6cf574bb05bd0bf571fc35979a3032377b95fb0d692b8061')
+
+
 def test_ctr_positive_smoke_inspect(module_headers):
     """Perform testing for inspect end point of threat response application
     server
@@ -45,7 +50,8 @@ def test_ctr_positive_smoke_inspect(module_headers):
 
         1. Send request with domain name to inspect end point
 
-    Expectedresults: POST action reached end point and returned correct data
+    Expectedresults: POST action successfully get to the end point and return
+        correct data
 
     Importance: High
     """
@@ -103,18 +109,17 @@ def test_ctr_positive_tool_enrich_observe_observables(
         2. Send same request using custom python module
         3. Compare results
 
-    Expectedresults: POST action finished get to the end point and return
+    Expectedresults: POST action successfully get to the end point and return
         correct data
 
     Importance: Critical
     """
-    data = '01f30887a828344f6cf574bb05bd0bf571fc35979a3032377b95fb0d692b8061'
     response = enrich_observe_observables(
-        payload=[{'type': 'sha256', 'value': data}],
+        payload=[{'type': 'sha256', 'value': SHA256_HASH}],
         **{'headers': module_headers}
     )['data']
     tool_response = module_tool_client.enrich.observe.observables(
-        [{'type': 'sha256', 'value': data}])['data']
+        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
     direct_observables = get_observables(response, 'AMP File Reputation')
     tool_observables = get_observables(tool_response, 'AMP File Reputation')
     assert tool_observables['data']['verdicts']['count'] > 0, (
@@ -141,18 +146,17 @@ def test_ctr_positive_tool_enrich_deliberate_observables(
         2. Send same request using custom python module
         3. Compare results
 
-    Expectedresults: POST action finished get to the end point and return
+    Expectedresults: POST action successfully get to the end point and return
         correct data
 
     Importance: Critical
     """
-    data = '01f30887a828344f6cf574bb05bd0bf571fc35979a3032377b95fb0d692b8061'
     response = enrich_deliberate_observables(
-        payload=[{'type': 'sha256', 'value': data}],
+        payload=[{'type': 'sha256', 'value': SHA256_HASH}],
         **{'headers': module_headers}
     )['data']
     tool_response = module_tool_client.enrich.deliberate.observables(
-        [{'type': 'sha256', 'value': data}])['data']
+        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
     direct_observables = get_observables(response, 'AMP File Reputation')
     tool_observables = get_observables(tool_response, 'AMP File Reputation')
     assert tool_observables['data']['verdicts']['count'] > 0, (
@@ -178,7 +182,7 @@ def test_ctr_positive_tool_enrich_refer_observables(
         2. Send same request using custom python module
         3. Compare results
 
-    Expectedresults: POST action finished get to the end point and return
+    Expectedresults: POST action successfully get to the end point and return
         correct data
 
     Importance: Critical
@@ -192,4 +196,39 @@ def test_ctr_positive_tool_enrich_refer_observables(
         [{'type': 'domain', 'value': request_content}])['data'][0]
     assert tool_response['module']
     assert tool_response['title'] == 'Search for this domain'
+    assert response == tool_response
+
+
+def test_ctr_positive_tool_response_respond_observables(
+        module_headers, module_tool_client):
+    """Perform testing for response respond observables end point of custom
+        threat response python module
+
+    ID: CCTRI-137-b8f74c6e-b670-4159-8d74-eb4756b24084
+
+    Steps:
+
+        1. Send request sha256 hash to response respond observables end
+            point of threat response server using direct POST call
+        2. Send same request using custom python module
+        3. Compare results
+
+    Expectedresults: POST action successfully get to the end point and return
+        correct data
+
+    Importance: Critical
+    """
+    expected_list = [
+        'Add SHA256 to custom detections 500 PDFs',
+        'Add SHA256 to custom detections testing',
+        'Remove SHA256 from custom detections File Blacklist'
+    ]
+    response = response_respond_observables(
+        payload=[{'type': 'sha256', 'value': SHA256_HASH}],
+        **{'headers': module_headers}
+    )['data']
+    tool_response = module_tool_client.response.respond.observables(
+        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
+    assert len(tool_response) > 0
+    assert set(expected_list) == set([d['title'] for d in tool_response])
     assert response == tool_response
