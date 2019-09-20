@@ -17,14 +17,11 @@ def assert_succeeds_with_get(invoke, url, id_=None, **query):
 
 
 def assert_succeeds_with_perform(invoke, method, url, id_=None,
-                                 payload=None, observable_type=None,
-                                 observable_value=None, **query):
+                                 payload=None, **query):
     response, request, api = response_request_and_api()
     request.perform.return_value = response
     if payload:
         invoke(api, id_, payload)
-    elif observable_type and observable_value:
-        invoke(api, observable_type, observable_value)
     elif id_ and query:
         invoke(api, id_, query)
     elif id_ is None:
@@ -33,8 +30,6 @@ def assert_succeeds_with_perform(invoke, method, url, id_=None,
         invoke(api, id_)
     if payload:
         request.perform.assert_called_once_with(method, url, json=payload)
-    elif observable_type and observable_value:
-        request.perform.assert_called_once_with(method, url, observable_type, observable_value)
     else:
         request.perform.assert_called_once_with(method, url, params=query)
     response.json.assert_called_once_with()
