@@ -39,6 +39,8 @@ def module_tool_client():
 SHA256_HASH = (
     '01f30887a828344f6cf574bb05bd0bf571fc35979a3032377b95fb0d692b8061')
 
+DOMAIN = 'cpi-istanbul.com'
+
 
 def test_ctr_positive_smoke_inspect(module_headers):
     """Perform testing for inspect end point of threat response application
@@ -64,9 +66,9 @@ def test_ctr_positive_smoke_inspect(module_headers):
     assert response[0]['type'] == 'domain'
 
 
-def test_ctr_positive_tool_inspect(module_headers, module_tool_client):
+def test_python_module_positive_inspect(module_headers, module_tool_client):
     """Perform testing for inspect end point of custom threat response python
-        module
+    module
 
     ID: 3ce73f46-7db9-4ae7-a69d-fd791c943d28
 
@@ -95,10 +97,10 @@ def test_ctr_positive_tool_inspect(module_headers, module_tool_client):
     assert tool_response[0]['type'] == 'sha256'
 
 
-def test_ctr_positive_tool_enrich_observe_observables(
+def test_python_module_positive_enrich_observe_observables(
         module_headers, module_tool_client):
     """Perform testing for enrich observe observables end point of custom
-        threat response python module
+    threat response python module
 
     ID: d1dd6d3b-f762-4280-a573-7cc815da5a85
 
@@ -132,10 +134,10 @@ def test_ctr_positive_tool_enrich_observe_observables(
         'count'] == tool_observables['data']['judgements']['count']
 
 
-def test_ctr_positive_tool_enrich_deliberate_observables(
+def test_python_module_positive_enrich_deliberate_observables(
         module_headers, module_tool_client):
     """Perform testing for enrich deliberate observables end point of custom
-        threat response python module
+    threat response python module
 
     ID: 2deb7d0f-a44f-49d6-81f1-5a6e16e7d652
 
@@ -168,10 +170,10 @@ def test_ctr_positive_tool_enrich_deliberate_observables(
         'count'] == tool_observables['data']['verdicts']['count']
 
 
-def test_ctr_positive_tool_enrich_refer_observables(
+def test_python_module_positive_enrich_refer_observables(
         module_headers, module_tool_client):
     """Perform testing for enrich refer observables end point of custom
-        threat response python module
+    threat response python module
 
     ID: 7b8d86b5-a360-4f91-acd7-f2d9e4104b03
 
@@ -199,10 +201,10 @@ def test_ctr_positive_tool_enrich_refer_observables(
     assert response == tool_response
 
 
-def test_ctr_positive_tool_response_respond_observables(
+def test_python_module_positive_response_respond_observables_by_hash(
         module_headers, module_tool_client):
     """Perform testing for response respond observables end point of custom
-        threat response python module
+    threat response python module by hash type
 
     ID: CCTRI-137-b8f74c6e-b670-4159-8d74-eb4756b24084
 
@@ -231,4 +233,35 @@ def test_ctr_positive_tool_response_respond_observables(
         [{'type': 'sha256', 'value': SHA256_HASH}])['data']
     assert len(tool_response) > 0
     assert set(expected_list) == set([d['title'] for d in tool_response])
+    assert response == tool_response
+
+
+def test_python_module_positive_response_respond_observables_by_domain(
+        module_headers, module_tool_client):
+    """Perform testing for response respond observables end point of custom
+    threat response python module by domain type
+
+    ID: CCTRI-137-38e4089c-7ca5-4c0a-820d-e6124e939428
+
+    Steps:
+
+        1. Send domain name in request to response respond observables end
+            point of threat response server using direct POST call
+        2. Send same request using custom python module
+        3. Compare results
+
+    Expectedresults: POST action successfully get to the end point and return
+        correct data
+
+    Importance: Critical
+    """
+    response = response_respond_observables(
+        payload=[{'type': 'domain', 'value': DOMAIN}],
+        **{'headers': module_headers}
+    )['data']
+    tool_response = module_tool_client.response.respond.observables(
+        [{'type': 'domain', 'value': DOMAIN}])['data']
+    assert len(tool_response) > 0
+    assert tool_response[0]['module'] == 'Umbrella'
+    assert tool_response[0]['title'] == 'Block this domain'
     assert response == tool_response
