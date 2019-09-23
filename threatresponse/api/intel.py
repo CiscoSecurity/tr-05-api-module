@@ -115,7 +115,6 @@ class IntelAPI(API):
         return self._judgement
 
     @property
-
     def casebook(self):
         return self._casebook
 
@@ -127,6 +126,7 @@ class IntelAPI(API):
     def bulk(self):
         return self._bulk
 
+    @property
     def malware(self):
         return self._malware
 
