@@ -49,7 +49,7 @@ class IntelAPI(API):
         self._bulk = EntityAPI(request, '/ctia/bulk')
         self._bulk.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Bulk"
-        
+
         self._malware = EntityAPI(request, '/ctia/malware')
         self._malware.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Malware"
