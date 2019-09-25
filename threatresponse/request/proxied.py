@@ -3,10 +3,18 @@ from .standard import StandardRequest
 
 class ProxiedRequest(StandardRequest):
     """
-    Supports request proxying via a specified proxy server.
+    Supports HTTP request proxying via a specified proxy server.
     """
 
     def __init__(self, proxy):
         super(ProxiedRequest, self).__init__()
 
-        self._session.proxies = {'http': proxy, 'https': proxy}
+        self._proxy = proxy
+
+        self._configure_session_proxies()
+
+    def _configure_session_proxies(self):
+        self._session.proxies = {
+            'http': self._proxy,
+            'https': self._proxy,
+        }
