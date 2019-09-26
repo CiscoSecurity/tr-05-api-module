@@ -58,7 +58,6 @@ def assert_succeeds_with_delete(invoke, url, id_):
     invoke(api, id_)
 
     request.delete.assert_called_once_with(url)
-    response.json.assert_called_once_with()
 
 
 def assert_succeeds_with_put(invoke, url, id_, payload):
