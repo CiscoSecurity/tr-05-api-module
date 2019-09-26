@@ -22,15 +22,15 @@ class IntelAPI(API):
 
         self._campaign = EntityAPI(request, '/ctia/campaign')
         self._campaign.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/Campaign/"
+            "https://private.intel.amp.cisco.com/index.html#!/Campaign"
 
         self._coa = EntityAPI(request, '/ctia/coa')
         self._coa.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/COA/"
+            "https://private.intel.amp.cisco.com/index.html#!/COA"
 
         self._data_table = EntityAPI(request, '/ctia/data-table')
         self._data_table.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/DataTable/"
+            "https://private.intel.amp.cisco.com/index.html#!/DataTable"
 
         self._attack_pattern = EntityAPI(request, '/ctia/attack-pattern')
         self._attack_pattern.__doc__ = \
@@ -51,6 +51,10 @@ class IntelAPI(API):
         self._relationship = EntityAPI(request, '/ctia/relationship')
         self._relationship.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Relationship"
+
+        self._tool = EntityAPI(request, '/ctia/tool')
+        self._tool.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Tool"
 
         self._bundle = BundleAPI(request)
         self._event = EventAPI(request)
@@ -114,10 +118,31 @@ class IntelAPI(API):
     def relationship(self):
         return self._relationship
 
+    @property
+    def tool(self):
+        return self._tool
+
     @route('properties.get')
     def _perform(self):
         """
-        https://private.intel.amp.cisco.com/index.html#!/Properties/get_ctia_properties
+        https://private.intel.amp.cisco.com/index.html#/Properties
         """
 
         return self._get('/ctia/properties')
+
+    @route('metrics.get')
+    def _perform(self):
+        """
+        https://private.intel.amp.cisco.com/index.html#/Metrics
+        """
+
+        return self._get('/ctia/metrics')
+
+    @route('verdict.get')
+    def _perform(self, observable_type, observable_value):
+        """
+        https://private.intel.amp.cisco.com/index.html#/Verdict
+        """
+
+        return self._get('/ctia/%s/%s/verdict' %
+                         (observable_type, observable_value))
