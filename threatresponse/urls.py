@@ -1,4 +1,4 @@
-from .exceptions import InvalidRegionError
+from .exceptions import RegionError
 
 
 _url_patterns_by_api_family = {
@@ -31,7 +31,7 @@ def url_for(region, family):
 
     if region not in _urls_by_region:
         # Use `repr` to make each region enclosed in quotes.
-        raise InvalidRegionError(
+        raise RegionError(
             'Invalid region {}, must be one of: {}.'.format(
                 repr(region),
                 ', '.join(map(repr, _urls_by_region.keys())),
