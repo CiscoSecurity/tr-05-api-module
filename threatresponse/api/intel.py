@@ -138,6 +138,10 @@ class IntelAPI(API):
     def relationship(self):
         return self._relationship
 
+    @property
+    def investigation(self):
+        return self._investigation
+
     @route('properties.get')
     def _perform(self):
         """
