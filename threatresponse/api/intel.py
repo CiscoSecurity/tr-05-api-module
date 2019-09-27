@@ -58,6 +58,10 @@ class IntelAPI(API):
         self._relationship.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Relationship"
 
+        self._investigation = EntityAPI(request, '/ctia/investigation')
+        self._investigation.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Investigation"
+
         self._bundle = BundleAPI(request)
         self._event = EventAPI(request)
         self._incident = IncidentAPI(request)
@@ -141,3 +145,19 @@ class IntelAPI(API):
         """
 
         return self._get('/ctia/properties')
+
+    @route('status.get')
+    def _perform(self):
+        """
+        https://private.intel.amp.cisco.com/index.html#/Status
+        """
+
+        return self._get('/ctia/status')
+
+    @route('version.get')
+    def _perform(self):
+        """
+        https://private.intel.amp.cisco.com/index.html#/Version
+        """
+
+        return self._get('/ctia/version')
