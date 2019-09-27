@@ -3,6 +3,23 @@ from mock import MagicMock
 from threatresponse.api import IntelAPI
 
 
+payload = {'ham': 'eggs'}
+
+
+def invoke(invocation):
+    request, response = MagicMock(), MagicMock()
+
+    for method in ['get', 'post', 'patch', 'put', 'delete', 'perform']:
+        method = getattr(request, method)
+        method.return_value = response
+
+    invocation(IntelAPI(request))
+
+    # Assertions.
+    response.json.assert_called_once()
+
+    return request
+
 def assert_succeeds_with_get(invoke, url, id_=None, **query):
     response, request, api = response_request_and_api()
     request.get.return_value = response
@@ -13,19 +30,6 @@ def assert_succeeds_with_get(invoke, url, id_=None, **query):
     else:
         invoke(api, id_)
     request.get.assert_called_once_with(url, params=query)
-    response.json.assert_called_once_with()
-
-
-def assert_succeeds_with_perform(invoke, method, url, id_=None, **query):
-    response, request, api = response_request_and_api()
-    request.perform.return_value = response
-    if id_ and query:
-        invoke(api, id_, query)
-    elif id_ is None:
-        invoke(api, query)
-    else:
-        invoke(api, id_)
-    request.perform.assert_called_once_with(method, url, params=query)
     response.json.assert_called_once_with()
 
 
@@ -52,7 +56,6 @@ def assert_succeeds_with_delete(invoke, url, id_):
     invoke(api, id_)
 
     request.delete.assert_called_once_with(url)
-    response.json.assert_called_once_with()
 
 
 def assert_succeeds_with_put(invoke, url, id_, payload):
