@@ -30,7 +30,7 @@ class EntityAPI(API):
         response = self._request.delete(url)
         response.raise_for_status()
 
-        return response.status_code
+        return
 
     def put(self, id_, payload):
         url = '%s/%s' % (self._url, id_)
