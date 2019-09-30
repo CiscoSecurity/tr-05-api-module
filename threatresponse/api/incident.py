@@ -12,11 +12,13 @@ class IncidentAPI(EntityAPI):
 
     @route('status')
     def _perform(self, id_, payload, **params):
-        return self._post('%s/%s/status' % (self._url, id_), json=payload, params=params)
+        return self._post('%s/%s/status' % (self._url, id_),
+                          json=payload, params=params)
 
     @route('link')
     def _perform(self, id_, payload, **params):
-        return self._post('%s/%s/link' % (self._url, id_), json=payload, params=params)
+        return self._post('%s/%s/link' % (self._url, id_),
+                          json=payload, params=params)
 
     @route('sightings.incidents')
     def _perform(self, observable_type, observable_value):

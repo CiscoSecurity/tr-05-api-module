@@ -12,12 +12,15 @@ class CasebookAPI(EntityAPI):
 
     @route('observables')
     def _perform(self, id_, payload, **params):
-        return self._post('%s/%s/observables' % (self._url, id_), json=payload, params=params)
+        return self._post('%s/%s/observables' % (self._url, id_),
+                          json=payload, params=params)
 
     @route('texts')
     def _perform(self, id_, payload, **params):
-        return self._post('%s/%s/texts' % (self._url, id_), json=payload, params=params)
+        return self._post('%s/%s/texts' % (self._url, id_),
+                          json=payload, params=params)
 
     @route('bundle')
     def _perform(self, id_, payload, **params):
-        return self._post('%s/%s/bundle' % (self._url, id_), json=payload, params=params)
+        return self._post('%s/%s/bundle' % (self._url, id_),
+                          json=payload, params=params)
