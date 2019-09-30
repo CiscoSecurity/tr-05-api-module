@@ -68,6 +68,14 @@ class IntelAPI(API):
         self._investigation.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Investigation"
 
+        self._vulnerability = EntityAPI(request, '/ctia/vulnerability')
+        self._vulnerability.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Vulnerability"
+
+        self._weakness = EntityAPI(request, '/ctia/weakness')
+        self._weakness.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Weakness"
+
         self._bundle = BundleAPI(request)
         self._event = EventAPI(request)
         self._incident = IncidentAPI(request)
@@ -151,6 +159,14 @@ class IntelAPI(API):
     @property
     def investigation(self):
         return self._investigation
+
+    @property
+    def vulnerability(self):
+        return self._vulnerability
+
+    @property
+    def weakness(self):
+        return self._weakness
 
     @route('properties.get')
     def _perform(self):
