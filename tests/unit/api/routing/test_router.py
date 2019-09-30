@@ -2,6 +2,7 @@ import pytest
 import six
 
 from threatresponse.api.routing import Router
+from threatresponse.exceptions import RouteError
 
 
 def test_new():
@@ -27,7 +28,7 @@ def test_register_resolve():
     register('a.b')(ab)
     register('a.b.c')(abc)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(RouteError):
         register('a.b')(ab)
 
     # Check that `router` gets populated behind the scenes.
@@ -37,7 +38,7 @@ def test_register_resolve():
     assert router.resolve('a.b') is ab
     assert router.resolve('a.b.c') is abc
 
-    with pytest.raises(ValueError):
+    with pytest.raises(RouteError):
         router.resolve('a.b.c.d')
 
 

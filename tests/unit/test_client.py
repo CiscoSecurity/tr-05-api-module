@@ -5,9 +5,11 @@ from requests import HTTPError
 from threatresponse.api import (
     InspectAPI,
     EnrichAPI,
+    ResponseAPI,
+    IntelAPI,
 )
 from threatresponse.client import ThreatResponse
-from threatresponse.exceptions import InvalidRegionError
+from threatresponse.exceptions import RegionError
 
 
 @patch('requests.Session.request')
@@ -16,6 +18,9 @@ def test_types_of_inner_apis(_):
 
     assert isinstance(client.inspect, InspectAPI)
     assert isinstance(client.enrich, EnrichAPI)
+    assert isinstance(client.response, ResponseAPI)
+    assert isinstance(client.private_intel, IntelAPI)
+    assert isinstance(client.global_intel, IntelAPI)
 
 
 @patch('requests.Session.request')
@@ -27,7 +32,7 @@ def test_different_regions(_):
         TR(region)
 
     for region in ['foo', 'bar']:
-        with pytest.raises(InvalidRegionError):
+        with pytest.raises(RegionError):
             TR(region)
 
 
