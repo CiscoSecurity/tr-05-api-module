@@ -45,4 +45,4 @@ different (ideally minimum) privileges.
 Other regions are not supported yet.
 - `logger` must be an (already configured) instance of the built-in
 `logging.Logger` class (or one of its descendants).
-- `proxy` must be a URL in the format: `http[s]://host[:port]`.
+- `proxy` must be a URL in the format: `http[s]://[username[:password]@]host[:port]`.
