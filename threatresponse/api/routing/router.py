@@ -1,5 +1,7 @@
 from itertools import chain
 
+from ...exceptions import RouteError
+
 
 class Router(object):
     """ Represents a mapping from a route to a method. """
@@ -12,7 +14,7 @@ class Router(object):
 
         def register(method):
             if route in self._routes:
-                raise ValueError(
+                raise RouteError(
                     'Route {} has already been registered.'.format(repr(route))
                 )
 
@@ -28,9 +30,9 @@ class Router(object):
         """ Returns a method by the specified route. """
 
         if not route:
-            raise ValueError('Route cannot be empty.')
+            raise RouteError('Route cannot be empty.')
         if route not in self._routes:
-            raise ValueError('Route {} is not registered.'.format(repr(route)))
+            raise RouteError('Route {} is not registered.'.format(repr(route)))
 
         return self._routes[route]
 

@@ -1,12 +1,13 @@
 from mock import patch
 
+from threatresponse.request.response import Response
 from threatresponse.request.standard import StandardRequest
 
 
 @patch('requests.Session.request')
-def test_that_standard_request_simply_wraps_session(inner_session_request):
+def test_that_standard_request_wraps_session_response(inner_session_request):
     request = StandardRequest()
-    request.post(
+    response = request.post(
         '/foo/bar',
         json={'spam': 'eggs'},
         headers={'Threat': 'Response'},
@@ -18,3 +19,4 @@ def test_that_standard_request_simply_wraps_session(inner_session_request):
         json={'spam': 'eggs'},
         headers={'Threat': 'Response'},
     )
+    assert isinstance(response, Response)

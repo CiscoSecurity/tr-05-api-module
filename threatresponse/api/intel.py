@@ -1,3 +1,5 @@
+from six.moves.urllib.parse import quote
+
 from .routing import Router
 from .entity import EntityAPI
 from .base import API
@@ -20,19 +22,19 @@ class IntelAPI(API):
 
         self._actor = EntityAPI(request, '/ctia/actor')
         self._actor.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/Actor"
+            "https://private.intel.amp.cisco.com/index.html#/Actor"
 
         self._campaign = EntityAPI(request, '/ctia/campaign')
         self._campaign.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/Campaign/"
+            "https://private.intel.amp.cisco.com/index.html#/Campaign"
 
         self._coa = EntityAPI(request, '/ctia/coa')
         self._coa.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/COA/"
+            "https://private.intel.amp.cisco.com/index.html#/COA"
 
         self._data_table = EntityAPI(request, '/ctia/data-table')
         self._data_table.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/DataTable/"
+            "https://private.intel.amp.cisco.com/index.html#/DataTable"
 
         self._attack_pattern = EntityAPI(request, '/ctia/attack-pattern')
         self._attack_pattern.__doc__ = \
@@ -57,6 +59,10 @@ class IntelAPI(API):
         self._relationship = EntityAPI(request, '/ctia/relationship')
         self._relationship.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Relationship"
+
+        self._tool = EntityAPI(request, '/ctia/tool')
+        self._tool.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Tool"
 
         self._investigation = EntityAPI(request, '/ctia/investigation')
         self._investigation.__doc__ = \
@@ -139,16 +145,37 @@ class IntelAPI(API):
         return self._relationship
 
     @property
+    def tool(self):
+        return self._tool
+
+    @property
     def investigation(self):
         return self._investigation
 
     @route('properties.get')
     def _perform(self):
         """
-        https://private.intel.amp.cisco.com/index.html#!/Properties/get_ctia_properties
+        https://private.intel.amp.cisco.com/index.html#/Properties
         """
 
         return self._get('/ctia/properties')
+
+    @route('metrics.get')
+    def _perform(self):
+        """
+        https://private.intel.amp.cisco.com/index.html#/Metrics
+        """
+
+        return self._get('/ctia/metrics')
+
+    @route('verdict.get')
+    def _perform(self, observable_type, observable_value):
+        """
+        https://private.intel.amp.cisco.com/index.html#/Verdict
+        """
+
+        return self._get('/ctia/%s/%s/verdict' %
+                         (quote(observable_type), quote(observable_value)))
 
     @route('status.get')
     def _perform(self):

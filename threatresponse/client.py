@@ -1,9 +1,10 @@
-from .api.intel import IntelAPI
 from .api.enrich import EnrichAPI
 from .api.inspect import InspectAPI
+from .api.intel import IntelAPI
 from .api.response import ResponseAPI
 from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest
+from .request.proxied import ProxiedRequest
 from .request.relative import RelativeRequest
 from .request.standard import StandardRequest
 from .urls import url_for
@@ -14,10 +15,11 @@ class ThreatResponse(object):
     def __init__(self, client_id, client_password, **options):
         credentials = (client_id, client_password)
 
+        proxy = options.get('proxy')
         logger = options.get('logger')
         region = options.get('region')
 
-        request = StandardRequest()
+        request = ProxiedRequest(proxy) if proxy else StandardRequest()
         request = LoggedRequest(request, logger) if logger else request
         request = AuthorizedRequest(request, *credentials, region=region)
 
