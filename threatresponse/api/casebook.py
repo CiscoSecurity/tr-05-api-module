@@ -11,9 +11,9 @@ class CasebookAPI(EntityAPI):
         super(CasebookAPI, self).__init__(request, '/ctia/casebook')
 
     @route('observables')
-    def _perform(self, id_, payload, **params):
+    def _perform(self, id_, payload):
         return self._post('%s/%s/observables' % (self._url, id_),
-                          json=payload, params=params)
+                          json=payload)
 
     @route('texts')
     def _perform(self, id_, payload, **params):

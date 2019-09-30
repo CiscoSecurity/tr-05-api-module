@@ -7,8 +7,7 @@ def test_casebook_observable_with_id_succeeds():
     request.perform.assert_called_once_with(
         'POST',
         '/ctia/casebook/12/observables',
-        json=payload,
-        params={}
+        json=payload
         )
 
 
