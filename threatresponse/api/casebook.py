@@ -16,11 +16,11 @@ class CasebookAPI(EntityAPI):
                           json=payload)
 
     @route('texts')
-    def _perform(self, id_, payload, **params):
+    def _perform(self, id_, payload):
         return self._post('%s/%s/texts' % (self._url, id_),
-                          json=payload, params=params)
+                          json=payload)
 
     @route('bundle')
-    def _perform(self, id_, payload, **params):
+    def _perform(self, id_, payload):
         return self._post('%s/%s/bundle' % (self._url, id_),
-                          json=payload, params=params)
+                          json=payload)
