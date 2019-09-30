@@ -1,3 +1,5 @@
+from six.moves.urllib.parse import quote
+
 from .routing import Router
 from .entity import EntityAPI
 from .base import API
@@ -18,19 +20,19 @@ class IntelAPI(API):
 
         self._actor = EntityAPI(request, '/ctia/actor')
         self._actor.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/Actor"
+            "https://private.intel.amp.cisco.com/index.html#/Actor"
 
         self._campaign = EntityAPI(request, '/ctia/campaign')
         self._campaign.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/Campaign"
+            "https://private.intel.amp.cisco.com/index.html#/Campaign"
 
         self._coa = EntityAPI(request, '/ctia/coa')
         self._coa.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/COA"
+            "https://private.intel.amp.cisco.com/index.html#/COA"
 
         self._data_table = EntityAPI(request, '/ctia/data-table')
         self._data_table.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#!/DataTable"
+            "https://private.intel.amp.cisco.com/index.html#/DataTable"
 
         self._attack_pattern = EntityAPI(request, '/ctia/attack-pattern')
         self._attack_pattern.__doc__ = \
@@ -145,4 +147,4 @@ class IntelAPI(API):
         """
 
         return self._get('/ctia/%s/%s/verdict' %
-                         (observable_type, observable_value))
+                         (quote(observable_type), quote(observable_value)))
