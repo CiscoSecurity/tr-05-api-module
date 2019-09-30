@@ -53,9 +53,10 @@ def test_campaign_search_succeeds_with_query():
 
 def test_create_campaign_success():
     assert_succeeds_with_post(
-        lambda api, payload: api.campaign.post(payload),
+        lambda api, payload, params: api.campaign.post(payload),
         payload={'ham': 'egg'},
-        url='/ctia/campaign'
+        url='/ctia/campaign',
+        params={}
     )
 
 

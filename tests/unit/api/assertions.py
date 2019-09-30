@@ -33,19 +33,19 @@ def assert_succeeds_with_get(invoke, url, id_=None, **query):
     response.json.assert_called_once_with()
 
 
-def assert_succeeds_with_post(invoke, url, payload=None):
+def assert_succeeds_with_post(invoke, url, params, payload=None):
     response, request, api = response_request_and_api()
     request.post.return_value = response
 
     if payload is not None:
-        invoke(api, payload)
+        invoke(api, payload, params)
     else:
-        invoke(api)
+        invoke(api, params)
 
     if payload is not None:
-        request.post.assert_called_once_with(url, json=payload)
+        request.post.assert_called_once_with(url, params=params, json=payload)
     else:
-        request.post.assert_called_once_with(url)
+        request.post.assert_called_once_with(url, params=params)
 
     response.json.assert_called_once_with()
 

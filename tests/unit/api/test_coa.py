@@ -54,9 +54,10 @@ def test_coa_search_succeeds_with_query():
 
 def test_create_coa_success():
     assert_succeeds_with_post(
-        lambda api, payload: api.coa.post(payload),
+        lambda api, payload, params: api.coa.post(payload),
         payload={'ham': 'egg'},
-        url='/ctia/coa'
+        url='/ctia/coa',
+        params={}
     )
 
 

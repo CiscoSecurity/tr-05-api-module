@@ -46,9 +46,10 @@ def test_data_table_by_external_id_succeeds():
 
 def test_create_data_table_success():
     assert_succeeds_with_post(
-        lambda api, payload: api.data_table.post(payload),
+        lambda api, payload, params: api.data_table.post(payload),
         payload={'ham': 'egg'},
-        url='/ctia/data-table'
+        url='/ctia/data-table',
+        params={}
     )
 
 

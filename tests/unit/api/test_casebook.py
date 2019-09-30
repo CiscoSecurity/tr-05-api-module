@@ -7,7 +7,8 @@ def test_casebook_observable_with_id_succeeds():
     request.perform.assert_called_once_with(
         'POST',
         '/ctia/casebook/12/observables',
-        json=payload
+        json=payload,
+        params={}
         )
 
 
@@ -16,7 +17,8 @@ def test_casebook_text_with_id_succeeds():
     request.perform.assert_called_once_with(
         'POST',
         '/ctia/casebook/12/texts',
-        json=payload
+        json=payload,
+        params={}
     )
 
 
@@ -25,5 +27,6 @@ def test_casebook_bulk_with_id_succeeds():
     request.perform.assert_called_once_with(
         'POST',
         '/ctia/casebook/12/bundle',
-        json=payload
+        json=payload,
+        params={}
     )
