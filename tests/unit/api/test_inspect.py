@@ -1,26 +1,15 @@
 import pytest
-from mock import MagicMock
+
+from .assertions import *
 
 from threatresponse.api.inspect import InspectAPI
 
 
 def test_inspect_succeeds():
-    response = MagicMock()
-
-    request = MagicMock()
-    request.post.return_value = response
-
-    payload = {'foo': 'bar'}
-
-    api = InspectAPI(request)
-    api.inspect(payload)
-
+    request = invoke(lambda api: api.inspect(payload), InspectAPI)
     request.post.assert_called_once_with(
         '/iroh/iroh-inspect/inspect',
-        json=payload,
-    )
-
-    response.json.assert_called_once_with()
+        json=payload)
 
 
 def test_inspect_fails():
@@ -32,8 +21,6 @@ def test_inspect_fails():
 
     request = MagicMock()
     request.post.return_value = response
-
-    payload = {'foo': 'bar'}
 
     api = InspectAPI(request)
     with pytest.raises(TestError):

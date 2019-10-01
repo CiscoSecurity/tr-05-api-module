@@ -6,70 +6,22 @@ from threatresponse.api import IntelAPI
 payload = {'ham': 'eggs'}
 
 
-def invoke(invocation):
+def invoke(invocation, api=None):
     request, response = MagicMock(), MagicMock()
 
     for method in ['get', 'post', 'patch', 'put', 'delete', 'perform']:
         method = getattr(request, method)
         method.return_value = response
 
-    invocation(IntelAPI(request))
+    if api:
+        invocation(api(request))
+    else:
+        invocation(IntelAPI(request))
 
     # Assertions.
-    response.json.assert_called_once()
-
-    return request
-
-def assert_succeeds_with_get(invoke, url, id_=None, **query):
-    response, request, api = response_request_and_api()
-    request.get.return_value = response
-    if id_ and query:
-        invoke(api, id_, query)
-    elif id_ is None:
-        invoke(api, query)
+    # Since DELETE do not trigger json we need this statement here.
+    if request.delete.call_count > 0:
+        return request
     else:
-        invoke(api, id_)
-    request.get.assert_called_once_with(url, params=query)
-    response.json.assert_called_once_with()
-
-
-def assert_succeeds_with_post(invoke, url, params, payload=None):
-    response, request, api = response_request_and_api()
-    request.post.return_value = response
-
-    if payload is not None:
-        invoke(api, payload, params)
-    else:
-        invoke(api, params)
-
-    if payload is not None:
-        request.post.assert_called_once_with(url, params=params, json=payload)
-    else:
-        request.post.assert_called_once_with(url, params=params)
-
-    response.json.assert_called_once_with()
-
-
-def assert_succeeds_with_delete(invoke, url, id_):
-    response, request, api = response_request_and_api()
-    request.delete.return_value = response
-    invoke(api, id_)
-
-    request.delete.assert_called_once_with(url)
-
-
-def assert_succeeds_with_put(invoke, url, id_, payload):
-    response, request, api = response_request_and_api()
-    request.put.return_value = response
-    invoke(api, id_, payload)
-
-    request.put.assert_called_once_with(url, json=payload)
-    response.json.assert_called_once_with()
-
-
-def response_request_and_api():
-    response = MagicMock()
-    request = MagicMock()
-    api = IntelAPI(request)
-
-    return response, request, api
+        response.json.assert_called_once()
+        return request

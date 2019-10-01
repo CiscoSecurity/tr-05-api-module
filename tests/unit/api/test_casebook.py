@@ -2,7 +2,6 @@ from .assertions import *
 
 
 def test_casebook_observable_with_id_succeeds():
-
     request = invoke(lambda api: api.casebook.observables(12, payload))
     request.perform.assert_called_once_with(
         'POST',
