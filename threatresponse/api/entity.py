@@ -18,8 +18,8 @@ class EntityAPI(API):
 
         return response.json()
 
-    def post(self, payload):
-        response = self._request.post(self._url, json=payload)
+    def post(self, payload, **params):
+        response = self._request.post(self._url, json=payload, params=params)
         response.raise_for_status()
 
         return response.json()
