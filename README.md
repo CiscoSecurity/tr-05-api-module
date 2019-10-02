@@ -3,7 +3,7 @@
 
 ### Threat Response Python API Module:
 
-Python module for working with the Threat Response APIs
+Python API Module for Threat Response APIs
 
 ### Installation:
 
