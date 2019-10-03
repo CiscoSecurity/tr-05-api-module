@@ -10,7 +10,7 @@ Python API Module for Threat Response APIs
 * Local:
 
 ```bash
-python setup.py install
+pip install -U .
 pip show threatresponse
 ```
 
