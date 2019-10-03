@@ -11,14 +11,21 @@ Python API Module for Threat Response APIs
 
 ```bash
 python setup.py install
-pip show tr-api-client
+pip show threatresponse
 ```
 
 * GitHub:
 
 ```bash
-pip install git+https://github.com/CiscoSecurity/tr-05-api-module.git
-pip show tr-api-client
+pip install git+https://github.com/CiscoSecurity/tr-05-api-module.git[@branch_name_or_release_version]
+pip show threatresponse
+```
+
+* PyPi:
+
+```bash
+pip install threatresponse[==release_version]
+pip show threatresponse
 ```
 
 ### Usage:
