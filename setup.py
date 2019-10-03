@@ -21,11 +21,11 @@ def read_requirements():
         return requirements
 
 
-NAME = 'tr-api-client'
+NAME = 'threatresponse'
 
-DESCRIPTION = 'Python module for working with the Threat Response APIs'
+DESCRIPTION = 'Python API Module for Threat Response APIs'
 
-AUTHOR = 'Cisco'
+AUTHOR = 'Cisco Security'
 
 URL = 'https://github.com/CiscoSecurity/tr-05-api-module'
 
@@ -33,9 +33,9 @@ VERSION = read_version()
 
 INSTALL_REQUIRES = read_requirements()
 
-PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'])
+PACKAGES = setuptools.find_packages()
 
-KEYWORDS = ['python', 'threat', 'response', 'api', 'client']
+KEYWORDS = ['cisco', 'security', 'python', 'threat', 'response', 'api']
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
@@ -50,6 +50,8 @@ CLASSIFIERS = [
     'Topic :: Software Development :: Libraries :: Python Modules',
 ]
 
+LICENSE = 'MIT'
+
 
 setuptools.setup(
     name=NAME,
@@ -61,4 +63,5 @@ setuptools.setup(
     packages=PACKAGES,
     keywords=KEYWORDS,
     classifiers=CLASSIFIERS,
+    license=LICENSE,
 )
