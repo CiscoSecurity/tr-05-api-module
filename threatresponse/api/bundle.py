@@ -15,6 +15,6 @@ class BundleAPI(API):
     def _perform(self, payload, **params):
         return self._post('/ctia/bundle/export', json=payload, params=params)
 
-    @route('import.post')
+    @route('import_.post')
     def _perform(self, payload, **params):
         return self._post('/ctia/bundle/import', json=payload, params=params)
