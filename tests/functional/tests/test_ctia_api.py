@@ -19,6 +19,7 @@ from ctrlibrary.ctia.endpoints import (
     INVESTIGATION,
     JUDGEMENT,
     MALWARE,
+    RELATIONSHIP,
     SIGHTING,
     TOOL,
     VERDICT,
@@ -269,6 +270,75 @@ def test_python_module_ctia_positive_bulk(module_headers, module_tool_client):
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+
+
+def test_python_module_ctia_positive_bundle(module_tool_client):
+    """Perform testing for bundle functionality of custom threat intelligence
+    python module
+
+    ID: CCTRI-172-f483fa82-f308-4606-9045-ffc2dc8b41f0
+
+    Steps:
+
+        1. Send POST request to create one incident entity to be used for
+            bundle functionality
+        2. Send POST request to create one indicator entity to be used for
+            bundle functionality
+        3. Send POST request to export data using bundle functionality
+        4. Send POST request to import data using bundle functionality
+
+    Expectedresults: Bundle functionality works properly and some entities can
+        be imported or exported using custom python module
+
+    Importance: Critical
+    """
+    # Prepare data for incident
+    incident = module_tool_client.private_intel.incident
+    payload = {
+        'confidence': 'Low',
+        'incident_time': {
+            'opened': "2014-01-11T00:40:48.212Z"
+        },
+        'status': 'New',
+        'type': 'incident',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new incident using provided payload
+    incident_post_response = incident.post(payload=payload, wait_for='true')
+    # Prepare data for indicator
+    indicator = module_tool_client.private_intel.indicator
+    payload = {
+        'producer': 'producer',
+        'schema_version': SERVER_VERSION,
+        'type': 'indicator',
+        'revision': 0
+    }
+    # Create new indicator using provided payload
+    indicator_post_response = indicator.post(payload=payload, wait_for='true')
+    # Use created entities for bundle
+    bundle = module_tool_client.private_intel.bundle
+    payload = {
+        'ids': [
+            incident_post_response['id'],
+            indicator_post_response['id']
+        ]
+    }
+    # Validate export endpoint
+    post_tool_response = bundle.export.post(payload=payload)
+    assert post_tool_response['type'] == 'bundle'
+    assert post_tool_response['source'] == 'ctia'
+    assert post_tool_response[
+        'incidents'][0]['id'] == incident_post_response['id']
+    assert post_tool_response[
+        'indicators'][0]['id'] == indicator_post_response['id']
+    # Validate import endpoint
+    payload = {
+        'schema_version': SERVER_VERSION,
+        'type': 'bundle',
+        'source': 'random source',
+    }
+    post_tool_response = bundle.import_.post(payload=payload)
+    assert post_tool_response
 
 
 def test_python_module_ctia_positive_campaign(
@@ -1107,6 +1177,111 @@ def test_python_module_ctia_positive_malware(
     delayed_return(malware.delete(entity_id))
     with pytest.raises(HTTPError):
         malware.get(entity_id)
+
+
+def test_python_module_ctia_positive_relationship(
+        module_headers, module_tool_client):
+    """Perform testing for relationship entity of custom threat intelligence
+    python module
+
+    ID: CCTRI-164-f3c6e3c2-b437-4db9-a630-3c6072517ff2
+
+    Steps:
+
+        1. Send POST request to create one campaign entity to be used for
+            relationship functionality
+        2. Send POST request to create one indicator entity to be used for
+            relationship functionality
+        3. Send POST request to create new relationship entity using custom
+            python module
+        4. Send GET request using custom python module to read just created
+            entity back.
+        5. Send same GET request, but using direct access to the server
+        6. Compare results
+        7. Update relationship entity using custom python module
+        8. Repeat GET request using python module and validate that entity was
+            updated
+        9. Delete entity from the system
+
+    Expectedresults: Relationship entity can be created, fetched, updated and
+        deleted using custom python module. Data stored in the entity is the
+        same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    # Prepare data for campaign
+    campaign = module_tool_client.private_intel.campaign
+    payload = {
+        'campaign_type': 'Low',
+        'confidence': 'Medium',
+        'type': 'campaign',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new campaign using provided payload
+    campaign_post_response = campaign.post(payload=payload, wait_for='true')
+    # Prepare data for indicator
+    indicator = module_tool_client.private_intel.indicator
+    payload = {
+        'producer': 'producer',
+        'schema_version': SERVER_VERSION,
+        'type': 'indicator',
+        'revision': 0
+    }
+    # Create new indicator using provided payload
+    indicator_post_response = indicator.post(payload=payload, wait_for='true')
+    # Use created entities for relationship
+    relationship = module_tool_client.private_intel.relationship
+    payload = {
+        'description': 'Demo relation',
+        'schema_version': SERVER_VERSION,
+        'type': 'relationship',
+        'source_ref': campaign_post_response['id'],
+        'target_ref': indicator_post_response['id'],
+        'relationship_type': 'indicates',
+    }
+    # Create new entity using provided payload
+    post_tool_response = relationship.post(payload=payload, wait_for='true')
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'source_ref',
+            'target_ref',
+            'relationship_type',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = relationship.get(entity_id)
+    get_direct_response = ctia_get_data(
+        target_url=RELATIONSHIP,
+        entity_id=entity_id,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Update entity values
+    put_tool_response = delayed_return(
+        relationship.put(
+            id_=entity_id,
+            payload={
+                'description': 'New demo relation',
+                'source_ref': campaign_post_response['id'],
+                'target_ref': indicator_post_response['id'],
+                'relationship_type': 'indicates',
+            }
+        )
+    )
+    assert put_tool_response['description'] == 'New demo relation'
+    get_tool_response = relationship.get(entity_id)
+    assert get_tool_response['description'] == 'New demo relation'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(relationship.delete(entity_id))
+    with pytest.raises(HTTPError):
+        relationship.get(entity_id)
 
 
 def test_python_module_ctia_positive_sighting(
