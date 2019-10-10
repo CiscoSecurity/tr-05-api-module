@@ -16,8 +16,8 @@ class EntityAPI(API):
 
         return self._get(url, params=params)
 
-    def post(self, payload):
-        return self._post(self._url, json=payload)
+    def post(self, payload, **params):
+        return self._post(self._url, json=payload, params=params)
 
     def put(self, id_, payload):
         return self._put('%s/%s' % (self._url, id_), json=payload)

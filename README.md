@@ -1,24 +1,32 @@
 [![Gitter chat](https://img.shields.io/badge/gitter-join%20chat-brightgreen.svg)](https://gitter.im/CiscoSecurity/Threat-Response "Gitter chat")
 [![Travis build](https://travis-ci.com/CiscoSecurity/tr-05-api-module.svg)](https://travis-ci.com/CiscoSecurity/tr-05-api-module)
+[![PyPi version](https://img.shields.io/pypi/v/threatresponse.svg)](https://pypi.python.org/pypi/threatresponse)
 
 ### Threat Response Python API Module:
 
-Python module for working with the Threat Response APIs
+Python API Module for Threat Response APIs
 
 ### Installation:
 
 * Local:
 
 ```bash
-python setup.py install
-pip show tr-api-client
+pip install -U .
+pip show threatresponse
 ```
 
 * GitHub:
 
 ```bash
-pip install git+https://github.com/CiscoSecurity/tr-05-api-module.git
-pip show tr-api-client
+pip install git+https://github.com/CiscoSecurity/tr-05-api-module.git[@branch_name_or_release_version]
+pip show threatresponse
+```
+
+* PyPi:
+
+```bash
+pip install threatresponse[==release_version]
+pip show threatresponse
 ```
 
 ### Usage:
