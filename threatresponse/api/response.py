@@ -9,16 +9,12 @@ class ResponseAPI(API):
 
     @route('respond.observables')
     def _perform(self, payload):
-        """
-        https://visibility.amp.cisco.com/iroh/iroh-response/index.html#!/Response/post_iroh_iroh_response_respond_observables
-        """
+        """https://visibility.amp.cisco.com/iroh/iroh-response/index.html#/Response"""
 
-        response = self._request.post(
+        return self._post(
             '/iroh/iroh-response/respond/observables',
-            json=payload,
+            json=payload
         )
-        response.raise_for_status()
-        return response.json()
 
     @route('respond.trigger')
     def _perform(self,
@@ -42,6 +38,4 @@ class ResponseAPI(API):
             'observable_value': observable_value,
         })
 
-        response = self._request.post(url, params=query)
-        response.raise_for_status()
-        return response.json()
+        return self._post(url, params=query)

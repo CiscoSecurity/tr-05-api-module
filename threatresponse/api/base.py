@@ -23,11 +23,23 @@ class API(object):
     def _delete(self, *args, **kwargs):
         return self.__perform('DELETE', *args, **kwargs)
 
-    def __perform(self, url, *args, **kwargs):
-        response = self._request.perform(url, *args, **kwargs)
+    def __perform(self, method, *args, **kwargs):
+        response_types = {
+            'raw': lambda res: res,
+            'json': lambda res: res.json()
+        }
+        response_type = kwargs.pop('response', 'json')
+
+        if response_type not in response_types:
+            raise ValueError('unsupported response type: %s' %
+                             repr(response_type))
+
+        response = self._request.perform(method, *args, **kwargs)
         response.raise_for_status()
 
-        return response.json()
+        processed = response_types[response_type]
+
+        return processed(response)
 
     def __getattr__(self, item):
         if self._resolution is None:
