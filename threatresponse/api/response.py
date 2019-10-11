@@ -9,7 +9,9 @@ class ResponseAPI(API):
 
     @route('respond.observables')
     def _perform(self, payload):
-        """https://visibility.amp.cisco.com/iroh/iroh-response/index.html#/Response"""
+        """
+        https://visibility.amp.cisco.com/iroh/iroh-response/index.html#/Response
+        """
 
         return self._post(
             '/iroh/iroh-response/respond/observables',
