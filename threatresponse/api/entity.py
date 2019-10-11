@@ -26,7 +26,7 @@ class EntityAPI(API):
         return self._patch('%s/%s' % (self._url, id_), json=payload)
 
     def delete(self, id_):
-        return self._delete('%s/%s' % (self._url, id_))
+        self._delete('%s/%s' % (self._url, id_), response='plain')
 
     def search(self, **params):
         return self._get('%s/search' % self._url, params=params)
