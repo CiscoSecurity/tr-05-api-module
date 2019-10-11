@@ -45,3 +45,11 @@ class EnrichAPI(API):
             '/iroh/iroh-enrich/refer/observables',
             json=payload
         )
+
+    @route('settings.get')
+    def _perform(self):
+        """
+        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Settings/get_iroh_iroh_enrich_settings
+        """
+
+        return self._get('/iroh/iroh-enrich/settings')

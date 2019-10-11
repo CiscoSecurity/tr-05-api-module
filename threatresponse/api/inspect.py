@@ -11,4 +11,4 @@ class InspectAPI(API):
         https://visibility.amp.cisco.com/iroh/iroh-inspect/index.html#!/INSPECT/post_iroh_iroh_inspect_inspect
         """
 
-        return self.post('/iroh/iroh-inspect/inspect', json=payload)
+        return self._post('/iroh/iroh-inspect/inspect', json=payload)
