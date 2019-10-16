@@ -14,8 +14,10 @@ def invoke(api, invocation):
 
     invocation(api(request))
 
-    # 'DELETE' doesn't return anything, and thus we need to check that 'json' wasn't called.
-    if request.delete.call_count > 0 or request.perform.call_args.args[0] == 'DELETE':
+    # 'DELETE' doesn't return anything,
+    # and thus we need to check that 'json' wasn't called.
+    if request.delete.call_count > 0 or \
+       request.perform.call_args.args[0] == 'DELETE':
         response.json.assert_not_called()
         return request
     else:

@@ -4,3 +4,7 @@ class RegionError(ValueError):
 
 class RouteError(ValueError):
     pass
+
+
+class ResponseTypeError(ValueError):
+    pass

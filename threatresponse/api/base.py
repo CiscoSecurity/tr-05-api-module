@@ -1,3 +1,4 @@
+from threatresponse.exceptions import ResponseTypeError
 from .routing import Resolution, Router
 
 
@@ -28,11 +29,10 @@ class API(object):
             'raw': lambda res: res,
             'json': lambda res: res.json()
         }
-        response_type = kwargs.pop('response', 'json')
+        response_type = kwargs.pop('response_type', 'json')
 
         if response_type not in response_types:
-            raise ValueError('unsupported response type: %s' %
-                             repr(response_type))
+            raise ResponseTypeError(response_type)
 
         response = self._request.perform(method, *args, **kwargs)
         response.raise_for_status()
