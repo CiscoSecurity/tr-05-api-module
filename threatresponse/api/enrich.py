@@ -53,3 +53,22 @@ class EnrichAPI(API):
         )
         response.raise_for_status()
         return response.json()
+
+    @route('settings.get')
+    def _perform(self):
+        """
+        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Settings/get_iroh_iroh_enrich_settings
+        """
+
+        return self._get('/iroh/iroh-enrich/settings')
+
+    @route('settings.post')
+    def _perform(self, payload):
+        """
+        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Settings/post_iroh_iroh_enrich_settings
+        """
+
+        return self._post(
+            '/iroh/iroh-enrich/settings',
+            json=payload
+        )
