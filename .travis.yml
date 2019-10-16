@@ -9,8 +9,7 @@ before_install:
 - openssl aes-256-cbc -k "$travis_key_password" -d -md sha256 -a -in travis_key.enc -out ~/.ssh/id_rsa
 - chmod 400 ~/.ssh/id_rsa
 install:
-- pip install -r requirements.txt
-- python setup.py install
+- pip install .
 - pip install -r test-requirements.txt
 before_script:
 - cp ~/build/CiscoSecurity/tr-05-api-module/tests/functional/project.properties.sample ~/build/CiscoSecurity/project.properties
