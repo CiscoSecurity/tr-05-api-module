@@ -48,6 +48,14 @@ def test_post_succeeds():
     )
 
 
+def test_delete_succeeds():
+    request = invoke(entity_api('/x'), lambda api: api.delete(42))
+    request.perform.assert_called_once_with(
+        'DELETE',
+        '/x/42'
+    )
+
+
 def test_put_succeeds():
     request = invoke(entity_api('/x'), lambda api: api.put(12, payload))
     request.perform.assert_called_once_with(
