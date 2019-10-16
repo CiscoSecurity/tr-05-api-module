@@ -11,16 +11,25 @@ class CasebookAPI(EntityAPI):
         super(CasebookAPI, self).__init__(request, '/ctia/casebook')
 
     @route('observables')
-    def _perform(self, id_, payload):
-        return self._post('%s/%s/observables' % (self._url, id_),
-                          json=payload)
+    def _perform(self, id_, payload, response_type='json'):
+        return self._post(
+            '%s/%s/observables' % (self._url, id_),
+            json=payload,
+            response_type=response_type
+        )
 
     @route('texts')
-    def _perform(self, id_, payload):
-        return self._post('%s/%s/texts' % (self._url, id_),
-                          json=payload)
+    def _perform(self, id_, payload, response_type='json'):
+        return self._post(
+            '%s/%s/texts' % (self._url, id_),
+            json=payload,
+            response_type=response_type
+        )
 
     @route('bundle')
-    def _perform(self, id_, payload):
-        return self._post('%s/%s/bundle' % (self._url, id_),
-                          json=payload)
+    def _perform(self, id_, payload, response_type='json'):
+        return self._post(
+            '%s/%s/bundle' % (self._url, id_),
+            json=payload,
+            response_type=response_type
+        )

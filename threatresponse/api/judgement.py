@@ -11,8 +11,11 @@ class JudgementAPI(EntityAPI):
         super(JudgementAPI, self).__init__(request, '/ctia/judgement')
 
     @route('judgements')
-    def _perform(self, observable_type, observable_value):
+    def _perform(self,
+                 observable_type,
+                 observable_value,
+                 response_type='json'):
         return self._get(
-            '/ctia/%s/%s/judgements' %
-            (observable_type, observable_value)
+            '/ctia/%s/%s/judgements' % (observable_type, observable_value),
+            response_type=response_type
         )

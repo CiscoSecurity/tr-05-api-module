@@ -169,42 +169,47 @@ class IntelAPI(API):
         return self._weakness
 
     @route('properties.get')
-    def _perform(self):
+    def _perform(self, response_type='json'):
         """
         https://private.intel.amp.cisco.com/index.html#/Properties
         """
 
-        return self._get('/ctia/properties')
+        return self._get('/ctia/properties', response_type=response_type)
 
     @route('metrics.get')
-    def _perform(self):
+    def _perform(self, response_type='json'):
         """
         https://private.intel.amp.cisco.com/index.html#/Metrics
         """
 
-        return self._get('/ctia/metrics')
+        return self._get('/ctia/metrics', response_type=response_type)
 
     @route('verdict.get')
-    def _perform(self, observable_type, observable_value):
+    def _perform(self,
+                 observable_type,
+                 observable_value,
+                 response_type='json'):
         """
         https://private.intel.amp.cisco.com/index.html#/Verdict
         """
 
-        return self._get('/ctia/%s/%s/verdict' %
-                         (quote(observable_type), quote(observable_value)))
+        return self._get(
+            '/ctia/%s/%s/verdict' % (quote(observable_type),
+                                     quote(observable_value)),
+            response_type=response_type)
 
     @route('status.get')
-    def _perform(self):
+    def _perform(self, response_type='json'):
         """
         https://private.intel.amp.cisco.com/index.html#/Status
         """
 
-        return self._get('/ctia/status')
+        return self._get('/ctia/status', response_type=response_type)
 
     @route('version.get')
-    def _perform(self):
+    def _perform(self, response_type='json'):
         """
         https://private.intel.amp.cisco.com/index.html#/Version
         """
 
-        return self._get('/ctia/version')
+        return self._get('/ctia/version', response_type=response_type)

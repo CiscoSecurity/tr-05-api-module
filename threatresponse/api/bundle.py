@@ -8,13 +8,27 @@ class BundleAPI(API):
     __router, route = Router.new()
 
     @route('export.get')
-    def _perform(self, **params):
-        return self._get('/ctia/bundle/export', params=params)
+    def _perform(self, response_type='json', **params):
+        return self._get(
+            '/ctia/bundle/export',
+            params=params,
+            response_type=response_type
+        )
 
     @route('export.post')
-    def _perform(self, payload, **params):
-        return self._post('/ctia/bundle/export', json=payload, params=params)
+    def _perform(self, payload, response_type='json', **params):
+        return self._post(
+            '/ctia/bundle/export',
+            json=payload,
+            params=params,
+            response_type=response_type
+        )
 
     @route('import_.post')
-    def _perform(self, payload, **params):
-        return self._post('/ctia/bundle/import', json=payload, params=params)
+    def _perform(self, payload, response_type='json', **params):
+        return self._post(
+            '/ctia/bundle/import',
+            json=payload,
+            params=params,
+            response_type=response_type
+        )

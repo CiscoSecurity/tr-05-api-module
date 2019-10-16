@@ -11,8 +11,11 @@ class SightingAPI(EntityAPI):
         super(SightingAPI, self).__init__(request, '/ctia/sighting')
 
     @route('sightings')
-    def _perform(self, observable_type, observable_value):
+    def _perform(self,
+                 observable_type,
+                 observable_value,
+                 response_type='json'):
         return self._get(
-            '/ctia/%s/%s/sightings' %
-            (observable_type, observable_value)
+            '/ctia/%s/%s/sightings' % (observable_type, observable_value),
+            response_type=response_type
         )

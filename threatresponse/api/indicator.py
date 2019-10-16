@@ -11,15 +11,23 @@ class IndicatorAPI(EntityAPI):
         super(IndicatorAPI, self).__init__(request, '/ctia/indicator')
 
     @route('judgements.indicators')
-    def _perform(self, observable_type, observable_value):
+    def _perform(self,
+                 observable_type,
+                 observable_value,
+                 response_type='json'):
         return self._get(
-            '/ctia/%s/%s/judgements/indicators' %
-            (observable_type, observable_value)
+            '/ctia/%s/%s/judgements/indicators' % (observable_type,
+                                                   observable_value),
+            response_type=response_type
         )
 
     @route('sightings.indicators')
-    def _perform(self, observable_type, observable_value):
+    def _perform(self,
+                 observable_type,
+                 observable_value,
+                 response_type='json'):
         return self._get(
-            '/ctia/%s/%s/sightings/indicators' %
-            (observable_type, observable_value)
+            '/ctia/%s/%s/sightings/indicators' % (observable_type,
+                                                  observable_value),
+            response_type=response_type
         )
