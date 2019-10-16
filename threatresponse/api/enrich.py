@@ -51,3 +51,26 @@ class EnrichAPI(API):
             json=payload,
             response_type=response_type
         )
+
+    @route('settings.get')
+    def _perform(self, response_type='json'):
+        """
+        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Settings/get_iroh_iroh_enrich_settings
+        """
+
+        return self._get(
+            '/iroh/iroh-enrich/settings',
+            response_type=response_type
+        )
+
+    @route('settings.post')
+    def _perform(self, payload, response_type='json'):
+        """
+        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Settings/post_iroh_iroh_enrich_settings
+        """
+
+        return self._post(
+            '/iroh/iroh-enrich/settings',
+            json=payload,
+            response_type=response_type
+        )
