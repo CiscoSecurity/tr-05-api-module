@@ -1,17 +1,21 @@
-from .assertions import *
-
 from threatresponse.api.inspect import InspectAPI
+
+from .assertions import *
 
 
 def test_inspect_succeeds():
-    request = invoke(lambda api: api.inspect(payload), InspectAPI)
-    request.post.assert_called_once_with(
+    request = invoke(InspectAPI, lambda api: api.inspect(payload))
+    request.perform.assert_called_once_with(
+        'POST',
         '/iroh/iroh-inspect/inspect',
-        json=payload)
+        json=payload
+    )
 
 
 def test_inspect_fails():
-    request = invoke_with_failure(lambda api: api.inspect(payload), InspectAPI)
-    request.post.assert_called_once_with(
+    request = invoke_with_failure(InspectAPI, lambda api: api.inspect(payload))
+    request.perform.assert_called_once_with(
+        'POST',
         '/iroh/iroh-inspect/inspect',
-        json=payload)
+        json=payload
+    )

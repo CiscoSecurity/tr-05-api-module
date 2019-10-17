@@ -1,34 +1,28 @@
 from mock import MagicMock
-import pytest
-
-from threatresponse.api import IntelAPI
+from pytest import raises
 
 
 payload = {'ham': 'eggs'}
 
 
-def invoke(invocation, api=None):
+def invoke(api, invocation, response_type='json'):
     request, response = MagicMock(), MagicMock()
 
     for method in ['get', 'post', 'patch', 'put', 'delete', 'perform']:
         method = getattr(request, method)
         method.return_value = response
 
-    if api:
-        invocation(api(request))
-    else:
-        invocation(IntelAPI(request))
+    invocation(api(request))
 
-    # Assertions.
-    # Since DELETE do not trigger json we need this statement here.
-    if request.delete.call_count > 0:
-        return request
-    else:
+    if response_type == 'raw':
+        response.json.assert_not_called()
+    if response_type == 'json':
         response.json.assert_called_once()
-        return request
+
+    return request
 
 
-def invoke_with_failure(invocation, api=None):
+def invoke_with_failure(api, invocation):
     class TestError(Exception):
         pass
 
@@ -39,11 +33,8 @@ def invoke_with_failure(invocation, api=None):
         method = getattr(request, method)
         method.return_value = response
 
-    if api:
-        with pytest.raises(TestError):
-            invocation(api(request))
-    else:
-        with pytest.raises(TestError):
-            invocation(IntelAPI(request))
+    with raises(TestError):
+        invocation(api(request))
+
     response.raise_for_status.assert_called_once_with()
     return request

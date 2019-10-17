@@ -8,56 +8,56 @@ class EntityAPI(API):
 
         self._url = url
 
-    def get(self, id_=None, **params):
+    def get(self, id_=None, response_type='json', **params):
         if id_:
             url = '%s/%s' % (self._url, id_)
         else:
             url = self._url
-        response = self._request.get(url, params=params)
-        response.raise_for_status()
 
-        return response.json()
+        return self._get(
+            url,
+            params=params,
+            response_type=response_type
+        )
 
-    def post(self, payload, **params):
-        response = self._request.post(self._url, json=payload, params=params)
-        response.raise_for_status()
+    def post(self, payload, response_type='json',  **params):
+        return self._post(
+            self._url,
+            json=payload,
+            params=params,
+            response_type=response_type
+        )
 
-        return response.json()
+    def put(self, id_, payload, response_type='json'):
+        return self._put(
+            '%s/%s' % (self._url, id_),
+            json=payload,
+            response_type=response_type
+        )
+
+    def patch(self, id_, payload, response_type='json'):
+        return self._patch(
+            '%s/%s' % (self._url, id_),
+            json=payload,
+            response_type=response_type
+        )
 
     def delete(self, id_):
-        url = '%s/%s' % (self._url, id_)
+        self._delete(
+            '%s/%s' % (self._url, id_),
+            response_type='raw'
+        )
 
-        response = self._request.delete(url)
-        response.raise_for_status()
+    def search(self, response_type='json', **params):
+        return self._get(
+            '%s/search' % self._url,
+            params=params,
+            response_type=response_type
+        )
 
-    def put(self, id_, payload):
-        url = '%s/%s' % (self._url, id_)
-
-        response = self._request.put(url, json=payload)
-        response.raise_for_status()
-
-        return response.json()
-
-    def patch(self, id_, payload):
-        url = '%s/%s' % (self._url, id_)
-
-        response = self._request.patch(url, json=payload)
-        response.raise_for_status()
-
-        return response.json()
-
-    def external_id(self, id_, **params):
-        url = '%s/external_id/%s' % (self._url, id_)
-
-        response = self._request.get(url, params=params)
-        response.raise_for_status()
-
-        return response.json()
-
-    def search(self, **params):
-        url = '%s/search' % self._url
-
-        response = self._request.get(url, params=params)
-        response.raise_for_status()
-
-        return response.json()
+    def external_id(self, id_, response_type='json', **params):
+        return self._get(
+            '%s/external_id/%s' % (self._url, id_),
+            params=params,
+            response_type=response_type
+        )

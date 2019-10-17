@@ -6,69 +6,71 @@ class EnrichAPI(API):
     __router, route = Router.new()
 
     @route('health')
-    def _perform(self):
+    def _perform(self, response_type='json'):
         """
         https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Health/post_iroh_iroh_enrich_health
         """
 
-        response = self._request.post('/iroh/iroh-enrich/health')
-        response.raise_for_status()
-        return response.json()
+        return self._post(
+            '/iroh/iroh-enrich/health',
+            response_type=response_type
+        )
 
     @route('deliberate.observables')
-    def _perform(self, payload):
+    def _perform(self, payload, response_type='json'):
         """
         https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Deliberate/post_iroh_iroh_enrich_deliberate_observables
         """
 
-        response = self._request.post(
+        return self._post(
             '/iroh/iroh-enrich/deliberate/observables',
             json=payload,
+            response_type=response_type
         )
-        response.raise_for_status()
-        return response.json()
 
     @route('observe.observables')
-    def _perform(self, payload):
+    def _perform(self, payload, response_type='json'):
         """
         https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Observe/post_iroh_iroh_enrich_observe_observables
         """
 
-        response = self._request.post(
+        return self._post(
             '/iroh/iroh-enrich/observe/observables',
             json=payload,
+            response_type=response_type
         )
-        response.raise_for_status()
-        return response.json()
 
     @route('refer.observables')
-    def _perform(self, payload):
+    def _perform(self, payload, response_type='json'):
         """
         https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Refer/post_iroh_iroh_enrich_refer_observables
         """
 
-        response = self._request.post(
+        return self._post(
             '/iroh/iroh-enrich/refer/observables',
             json=payload,
+            response_type=response_type
         )
-        response.raise_for_status()
-        return response.json()
 
     @route('settings.get')
-    def _perform(self):
+    def _perform(self, response_type='json'):
         """
         https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Settings/get_iroh_iroh_enrich_settings
         """
 
-        return self._get('/iroh/iroh-enrich/settings')
+        return self._get(
+            '/iroh/iroh-enrich/settings',
+            response_type=response_type
+        )
 
     @route('settings.post')
-    def _perform(self, payload):
+    def _perform(self, payload, response_type='json'):
         """
         https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Settings/post_iroh_iroh_enrich_settings
         """
 
         return self._post(
             '/iroh/iroh-enrich/settings',
-            json=payload
+            json=payload,
+            response_type=response_type
         )

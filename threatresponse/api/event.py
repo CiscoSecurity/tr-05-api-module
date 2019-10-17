@@ -11,5 +11,9 @@ class EventAPI(EntityAPI):
         super(EventAPI, self).__init__(request, '/ctia/event')
 
     @route('history')
-    def _perform(self, id_, **kwargs):
-        return self._get('%s/history/%s' % (self._url, id_), params=kwargs)
+    def _perform(self, id_, response_type='json', **kwargs):
+        return self._get(
+            '%s/history/%s' % (self._url, id_),
+            params=kwargs,
+            response_type=response_type
+        )
