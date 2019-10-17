@@ -5,7 +5,7 @@ from pytest import raises
 payload = {'ham': 'eggs'}
 
 
-def invoke(api, invocation):
+def invoke(api, invocation, response_type='json'):
     request, response = MagicMock(), MagicMock()
 
     for method in ['get', 'post', 'patch', 'put', 'delete', 'perform']:
@@ -14,14 +14,12 @@ def invoke(api, invocation):
 
     invocation(api(request))
 
-    # 'DELETE' doesn't return anything,
-    # and thus we need to check that 'json' wasn't called.
-    if request.perform.call_args.args[0] == 'DELETE':
+    if response_type == 'raw':
         response.json.assert_not_called()
-        return request
-    else:
+    if response_type == 'json':
         response.json.assert_called_once()
-        return request
+
+    return request
 
 
 def invoke_with_failure(api, invocation):
