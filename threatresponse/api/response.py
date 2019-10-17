@@ -10,7 +10,7 @@ class ResponseAPI(API):
     @route('respond.observables')
     def _perform(self, payload, response_type='json'):
         """
-        https://visibility.amp.cisco.com/iroh/iroh-response/index.html#/Response
+        https://visibility.amp.cisco.com/iroh/iroh-response/index.html#!/Response/post_iroh_iroh_response_respond_observables
         """
 
         return self._post(
