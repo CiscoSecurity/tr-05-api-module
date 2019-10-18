@@ -1,6 +1,7 @@
 from six.moves.urllib.parse import quote
 
 from .base import API
+from ..exceptions import ResponseTypeError
 
 
 class EntityAPI(API):
@@ -37,8 +38,8 @@ class EntityAPI(API):
 
     def delete(self, id_, **kwargs):
         if 'response_type' in kwargs:
-            raise ValueError("'response_type' cannot be "
-                             "specified for this method.")
+            raise ResponseTypeError("'response_type' cannot be "
+                                    "specified for this method.")
 
         return self._delete(
             '%s/%s' % (self._url, quote(id_)),
