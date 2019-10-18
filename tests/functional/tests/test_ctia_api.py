@@ -252,7 +252,7 @@ def test_python_module_ctia_positive_bulk(module_headers, module_tool_client):
     assert len(post_tool_response['coas']) > 0
     campaign_entity_id = post_tool_response['campaigns'][0].rpartition('/')[-1]
     # Verify that GET request using bulk functionality return valid data
-    get_tool_response = bulk.get(campaigns=[campaign_entity_id])
+    get_tool_response = bulk.get(params={'campaigns': [campaign_entity_id]})
     values = {
         key: get_tool_response['campaigns'][0][key] for key in [
             'campaign_type',
@@ -415,7 +415,7 @@ def test_python_module_ctia_positive_campaign(
     get_tool_response = campaign.get(entity_id)
     assert get_tool_response['title'] == 'New demo campaign'
     # Search for campaign by entity id
-    search_tool_response = campaign.search(query=entity_id)
+    search_tool_response = campaign.search(params={'query': entity_id})
     # We got exactly one entry for provided unique entity id
     assert len(search_tool_response) == 1
     assert search_tool_response[0]['title'] == 'New demo campaign'
@@ -667,7 +667,7 @@ def test_python_module_ctia_positive_event(module_tool_client):
     Importance: Critical
     """
     event = module_tool_client.private_intel.event
-    entities_list = event.search(query='*')
+    entities_list = event.search(params={'query': '*'})
     assert len(entities_list) > 0
     entity = random.choice(entities_list)
     assert entity['type'] == 'event'
