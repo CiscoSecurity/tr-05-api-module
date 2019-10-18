@@ -1,4 +1,4 @@
-from threatresponse import urls
+from .. import urls
 from .base import API
 from ..exceptions import ResponseTypeError
 

@@ -1,4 +1,4 @@
-from threatresponse import urls
+from .. import urls
 from .routing import Router
 from .entity import EntityAPI
 from .base import API
