@@ -1,3 +1,4 @@
+from .. import urls
 from .routing import Router
 from .entity import EntityAPI
 
@@ -11,23 +12,25 @@ class IndicatorAPI(EntityAPI):
         super(IndicatorAPI, self).__init__(request, '/ctia/indicator')
 
     @route('judgements.indicators')
-    def _perform(self,
-                 observable_type,
-                 observable_value,
-                 response_type='json'):
+    def _perform(self, observable_type, observable_value, **kwargs):
         return self._get(
-            '/ctia/%s/%s/judgements/indicators' % (observable_type,
-                                                   observable_value),
-            response_type=response_type
+            urls.join(
+                '/ctia',
+                observable_type,
+                observable_value,
+                'judgements/indicators'
+            ),
+            **kwargs
         )
 
     @route('sightings.indicators')
-    def _perform(self,
-                 observable_type,
-                 observable_value,
-                 response_type='json'):
+    def _perform(self, observable_type, observable_value, **kwargs):
         return self._get(
-            '/ctia/%s/%s/sightings/indicators' % (observable_type,
-                                                  observable_value),
-            response_type=response_type
+            urls.join(
+                '/ctia',
+                observable_type,
+                observable_value,
+                'sightings/indicators'
+            ),
+            **kwargs
         )

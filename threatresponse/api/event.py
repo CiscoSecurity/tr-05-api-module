@@ -1,3 +1,4 @@
+from .. import urls
 from .routing import Router
 from .entity import EntityAPI
 
@@ -11,9 +12,8 @@ class EventAPI(EntityAPI):
         super(EventAPI, self).__init__(request, '/ctia/event')
 
     @route('history')
-    def _perform(self, id_, response_type='json', **kwargs):
+    def _perform(self, id_, **kwargs):
         return self._get(
-            '%s/history/%s' % (self._url, id_),
-            params=kwargs,
-            response_type=response_type
+            urls.join(self._url, 'history', id_),
+            **kwargs
         )

@@ -1,3 +1,5 @@
+from six.moves.urllib.parse import quote
+
 from .exceptions import RegionError
 
 
@@ -39,3 +41,11 @@ def url_for(region, family):
         )
 
     return _urls_by_region[region][family]
+
+
+def join(base, *parts):
+    url = base.rstrip('/')
+    for part in parts:
+        url += '/' + quote(part.strip('/'))
+
+    return url

@@ -1,3 +1,4 @@
+from .. import urls
 from .entity import EntityAPI
 from .routing import Router
 
@@ -11,11 +12,13 @@ class JudgementAPI(EntityAPI):
         super(JudgementAPI, self).__init__(request, '/ctia/judgement')
 
     @route('judgements')
-    def _perform(self,
-                 observable_type,
-                 observable_value,
-                 response_type='json'):
+    def _perform(self, observable_type, observable_value, **kwargs):
         return self._get(
-            '/ctia/%s/%s/judgements' % (observable_type, observable_value),
-            response_type=response_type
+            urls.join(
+                '/ctia',
+                observable_type,
+                observable_value,
+                'judgements'
+            ),
+            **kwargs
         )

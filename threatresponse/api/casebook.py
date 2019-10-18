@@ -1,3 +1,4 @@
+from .. import urls
 from .entity import EntityAPI
 from .routing import Router
 
@@ -11,25 +12,25 @@ class CasebookAPI(EntityAPI):
         super(CasebookAPI, self).__init__(request, '/ctia/casebook')
 
     @route('observables')
-    def _perform(self, id_, payload, response_type='json'):
+    def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/observables' % (self._url, id_),
+            urls.join(self._url, id_, 'observables'),
             json=payload,
-            response_type=response_type
+            **kwargs
         )
 
     @route('texts')
-    def _perform(self, id_, payload, response_type='json'):
+    def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/texts' % (self._url, id_),
+            urls.join(self._url, id_, 'texts'),
             json=payload,
-            response_type=response_type
+            **kwargs
         )
 
     @route('bundle')
-    def _perform(self, id_, payload, response_type='json'):
+    def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/bundle' % (self._url, id_),
+            urls.join(self._url, id_, 'bundle'),
             json=payload,
-            response_type=response_type
+            **kwargs
         )

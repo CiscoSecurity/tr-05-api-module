@@ -1,4 +1,6 @@
+from .. import urls
 from .base import API
+from ..exceptions import ResponseTypeError
 
 
 class EntityAPI(API):
@@ -8,56 +10,50 @@ class EntityAPI(API):
 
         self._url = url
 
-    def get(self, id_=None, response_type='json', **params):
+    def get(self, id_=None, **kwargs):
         if id_:
-            url = '%s/%s' % (self._url, id_)
+            url = urls.join(self._url, id_)
         else:
             url = self._url
 
-        return self._get(
-            url,
-            params=params,
-            response_type=response_type
-        )
+        return self._get(url, **kwargs)
 
-    def post(self, payload, response_type='json',  **params):
-        return self._post(
-            self._url,
-            json=payload,
-            params=params,
-            response_type=response_type
-        )
+    def post(self, payload, **kwargs):
+        return self._post(self._url, json=payload, **kwargs)
 
-    def put(self, id_, payload, response_type='json'):
+    def put(self, id_, payload, **kwargs):
         return self._put(
-            '%s/%s' % (self._url, id_),
+            urls.join(self._url, id_),
             json=payload,
-            response_type=response_type
+            **kwargs
         )
 
-    def patch(self, id_, payload, response_type='json'):
+    def patch(self, id_, payload, **kwargs):
         return self._patch(
-            '%s/%s' % (self._url, id_),
+            urls.join(self._url, id_),
             json=payload,
-            response_type=response_type
+            **kwargs
         )
 
-    def delete(self, id_):
-        self._delete(
-            '%s/%s' % (self._url, id_),
-            response_type='raw'
+    def delete(self, id_, **kwargs):
+        if 'response_type' in kwargs:
+            raise ResponseTypeError("'response_type' cannot be "
+                                    "specified for this method.")
+
+        return self._delete(
+            urls.join(self._url, id_),
+            response_type='raw',
+            **kwargs
         )
 
-    def search(self, response_type='json', **params):
+    def search(self, **kwargs):
         return self._get(
-            '%s/search' % self._url,
-            params=params,
-            response_type=response_type
+            urls.join(self._url, 'search'),
+            **kwargs
         )
 
-    def external_id(self, id_, response_type='json', **params):
+    def external_id(self, id_, **kwargs):
         return self._get(
-            '%s/external_id/%s' % (self._url, id_),
-            params=params,
-            response_type=response_type
+            urls.join(self._url, 'external_id', id_),
+            **kwargs
         )

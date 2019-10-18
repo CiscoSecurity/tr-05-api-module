@@ -1,3 +1,4 @@
+from .. import urls
 from .routing import Router
 from .entity import EntityAPI
 
@@ -11,28 +12,29 @@ class IncidentAPI(EntityAPI):
         super(IncidentAPI, self).__init__(request, '/ctia/incident')
 
     @route('status')
-    def _perform(self, id_, payload, response_type='json'):
+    def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/status' % (self._url, id_),
+            urls.join(self._url, id_, 'status'),
             json=payload,
-            response_type=response_type
+            **kwargs
         )
 
     @route('link')
-    def _perform(self, id_, payload, response_type='json'):
+    def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/link' % (self._url, id_),
+            urls.join(self._url, id_, 'link'),
             json=payload,
-            response_type=response_type
+            **kwargs
         )
 
     @route('sightings.incidents')
-    def _perform(self,
-                 observable_type,
-                 observable_value,
-                 response_type='json'):
+    def _perform(self, observable_type, observable_value, **kwargs):
         return self._get(
-            '/ctia/%s/%s/sightings/incidents' % (observable_type,
-                                                 observable_value),
-            response_type=response_type
+            urls.join(
+                '/ctia',
+                observable_type,
+                observable_value,
+                'sightings/incidents'
+            ),
+            **kwargs
         )

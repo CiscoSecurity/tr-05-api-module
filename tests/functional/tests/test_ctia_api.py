@@ -85,7 +85,8 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
         'type': 'actor',
     }
     # Create new entity using provided payload
-    post_tool_response = actor.post(payload=payload, wait_for='true')
+    post_tool_response = actor.post(payload=payload,
+                                    params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'actor_type',
@@ -160,7 +161,8 @@ def test_python_module_ctia_positive_attack_pattern(
         'type': 'attack-pattern'
     }
     # Create new entity using provided payload
-    post_tool_response = attack_pattern.post(payload=payload, wait_for='true')
+    post_tool_response = attack_pattern.post(payload=payload,
+                                             params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'description',
@@ -250,7 +252,7 @@ def test_python_module_ctia_positive_bulk(module_headers, module_tool_client):
     assert len(post_tool_response['coas']) > 0
     campaign_entity_id = post_tool_response['campaigns'][0].rpartition('/')[-1]
     # Verify that GET request using bulk functionality return valid data
-    get_tool_response = bulk.get(campaigns=[campaign_entity_id])
+    get_tool_response = bulk.get(params={'campaigns': [campaign_entity_id]})
     values = {
         key: get_tool_response['campaigns'][0][key] for key in [
             'campaign_type',
@@ -304,7 +306,8 @@ def test_python_module_ctia_positive_bundle(module_tool_client):
         'schema_version': SERVER_VERSION
     }
     # Create new incident using provided payload
-    incident_post_response = incident.post(payload=payload, wait_for='true')
+    incident_post_response = incident.post(payload=payload,
+                                           params={'wait_for': 'true'})
     # Prepare data for indicator
     indicator = module_tool_client.private_intel.indicator
     payload = {
@@ -314,7 +317,8 @@ def test_python_module_ctia_positive_bundle(module_tool_client):
         'revision': 0
     }
     # Create new indicator using provided payload
-    indicator_post_response = indicator.post(payload=payload, wait_for='true')
+    indicator_post_response = indicator.post(payload=payload,
+                                             params={'wait_for': 'true'})
     # Use created entities for bundle
     bundle = module_tool_client.private_intel.bundle
     payload = {
@@ -378,7 +382,8 @@ def test_python_module_ctia_positive_campaign(
         'schema_version': SERVER_VERSION
     }
     # Create new entity using provided payload
-    post_tool_response = campaign.post(payload=payload, wait_for='true')
+    post_tool_response = campaign.post(payload=payload,
+                                       params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'title',
@@ -410,7 +415,7 @@ def test_python_module_ctia_positive_campaign(
     get_tool_response = campaign.get(entity_id)
     assert get_tool_response['title'] == 'New demo campaign'
     # Search for campaign by entity id
-    search_tool_response = campaign.search(query=entity_id)
+    search_tool_response = campaign.search(params={'query': entity_id})
     # We got exactly one entry for provided unique entity id
     assert len(search_tool_response) == 1
     assert search_tool_response[0]['title'] == 'New demo campaign'
@@ -460,7 +465,8 @@ def test_python_module_ctia_positive_casebook(
         'timestamp': '2019-09-24T11:34:18.000Z'
     }
     # Create new entity using provided payload
-    post_tool_response = casebook.post(payload=payload, wait_for='true')
+    post_tool_response = casebook.post(payload=payload,
+                                       params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'type',
@@ -545,7 +551,8 @@ def test_python_module_ctia_positive_coa(module_headers, module_tool_client):
         'schema_version': SERVER_VERSION
     }
     # Create new entity using provided payload
-    post_tool_response = coa.post(payload=payload, wait_for='true')
+    post_tool_response = coa.post(payload=payload,
+                                  params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'description',
@@ -614,7 +621,8 @@ def test_python_module_ctia_positive_data_table(
         'rows': [[{}]]
     }
     # Create new entity using provided payload
-    post_tool_response = data_table.post(payload=payload, wait_for='true')
+    post_tool_response = data_table.post(payload=payload,
+                                         params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'columns',
@@ -659,7 +667,7 @@ def test_python_module_ctia_positive_event(module_tool_client):
     Importance: Critical
     """
     event = module_tool_client.private_intel.event
-    entities_list = event.search(query='*')
+    entities_list = event.search(params={'query': '*'})
     assert len(entities_list) > 0
     entity = random.choice(entities_list)
     assert entity['type'] == 'event'
@@ -699,7 +707,8 @@ def test_python_module_ctia_positive_feedback(
         'schema_version': SERVER_VERSION
     }
     # Create new campaign entity to be used for feedback
-    post_tool_response = campaign.post(payload=payload, wait_for='true')
+    post_tool_response = campaign.post(payload=payload,
+                                       params={'wait_for': 'true'})
     campaign_entity_id = post_tool_response['id'].rpartition('/')[-1]
     feedback = module_tool_client.private_intel.feedback
     payload = {
@@ -711,7 +720,8 @@ def test_python_module_ctia_positive_feedback(
     }
     # Create new feedback entity using provided payload with already formed
     # campaign entity
-    post_tool_response = feedback.post(payload=payload, wait_for='true')
+    post_tool_response = feedback.post(payload=payload,
+                                       params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'feedback',
@@ -769,7 +779,7 @@ def test_python_module_ctia_positive_graphql(module_tool_client):
     }
     # Create new entity using provided payload
     post_tool_response = module_tool_client.private_intel.graphql.post(
-        payload=payload, wait_for='true')
+        payload=payload, params={'wait_for': 'true'})
     assert post_tool_response
 
 
@@ -814,7 +824,8 @@ def test_python_module_ctia_positive_incident(
         'schema_version': SERVER_VERSION
     }
     # Create new entity using provided payload
-    post_tool_response = incident.post(payload=payload, wait_for='true')
+    post_tool_response = incident.post(payload=payload,
+                                       params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'confidence',
@@ -903,7 +914,8 @@ def test_python_module_ctia_positive_indicator(
         'revision': 0
     }
     # Create new entity using provided payload
-    post_tool_response = indicator.post(payload=payload, wait_for='true')
+    post_tool_response = indicator.post(payload=payload,
+                                        params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'producer',
@@ -978,7 +990,8 @@ def test_python_module_ctia_positive_investigation(
         'schema_version': SERVER_VERSION
     }
     # Create new entity using provided payload
-    post_tool_response = investigation.post(payload=payload, wait_for='true')
+    post_tool_response = investigation.post(payload=payload,
+                                            params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'title',
@@ -1058,7 +1071,8 @@ def test_python_module_ctia_positive_judgement(
         'type': 'judgement',
     }
     # Create new entity using provided payload
-    post_tool_response = judgement.post(payload=payload, wait_for='true')
+    post_tool_response = judgement.post(payload=payload,
+                                        params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'confidence',
@@ -1142,7 +1156,8 @@ def test_python_module_ctia_positive_malware(
         'labels': ['malware']
     }
     # Create new entity using provided payload
-    post_tool_response = malware.post(payload=payload, wait_for='true')
+    post_tool_response = malware.post(payload=payload,
+                                      params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'name',
@@ -1218,7 +1233,8 @@ def test_python_module_ctia_positive_relationship(
         'schema_version': SERVER_VERSION
     }
     # Create new campaign using provided payload
-    campaign_post_response = campaign.post(payload=payload, wait_for='true')
+    campaign_post_response = campaign.post(payload=payload,
+                                           params={'wait_for': 'true'})
     # Prepare data for indicator
     indicator = module_tool_client.private_intel.indicator
     payload = {
@@ -1228,7 +1244,8 @@ def test_python_module_ctia_positive_relationship(
         'revision': 0
     }
     # Create new indicator using provided payload
-    indicator_post_response = indicator.post(payload=payload, wait_for='true')
+    indicator_post_response = indicator.post(payload=payload,
+                                             params={'wait_for': 'true'})
     # Use created entities for relationship
     relationship = module_tool_client.private_intel.relationship
     payload = {
@@ -1240,7 +1257,8 @@ def test_python_module_ctia_positive_relationship(
         'relationship_type': 'indicates',
     }
     # Create new entity using provided payload
-    post_tool_response = relationship.post(payload=payload, wait_for='true')
+    post_tool_response = relationship.post(payload=payload,
+                                           params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'description',
@@ -1322,7 +1340,8 @@ def test_python_module_ctia_positive_sighting(
         'schema_version': SERVER_VERSION
     }
     # Create new entity using provided payload
-    post_tool_response = sighting.post(payload=payload, wait_for='true')
+    post_tool_response = sighting.post(payload=payload,
+                                       params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'count',
@@ -1419,7 +1438,8 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
         'schema_version': SERVER_VERSION
     }
     # Create new entity using provided payload
-    post_tool_response = tool.post(payload=payload, wait_for='true')
+    post_tool_response = tool.post(payload=payload,
+                                   params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'name',
@@ -1494,7 +1514,7 @@ def test_python_module_ctia_positive_verdict(
         'type': 'judgement',
     }
     # Create new judgement entity to be used for verdict
-    judgement.post(payload=payload, wait_for='true')
+    judgement.post(payload=payload, params={'wait_for': 'true'})
     verdict = module_tool_client.private_intel.verdict
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -1561,7 +1581,8 @@ def test_python_module_ctia_positive_vulnerability(
         'schema_version': SERVER_VERSION,
     }
     # Create new entity using provided payload
-    post_tool_response = vulnerability.post(payload=payload, wait_for='true')
+    post_tool_response = vulnerability.post(payload=payload,
+                                            params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'description',
@@ -1635,7 +1656,8 @@ def test_python_module_ctia_positive_weakness(
         'type': 'weakness'
     }
     # Create new entity using provided payload
-    post_tool_response = weakness.post(payload=payload, wait_for='true')
+    post_tool_response = weakness.post(payload=payload,
+                                       params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
             'description',

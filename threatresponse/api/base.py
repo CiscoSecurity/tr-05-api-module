@@ -1,5 +1,5 @@
-from threatresponse.exceptions import ResponseTypeError
 from .routing import Resolution, Router
+from ..exceptions import ResponseTypeError
 
 
 class API(object):
