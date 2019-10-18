@@ -8,7 +8,7 @@ class EnrichAPI(API):
     @route('health')
     def _perform(self, **kwargs):
         """
-        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Health/post_iroh_iroh_enrich_health
+        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Health/post_iroh_iroh_enrich_health
         """
 
         return self._post(
@@ -19,7 +19,7 @@ class EnrichAPI(API):
     @route('deliberate.observables')
     def _perform(self, payload, **kwargs):
         """
-        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Deliberate/post_iroh_iroh_enrich_deliberate_observables
+        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Deliberate/post_iroh_iroh_enrich_deliberate_observables
         """
 
         return self._post(
@@ -31,7 +31,7 @@ class EnrichAPI(API):
     @route('observe.observables')
     def _perform(self, payload, **kwargs):
         """
-        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Observe/post_iroh_iroh_enrich_observe_observables
+        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Observe/post_iroh_iroh_enrich_observe_observables
         """
 
         return self._post(
@@ -43,7 +43,7 @@ class EnrichAPI(API):
     @route('refer.observables')
     def _perform(self, payload, **kwargs):
         """
-        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#!/Refer/post_iroh_iroh_enrich_refer_observables
+        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Refer/post_iroh_iroh_enrich_refer_observables
         """
 
         return self._post(

@@ -1,14 +1,14 @@
-from .. import urls
-from .routing import Router
-from .entity import EntityAPI
 from .base import API
 from .bundle import BundleAPI
+from .casebook import CasebookAPI
+from .entity import EntityAPI
+from .event import EventAPI
 from .incident import IncidentAPI
 from .indicator import IndicatorAPI
 from .judgement import JudgementAPI
-from .event import EventAPI
+from .routing import Router
 from .sighting import SightingAPI
-from .casebook import CasebookAPI
+from .. import urls
 
 
 class IntelAPI(API):

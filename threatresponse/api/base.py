@@ -26,13 +26,18 @@ class API(object):
 
     def __perform(self, method, *args, **kwargs):
         response_types = {
-            'raw': lambda res: res,
-            'json': lambda res: res.json()
+            'raw': lambda response: response,
+            'json': lambda response: response.json(),
         }
         response_type = kwargs.pop('response_type', 'json')
 
         if response_type not in response_types:
-            raise ResponseTypeError(response_type)
+            raise ResponseTypeError(
+                'Unsupported response type {}, must be one of: {}.'.format(
+                    repr(response_type),
+                    ', '.join(map(repr, response_types.keys())),
+                )
+            )
 
         response = self._request.perform(method, *args, **kwargs)
         response.raise_for_status()

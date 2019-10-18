@@ -8,7 +8,7 @@ class InspectAPI(API):
     @route('inspect')
     def _perform(self, payload, **kwargs):
         """
-        https://visibility.amp.cisco.com/iroh/iroh-inspect/index.html#!/INSPECT/post_iroh_iroh_inspect_inspect
+        https://visibility.amp.cisco.com/iroh/iroh-inspect/index.html#/INSPECT/post_iroh_iroh_inspect_inspect
         """
 
         return self._post(

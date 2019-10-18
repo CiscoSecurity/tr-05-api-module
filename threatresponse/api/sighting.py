@@ -1,6 +1,6 @@
-from .. import urls
 from .entity import EntityAPI
 from .routing import Router
+from .. import urls
 
 
 class SightingAPI(EntityAPI):

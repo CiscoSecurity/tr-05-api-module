@@ -44,8 +44,7 @@ def url_for(region, family):
 
 
 def join(base, *parts):
-    url = base.rstrip('/')
-    for part in parts:
-        url += '/' + quote(part.strip('/'))
-
-    return url
+    return base.rstrip('/') + '/' + '/'.join(
+        quote(str(part).strip('/'), safe='')
+        for part in parts
+    )

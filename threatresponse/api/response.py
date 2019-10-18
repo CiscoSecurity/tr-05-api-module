@@ -1,6 +1,6 @@
-from .. import urls
 from .base import API
 from .routing import Router
+from .. import urls
 
 
 class ResponseAPI(API):
@@ -9,7 +9,7 @@ class ResponseAPI(API):
     @route('respond.observables')
     def _perform(self, payload, **kwargs):
         """
-        https://visibility.amp.cisco.com/iroh/iroh-response/index.html#!/Response/post_iroh_iroh_response_respond_observables
+        https://visibility.amp.cisco.com/iroh/iroh-response/index.html#/Response/post_iroh_iroh_response_respond_observables
         """
 
         return self._post(
@@ -26,7 +26,7 @@ class ResponseAPI(API):
                  observable_value,
                  **kwargs):
         """
-        https://visibility.amp.cisco.com/iroh/iroh-response/index.html#!/Response/post_iroh_iroh_response_respond_trigger_module_name_action_id
+        https://visibility.amp.cisco.com/iroh/iroh-response/index.html#/Response/post_iroh_iroh_response_respond_trigger__module_name___action_id_
         """
 
         url = urls.join(

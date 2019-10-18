@@ -1,6 +1,6 @@
-from .. import urls
-from .routing import Router
 from .entity import EntityAPI
+from .routing import Router
+from .. import urls
 
 
 class IncidentAPI(EntityAPI):

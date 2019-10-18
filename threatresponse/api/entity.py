@@ -1,5 +1,5 @@
-from .. import urls
 from .base import API
+from .. import urls
 from ..exceptions import ResponseTypeError
 
 
