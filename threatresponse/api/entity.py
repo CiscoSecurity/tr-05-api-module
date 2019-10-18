@@ -36,7 +36,11 @@ class EntityAPI(API):
         )
 
     def delete(self, id_, **kwargs):
-        self._delete(
+        if 'response_type' in kwargs:
+            raise ValueError("'response_type' cannot be "
+                             "specified for this method.")
+
+        return self._delete(
             '%s/%s' % (self._url, quote(id_)),
             response_type='raw',
             **kwargs
