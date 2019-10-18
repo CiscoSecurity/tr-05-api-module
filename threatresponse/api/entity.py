@@ -1,5 +1,4 @@
-from six.moves.urllib.parse import quote
-
+from threatresponse import urls
 from .base import API
 from ..exceptions import ResponseTypeError
 
@@ -13,7 +12,7 @@ class EntityAPI(API):
 
     def get(self, id_=None, **kwargs):
         if id_:
-            url = '%s/%s' % (self._url, quote(id_))
+            url = urls.join(self._url, id_)
         else:
             url = self._url
 
@@ -24,14 +23,14 @@ class EntityAPI(API):
 
     def put(self, id_, payload, **kwargs):
         return self._put(
-            '%s/%s' % (self._url, quote(id_)),
+            urls.join(self._url, id_),
             json=payload,
             **kwargs
         )
 
     def patch(self, id_, payload, **kwargs):
         return self._patch(
-            '%s/%s' % (self._url, quote(id_)),
+            urls.join(self._url, id_),
             json=payload,
             **kwargs
         )
@@ -42,19 +41,19 @@ class EntityAPI(API):
                                     "specified for this method.")
 
         return self._delete(
-            '%s/%s' % (self._url, quote(id_)),
+            urls.join(self._url, id_),
             response_type='raw',
             **kwargs
         )
 
     def search(self, **kwargs):
         return self._get(
-            '%s/search' % self._url,
+            urls.join(self._url, 'search'),
             **kwargs
         )
 
     def external_id(self, id_, **kwargs):
         return self._get(
-            '%s/external_id/%s' % (self._url, quote(id_)),
+            urls.join(self._url, 'external_id', id_),
             **kwargs
         )

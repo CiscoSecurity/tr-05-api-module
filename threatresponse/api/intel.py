@@ -1,5 +1,4 @@
-from six.moves.urllib.parse import quote
-
+from threatresponse import urls
 from .routing import Router
 from .entity import EntityAPI
 from .base import API
@@ -194,8 +193,7 @@ class IntelAPI(API):
         """
 
         return self._get(
-            '/ctia/%s/%s/verdict' % (quote(observable_type),
-                                     quote(observable_value)),
+            urls.join('/ctia', observable_type, observable_value, 'verdict'),
             **kwargs
         )
 

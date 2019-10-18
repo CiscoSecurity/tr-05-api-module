@@ -1,5 +1,4 @@
-from six.moves.urllib.parse import quote
-
+from threatresponse import urls
 from .entity import EntityAPI
 from .routing import Router
 
@@ -15,7 +14,7 @@ class CasebookAPI(EntityAPI):
     @route('observables')
     def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/observables' % (self._url, quote(id_)),
+            urls.join(self._url, id_, 'observables'),
             json=payload,
             **kwargs
         )
@@ -23,7 +22,7 @@ class CasebookAPI(EntityAPI):
     @route('texts')
     def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/texts' % (self._url, quote(id_)),
+            urls.join(self._url, id_, 'texts'),
             json=payload,
             **kwargs
         )
@@ -31,7 +30,7 @@ class CasebookAPI(EntityAPI):
     @route('bundle')
     def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/bundle' % (self._url, quote(id_)),
+            urls.join(self._url, id_, 'bundle'),
             json=payload,
             **kwargs
         )

@@ -1,5 +1,4 @@
-from six.moves.urllib.parse import quote
-
+from threatresponse import urls
 from .routing import Router
 from .entity import EntityAPI
 
@@ -15,7 +14,7 @@ class IncidentAPI(EntityAPI):
     @route('status')
     def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/status' % (self._url, quote(id_)),
+            urls.join(self._url, id_, 'status'),
             json=payload,
             **kwargs
         )
@@ -23,18 +22,19 @@ class IncidentAPI(EntityAPI):
     @route('link')
     def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/link' % (self._url, quote(id_)),
+            urls.join(self._url, id_, 'link'),
             json=payload,
             **kwargs
         )
 
     @route('sightings.incidents')
-    def _perform(self,
-                 observable_type,
-                 observable_value,
-                 **kwargs):
+    def _perform(self, observable_type, observable_value, **kwargs):
         return self._get(
-            '/ctia/%s/%s/sightings/incidents' % (quote(observable_type),
-                                                 quote(observable_value)),
+            urls.join(
+                '/ctia',
+                observable_type,
+                observable_value,
+                'sightings/incidents'
+            ),
             **kwargs
         )

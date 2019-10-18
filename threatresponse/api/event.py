@@ -1,5 +1,4 @@
-from six.moves.urllib.parse import quote
-
+from threatresponse import urls
 from .routing import Router
 from .entity import EntityAPI
 
@@ -15,6 +14,6 @@ class EventAPI(EntityAPI):
     @route('history')
     def _perform(self, id_, **kwargs):
         return self._get(
-            '%s/history/%s' % (self._url, quote(id_)),
+            urls.join(self._url, 'history', id_),
             **kwargs
         )

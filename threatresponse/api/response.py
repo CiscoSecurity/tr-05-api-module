@@ -1,5 +1,4 @@
-from six.moves.urllib.parse import quote
-
+from threatresponse import urls
 from .base import API
 from .routing import Router
 
@@ -30,9 +29,10 @@ class ResponseAPI(API):
         https://visibility.amp.cisco.com/iroh/iroh-response/index.html#!/Response/post_iroh_iroh_response_respond_trigger_module_name_action_id
         """
 
-        url = '/iroh/iroh-response/respond/trigger/{}/{}'.format(
-            quote(module_name),
-            quote(action_id),
+        url = urls.join(
+            '/iroh/iroh-response/respond/trigger',
+            module_name,
+            action_id
         )
 
         # Extend optional module-specific query params with the required ones.
