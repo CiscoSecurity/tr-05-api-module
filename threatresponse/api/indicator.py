@@ -1,3 +1,5 @@
+from six.moves.urllib.parse import quote
+
 from .routing import Router
 from .entity import EntityAPI
 
@@ -14,20 +16,20 @@ class IndicatorAPI(EntityAPI):
     def _perform(self,
                  observable_type,
                  observable_value,
-                 response_type='json'):
+                 **kwargs):
         return self._get(
-            '/ctia/%s/%s/judgements/indicators' % (observable_type,
-                                                   observable_value),
-            response_type=response_type
+            '/ctia/%s/%s/judgements/indicators' % (quote(observable_type),
+                                                   quote(observable_value)),
+            **kwargs
         )
 
     @route('sightings.indicators')
     def _perform(self,
                  observable_type,
                  observable_value,
-                 response_type='json'):
+                 **kwargs):
         return self._get(
-            '/ctia/%s/%s/sightings/indicators' % (observable_type,
-                                                  observable_value),
-            response_type=response_type
+            '/ctia/%s/%s/sightings/indicators' % (quote(observable_type),
+                                                  quote(observable_value)),
+            **kwargs
         )

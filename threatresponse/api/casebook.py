@@ -1,3 +1,5 @@
+from six.moves.urllib.parse import quote
+
 from .entity import EntityAPI
 from .routing import Router
 
@@ -11,25 +13,25 @@ class CasebookAPI(EntityAPI):
         super(CasebookAPI, self).__init__(request, '/ctia/casebook')
 
     @route('observables')
-    def _perform(self, id_, payload, response_type='json'):
+    def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/observables' % (self._url, id_),
+            '%s/%s/observables' % (self._url, quote(id_)),
             json=payload,
-            response_type=response_type
+            **kwargs
         )
 
     @route('texts')
-    def _perform(self, id_, payload, response_type='json'):
+    def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/texts' % (self._url, id_),
+            '%s/%s/texts' % (self._url, quote(id_)),
             json=payload,
-            response_type=response_type
+            **kwargs
         )
 
     @route('bundle')
-    def _perform(self, id_, payload, response_type='json'):
+    def _perform(self, id_, payload, **kwargs):
         return self._post(
-            '%s/%s/bundle' % (self._url, id_),
+            '%s/%s/bundle' % (self._url, quote(id_)),
             json=payload,
-            response_type=response_type
+            **kwargs
         )

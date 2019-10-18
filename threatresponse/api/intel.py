@@ -169,26 +169,26 @@ class IntelAPI(API):
         return self._weakness
 
     @route('properties.get')
-    def _perform(self, response_type='json'):
+    def _perform(self, **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Properties
         """
 
-        return self._get('/ctia/properties', response_type=response_type)
+        return self._get('/ctia/properties', **kwargs)
 
     @route('metrics.get')
-    def _perform(self, response_type='json'):
+    def _perform(self, **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Metrics
         """
 
-        return self._get('/ctia/metrics', response_type=response_type)
+        return self._get('/ctia/metrics', **kwargs)
 
     @route('verdict.get')
     def _perform(self,
                  observable_type,
                  observable_value,
-                 response_type='json'):
+                 **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Verdict
         """
@@ -196,20 +196,21 @@ class IntelAPI(API):
         return self._get(
             '/ctia/%s/%s/verdict' % (quote(observable_type),
                                      quote(observable_value)),
-            response_type=response_type)
+            **kwargs
+        )
 
     @route('status.get')
-    def _perform(self, response_type='json'):
+    def _perform(self, **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Status
         """
 
-        return self._get('/ctia/status', response_type=response_type)
+        return self._get('/ctia/status', **kwargs)
 
     @route('version.get')
-    def _perform(self, response_type='json'):
+    def _perform(self, **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Version
         """
 
-        return self._get('/ctia/version', response_type=response_type)
+        return self._get('/ctia/version', **kwargs)

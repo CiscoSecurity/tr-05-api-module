@@ -1,3 +1,5 @@
+from six.moves.urllib.parse import quote
+
 from .entity import EntityAPI
 from .routing import Router
 
@@ -14,8 +16,9 @@ class SightingAPI(EntityAPI):
     def _perform(self,
                  observable_type,
                  observable_value,
-                 response_type='json'):
+                 **kwargs):
         return self._get(
-            '/ctia/%s/%s/sightings' % (observable_type, observable_value),
-            response_type=response_type
+            '/ctia/%s/%s/sightings' % (quote(observable_type),
+                                       quote(observable_value)),
+            **kwargs
         )
