@@ -33,7 +33,7 @@ VERSION = read_version()
 
 INSTALL_REQUIRES = read_requirements()
 
-PACKAGES = setuptools.find_packages()
+PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'])
 
 KEYWORDS = ['cisco', 'security', 'python', 'threat', 'response', 'api']
 
