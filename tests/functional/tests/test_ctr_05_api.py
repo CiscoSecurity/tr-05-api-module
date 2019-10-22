@@ -8,7 +8,8 @@ from ctrlibrary.threatresponse.inspect import inspect
 from ctrlibrary.threatresponse.enrich import (
     enrich_deliberate_observables,
     enrich_observe_observables,
-    enrich_refer_observables
+    enrich_refer_observables,
+    enrich_get_settings,
 )
 from ctrlibrary.threatresponse.response import response_respond_observables
 from threatresponse import ThreatResponse
@@ -264,4 +265,37 @@ def test_python_module_positive_response_respond_observables_by_domain(
     assert len(tool_response) > 0
     assert tool_response[0]['module'] == 'Umbrella'
     assert tool_response[0]['title'] == 'Block this domain'
+    assert response == tool_response
+
+
+def test_python_module_positive_get_enrich_settings(
+        module_headers, module_tool_client):
+    """Perform testing for get enrich settings end point of custom threat
+    response python module by domain type
+
+    ID: CCTRI-13-3b3a98e0-81ac-4669-971d-4b72a0417061
+
+    Steps:
+
+        1. Send request to enrich settings end point of threat response server
+            using direct GET call
+        2. Send same request using custom python module
+        3. Compare results
+
+    Expectedresults: GET action successfully accessed end point and returned
+        correct data
+
+    Importance: Critical
+    """
+    response = enrich_get_settings(**{'headers': module_headers})
+    tool_response = module_tool_client.enrich.settings.get()
+    # Check that response is not empty
+    assert len(tool_response) > 0
+    # Check that some valid modules are present in response
+    modules_list = [item['name'] for item in tool_response['modules']]
+    assert set([
+        'AMP for Endpoints', 'AMP File Reputation', 'VirusTotal'
+    ]).issubset(modules_list)
+    # Check that responses are same for requests sent directly and using
+    # custom python module
     assert response == tool_response
