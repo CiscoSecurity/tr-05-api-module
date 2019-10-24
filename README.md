@@ -39,6 +39,7 @@ tr = TreatResponse(
     client_password='<YOUR TR CLIENT PASSWORD>',  # required
     region='<YOUR TR REGION>',  # optional
     logger=<SOME LOGGER INSTANCE>,  # optional
+    timeout=<SOME NUMBER OF SECONDS>,  # optional
     proxy='<SOME PROXY URL>',  # optional
 )
 ```
@@ -53,4 +54,8 @@ different (ideally minimum) privileges.
 Other regions are not supported yet.
 - `logger` must be an (already configured) instance of the built-in
 `logging.Logger` class (or one of its descendants).
+- `timeout` must be a number (`int` or `float`) meaning the default amount of
+time (in seconds) to wait for the server to send data before giving up and
+raising an exception. Can be overwritten by explicitly specifying `timeout` on
+each call to any endpoint.
 - `proxy` must be a URL in the format: `http[s]://[username[:password]@]host[:port]`.
