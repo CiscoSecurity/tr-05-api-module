@@ -7,6 +7,7 @@ from .request.logged import LoggedRequest
 from .request.proxied import ProxiedRequest
 from .request.relative import RelativeRequest
 from .request.standard import StandardRequest
+from .request.timed import TimedRequest
 from .urls import url_for
 
 
@@ -16,10 +17,12 @@ class ThreatResponse(object):
         credentials = (client_id, client_password)
 
         proxy = options.get('proxy')
+        timeout = options.get('timeout')
         logger = options.get('logger')
         region = options.get('region')
 
         request = ProxiedRequest(proxy) if proxy else StandardRequest()
+        request = TimedRequest(request, timeout) if timeout else request
         request = LoggedRequest(request, logger) if logger else request
         request = AuthorizedRequest(request, *credentials, region=region)
 
