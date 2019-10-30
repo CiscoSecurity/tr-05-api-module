@@ -1,5 +1,7 @@
 import pytest
 
+from requests import ReadTimeout
+
 from ctrlibrary.core import settings
 from ctrlibrary.threatresponse import token
 from ctrlibrary.core.datafactory import gen_sha256, gen_string
@@ -64,6 +66,28 @@ def test_ctr_positive_smoke_inspect(module_headers):
     )
     assert response[0]['value'] == request_content
     assert response[0]['type'] == 'domain'
+
+
+def test_python_module_negative_endpoint_timeout(module_tool_client):
+    """Perform testing of timeout argument for any threat response endpoint
+
+    ID: CCTRI-374-8b4de3f0-2e24-444a-8631-3ddb0745be46
+
+    Steps:
+
+        1. Send request to inspect end point of threat response server using
+            long enough timeout to finish successfully
+        2. Send same request, but with short timeout, so it fail with exception
+
+    Expectedresults: Timeout argument affects request result in expected way
+
+    Importance: High
+    """
+    request_content = gen_sha256(gen_string())
+    module_tool_client.inspect.inspect({'content': request_content}, timeout=5)
+    with pytest.raises(ReadTimeout):
+        module_tool_client.inspect.inspect(
+            {'content': request_content}, timeout=0.1)
 
 
 def test_python_module_positive_inspect(module_headers, module_tool_client):
