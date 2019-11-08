@@ -301,16 +301,18 @@ def test_ctr_positive_timeout_support(module_headers):
 
         1. Send request with domain name and timeout to inspect end point
 
-    Expectedresults: POST action successfully get timeout and return correct
-        data
+    Expectedresults: It is possible to use timeout as part of POST request to
+        have delay and return correct data
 
     Importance: High
     """
     request_content = 'cisco.com'
     response = inspect(
         payload={'content': request_content},
-        **{'headers': module_headers,
-           'timeout': 5}
+        **{
+                'headers': module_headers,
+                'timeout': 5
+           }
     )
     assert response[0]['value'] == request_content
     assert response[0]['type'] == 'domain'
