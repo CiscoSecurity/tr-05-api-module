@@ -68,6 +68,33 @@ def test_ctr_positive_smoke_inspect(module_headers):
     assert response[0]['type'] == 'domain'
 
 
+def test_ctr_positive_timeout_support(module_headers):
+    """Perform testing for inspect end point of threat response application
+    server
+
+    ID: CCTRI-eeb97060-f393-46d3-b281-602f7624e91e
+
+    Steps:
+
+        1. Send request with domain name and timeout to inspect end point
+
+    Expectedresults: It is possible to use timeout as part of POST request to
+        have delay and return correct data
+
+    Importance: High
+    """
+    request_content = 'cisco.com'
+    response = inspect(
+        payload={'content': request_content},
+        **{
+                'headers': module_headers,
+                'timeout': 5
+           }
+    )
+    assert response[0]['value'] == request_content
+    assert response[0]['type'] == 'domain'
+
+
 def test_python_module_negative_endpoint_timeout(module_tool_client):
     """Perform testing of timeout argument for any threat response endpoint
 
@@ -289,28 +316,3 @@ def test_python_module_positive_response_respond_observables_by_domain(
     assert tool_response[0]['module'] == 'Umbrella'
     assert tool_response[0]['title'] == 'Block this domain'
     assert response == tool_response
-
-
-def test_ctr_positive_timeout_support(module_headers):
-    """Perform testing for inspect end point of threat response application
-    server
-
-    ID: CCTRI-eeb97060-f393-46d3-b281-602f7624e91e
-
-    Steps:
-
-        1. Send request with domain name and timeout to inspect end point
-
-    Expectedresults: POST action successfully get timeout and return correct
-        data
-
-    Importance: High
-    """
-    request_content = 'cisco.com'
-    response = inspect(
-        payload={'content': request_content},
-        **{'headers': module_headers,
-           'timeout': 5}
-    )
-    assert response[0]['value'] == request_content
-    assert response[0]['type'] == 'domain'
