@@ -34,7 +34,7 @@ pip show threatresponse
 ```python
 from threatresponse import ThreatResponse
 
-tr = TreatResponse(
+tr = ThreatResponse(
     client_id='<YOUR TR CLIENT ID>',  # required
     client_password='<YOUR TR CLIENT PASSWORD>',  # required
     region='<YOUR TR REGION>',  # optional
