@@ -63,7 +63,7 @@ each call to any endpoint.
 
 - Inspect
 
-Inspect allow to find an observable in a concrete string :
+Inspect allows to find an observable in a concrete string :
 ```python
 
 from threatresponse import ThreatResponse
@@ -98,7 +98,7 @@ response = client.enrich.observe.observables(
 
 - Deliberate
 
-Deliberate return judgments based on added modules 
+Deliberate returns judgments based on added modules 
 ```python
 
 from threatresponse import ThreatResponse
