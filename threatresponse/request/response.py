@@ -31,6 +31,7 @@ class Response(object):
         try:
             self._response.raise_for_status()
         except requests.HTTPError as error:
+            print (error)
             raise extended(error)
 
     @staticmethod

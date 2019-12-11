@@ -1,3 +1,4 @@
+from .command import Verdict
 from .api.enrich import EnrichAPI
 from .api.inspect import InspectAPI
 from .api.intel import IntelAPI
@@ -35,6 +36,8 @@ class ThreatResponse(object):
         self._private_intel = IntelAPI(request_for('private_intel'))
         self._global_intel = IntelAPI(request_for('global_intel'))
 
+        self._verdict = Verdict(self)
+
     @property
     def inspect(self):
         return self._inspect
@@ -54,3 +57,6 @@ class ThreatResponse(object):
     @property
     def global_intel(self):
         return self._global_intel
+
+    def verdict(self, observable):
+        return self._verdict.perform(observable)
