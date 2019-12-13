@@ -10,7 +10,8 @@ class CommandsAPI(API):
     @route('verdict')
     def _perform(self, payload, **kwargs):
         """
-        Command allow to simple query CTR for a verdict for a bunch of observables
+        Command allow to simple query CTR
+        for a verdict for a bunch of observables
         """
 
         response = self._post(
@@ -28,7 +29,9 @@ class CommandsAPI(API):
         for module in response.get('data', []):
             module_name = module['module']
 
-            for doc in module.get('data', {}).get('verdicts', {}).get('docs', []):
+            for doc in module.get('data', {})\
+                    .get('verdicts', {})\
+                    .get('docs', []):
                 verdicts.append({
                     'observable_value': doc['observable']['value'],
                     'observable_type': doc['observable']['type'],
