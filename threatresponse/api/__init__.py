@@ -3,3 +3,4 @@ from .enrich import EnrichAPI
 from .inspect import InspectAPI
 from .response import ResponseAPI
 from .intel import IntelAPI
+from .commands import CommandsAPI
