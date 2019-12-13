@@ -1,8 +1,8 @@
-from .command import Verdict
 from .api.enrich import EnrichAPI
 from .api.inspect import InspectAPI
 from .api.intel import IntelAPI
 from .api.response import ResponseAPI
+from .api.commands import CommandsAPI
 from .request.authorized import AuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.proxied import ProxiedRequest
@@ -35,8 +35,7 @@ class ThreatResponse(object):
         self._response = ResponseAPI(request_for('visibility'))
         self._private_intel = IntelAPI(request_for('private_intel'))
         self._global_intel = IntelAPI(request_for('global_intel'))
-
-        self._verdict = Verdict(self)
+        self._commands = CommandsAPI(request_for('visibility'))
 
     @property
     def inspect(self):
@@ -58,5 +57,6 @@ class ThreatResponse(object):
     def global_intel(self):
         return self._global_intel
 
-    def verdict(self, observable):
-        return self._verdict.perform(observable)
+    @property
+    def commands(self):
+        return self._commands
