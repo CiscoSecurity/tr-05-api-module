@@ -113,6 +113,40 @@ client = TreatResponse(
 response = client.enrich.deliberate.observables(
         [{'type': 'sha256', 'value': '8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9'}])
 ```
+### Commands
+For your convenience, we have made some predefined commands that you can use 
+
+- Verdicts
+Verdicts returns verdicts from all modules if the modules are configured. Accepts multiple observables.
+```python
+
+from threatresponse import ThreatResponse
+
+client = TreatResponse(
+    client_id='<YOUR TR CLIENT ID>',  # required
+    client_password='<YOUR TR CLIENT PASSWORD>',  # required
+    region='<YOUR TR REGION>',  # optional
+    logger=<SOME LOGGER INSTANCE>,  # optional
+    proxy='<SOME PROXY URL>',  # optional
+)
+response = client.commands.verdict('string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")')
+```
+ 
+- Targets
+Targets returns all available targets if the modules are configured. Accepts multiple observables.
+```python
+
+from threatresponse import ThreatResponse
+
+client = TreatResponse(
+    client_id='<YOUR TR CLIENT ID>',  # required
+    client_password='<YOUR TR CLIENT PASSWORD>',  # required
+    region='<YOUR TR REGION>',  # optional
+    logger=<SOME LOGGER INSTANCE>,  # optional
+    proxy='<SOME PROXY URL>',  # optional
+)
+response = client.commands.targets('string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")')
+```
 
 ### Available endpoints 
 
