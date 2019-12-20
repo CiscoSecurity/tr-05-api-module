@@ -117,6 +117,7 @@ response = client.enrich.deliberate.observables(
 For your convenience, we have made some predefined commands that you can use 
 
 - Verdicts
+
 Verdicts returns verdicts from all modules if the modules are configured. Accepts multiple observables.
 ```python
 
@@ -133,6 +134,7 @@ response = client.commands.verdict('string with observables ("8A32950CD96C5EF88F
 ```
  
 - Targets
+
 Targets returns all available targets if the modules are configured. Accepts multiple observables.
 ```python
 
