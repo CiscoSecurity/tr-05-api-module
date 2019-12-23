@@ -316,3 +316,112 @@ def test_python_module_positive_response_respond_observables_by_domain(
     assert tool_response[0]['module'] == 'Umbrella'
     assert tool_response[0]['title'] == 'Block this domain'
     assert response == tool_response
+
+
+def test_python_module_positive_commands_verdict(module_tool_client):
+    """Perform testing for verdict command from custom threat response python
+    module for one observable
+
+    ID: CCTRI-385-9f8cc790-a316-4e82-b592-43229f85e381
+
+    Steps:
+
+        1. Get observable verdict using default deliberate observable request
+        2. Get observable verdict using our new tool command
+
+    Expectedresults: Verdict command for provided observable returns expected
+        values and disposition name is the same in comparison to direct server
+        request
+
+    Importance: Critical
+    """
+    tool_response = module_tool_client.enrich.deliberate.observables(
+        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
+    tool_observables = get_observables(tool_response, 'AMP File Reputation')
+    assert tool_observables['data']['verdicts']['count'] > 0, (
+        'No observables returned from server. Check hash value')
+    assert tool_observables[
+        'data']['verdicts']['docs'][0]['disposition_name'] == 'Malicious'
+
+    tool_command_response = module_tool_client.commands.verdict(SHA256_HASH)
+    tool_command_observable = get_observables(
+        tool_command_response['verdicts'], 'AMP File Reputation')
+    assert tool_command_observable['observable_value'] == SHA256_HASH
+    assert tool_command_observable['observable_type'] == 'sha256'
+    assert tool_command_observable['expiration'] is not None
+    assert tool_command_observable['module'] == 'AMP File Reputation'
+    assert tool_command_observable['disposition_name'] == 'Malicious'
+
+
+def test_python_module_positive_commands_verdict_multiple(module_tool_client):
+    """Perform testing for verdict command from custom threat response python
+    module for multiple observable
+
+    ID: CCTRI-385-9d42b99e-13ac-4f4e-b142-5e6781db4b00
+
+    Steps:
+
+        1. Get verdict using our new tool command for both hash and ip
+            observables
+
+    Expectedresults: Verdict command for provided observables returns expected
+        values
+
+    Importance: Critical
+    """
+    ip = '97.74.4.114'
+    tool_command_response = module_tool_client.commands.verdict((
+        SHA256_HASH, ip))
+    tool_command_hash_observable = get_observables(
+        tool_command_response['verdicts'], 'AMP File Reputation')
+    assert tool_command_hash_observable['observable_value'] == SHA256_HASH
+    assert tool_command_hash_observable['disposition_name'] == 'Malicious'
+    tool_command_ip_observable = get_observables(
+        tool_command_response['verdicts'], 'Umbrella')
+    assert tool_command_ip_observable['observable_value'] == ip
+    assert tool_command_ip_observable['observable_type'] == 'ip'
+    assert tool_command_ip_observable['module'] == 'Umbrella'
+    assert tool_command_ip_observable['disposition_name'] == 'Unknown'
+
+
+def test_python_module_positive_commands_target(module_tool_client):
+    """Perform testing for target command from custom threat response python
+    module for the observable
+
+    ID: CCTRI-422-c701fb34-8d35-4407-b103-0f319171e30d
+
+    Steps:
+
+        1. Get observable targets using our new tool command
+
+    Expectedresults: Target command for provided observable returns expected
+        values
+
+    Importance: Critical
+    """
+    HASH_WITH_TARGET = (
+        '5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124')
+    DEMO_TARGET = [
+        {'value': 'Demo_AMP_Threat_Quarantined', 'type': 'hostname'},
+        {
+            'value': 'd24735df-bdeb-4b72-970b-5be66c0f5506',
+            'type': 'amp_computer_guid'
+        },
+        {'value': '95.38.27.155', 'type': 'ip'},
+        {'value': '0c:1f:0d:9d:04:96', 'type': 'mac_address'}
+    ]
+    tool_command_response = module_tool_client.commands.targets(
+        HASH_WITH_TARGET)['targets']
+    tool_command_targets = get_observables(
+        tool_command_response, 'AMP for Endpoints')['targets']
+    # We expect 6 targets for observable
+    assert len(tool_command_targets) == 6
+    # Get one target from the list and compare values to expected ones
+    target = [
+        d for d
+        in tool_command_targets
+        if d['observables'][0]['value'] == 'Demo_AMP_Threat_Quarantined'
+    ][0]
+    assert target['type'] == 'endpoint'
+    assert target['observables'] == DEMO_TARGET
+    assert target['os'] == 'Windows 10, SP 0.0'

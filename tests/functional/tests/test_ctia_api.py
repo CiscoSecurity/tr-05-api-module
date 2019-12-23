@@ -48,7 +48,7 @@ def module_tool_client():
     )
 
 
-SERVER_VERSION = '1.0.11'
+SERVER_VERSION = '1.0.14'
 
 
 def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
@@ -415,7 +415,8 @@ def test_python_module_ctia_positive_campaign(
     get_tool_response = campaign.get(entity_id)
     assert get_tool_response['title'] == 'New demo campaign'
     # Search for campaign by entity id
-    search_tool_response = campaign.search(params={'query': entity_id})
+    search_tool_response = campaign.search(params={
+        'query': 'id:*{}'.format(entity_id)})
     # We got exactly one entry for provided unique entity id
     assert len(search_tool_response) == 1
     assert search_tool_response[0]['title'] == 'New demo campaign'
