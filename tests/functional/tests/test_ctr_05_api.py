@@ -39,7 +39,7 @@ def module_tool_client():
 
 
 SHA256_HASH = (
-    '01f30887a828344f6cf574bb05bd0bf571fc35979a3032377b95fb0d692b8061')
+    '6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86')
 
 DOMAIN = 'cpi-istanbul.com'
 
@@ -273,8 +273,8 @@ def test_python_module_positive_response_respond_observables_by_hash(
     """
     expected_list = [
         'Add SHA256 to custom detections 500 PDFs',
-        'Add SHA256 to custom detections testing',
-        'Remove SHA256 from custom detections File Blacklist'
+        'Add SHA256 to custom detections File Blacklist',
+        'Add SHA256 to custom detections testing'
     ]
     response = response_respond_observables(
         payload=[{'type': 'sha256', 'value': SHA256_HASH}],
@@ -314,7 +314,7 @@ def test_python_module_positive_response_respond_observables_by_domain(
         [{'type': 'domain', 'value': DOMAIN}])['data']
     assert len(tool_response) > 0
     assert tool_response[0]['module'] == 'Umbrella'
-    assert tool_response[0]['title'] == 'Block this domain'
+    assert tool_response[0]['title'] == 'Unblock this domain'
     assert response == tool_response
 
 
@@ -402,25 +402,25 @@ def test_python_module_positive_commands_target(module_tool_client):
     HASH_WITH_TARGET = (
         '5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124')
     DEMO_TARGET = [
-        {'value': 'Demo_AMP_Threat_Quarantined', 'type': 'hostname'},
+        {'value': 'Demo_AMP_Threat_Audit', 'type': 'hostname'},
         {
-            'value': 'd24735df-bdeb-4b72-970b-5be66c0f5506',
+            'value': '2e1d4e1b-0577-4fe6-9e07-7d08375c9275',
             'type': 'amp_computer_guid'
         },
-        {'value': '95.38.27.155', 'type': 'ip'},
-        {'value': '0c:1f:0d:9d:04:96', 'type': 'mac_address'}
+        {'value': '151.126.157.6', 'type': 'ip'},
+        {'value': '5f:99:5f:43:5e:6b', 'type': 'mac_address'}
     ]
     tool_command_response = module_tool_client.commands.targets(
         HASH_WITH_TARGET)['targets']
     tool_command_targets = get_observables(
         tool_command_response, 'AMP for Endpoints')['targets']
-    # We expect 6 targets for observable
-    assert len(tool_command_targets) == 6
+    # We expect 2 targets for observable
+    assert len(tool_command_targets) == 2
     # Get one target from the list and compare values to expected ones
     target = [
         d for d
         in tool_command_targets
-        if d['observables'][0]['value'] == 'Demo_AMP_Threat_Quarantined'
+        if d['observables'][0]['value'] == 'Demo_AMP_Threat_Audit'
     ][0]
     assert target['type'] == 'endpoint'
     assert target['observables'] == DEMO_TARGET
