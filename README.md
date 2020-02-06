@@ -34,7 +34,7 @@ pip show threatresponse
 ```python
 from threatresponse import ThreatResponse
 
-client = TreatResponse(
+client = ThreatResponse(
     client_id='<YOUR TR CLIENT ID>',  # required
     client_password='<YOUR TR CLIENT PASSWORD>',  # required
     region='<YOUR TR REGION>',  # optional
@@ -68,7 +68,7 @@ Inspect allows to find an observable in a concrete string :
 
 from threatresponse import ThreatResponse
 
-client = TreatResponse(
+client = ThreatResponse(
     client_id='<YOUR TR CLIENT ID>',  # required
     client_password='<YOUR TR CLIENT PASSWORD>',  # required
     region='<YOUR TR REGION>',  # optional
@@ -85,7 +85,7 @@ Observe returns summary for an observable
 
 from threatresponse import ThreatResponse
 
-client = TreatResponse(
+client = ThreatResponse(
     client_id='<YOUR TR CLIENT ID>',  # required
     client_password='<YOUR TR CLIENT PASSWORD>',  # required
     region='<YOUR TR REGION>',  # optional
@@ -103,7 +103,7 @@ Deliberate returns judgments based on added modules
 
 from threatresponse import ThreatResponse
 
-client = TreatResponse(
+client = ThreatResponse(
     client_id='<YOUR TR CLIENT ID>',  # required
     client_password='<YOUR TR CLIENT PASSWORD>',  # required
     region='<YOUR TR REGION>',  # optional
@@ -123,7 +123,7 @@ Verdicts returns verdicts from all modules if the modules are configured. Accept
 
 from threatresponse import ThreatResponse
 
-client = TreatResponse(
+client = ThreatResponse(
     client_id='<YOUR TR CLIENT ID>',  # required
     client_password='<YOUR TR CLIENT PASSWORD>',  # required
     region='<YOUR TR REGION>',  # optional
@@ -140,7 +140,7 @@ Targets returns all available targets if the modules are configured. Accepts mul
 
 from threatresponse import ThreatResponse
 
-client = TreatResponse(
+client = ThreatResponse(
     client_id='<YOUR TR CLIENT ID>',  # required
     client_password='<YOUR TR CLIENT PASSWORD>',  # required
     region='<YOUR TR REGION>',  # optional
@@ -155,7 +155,7 @@ response = client.commands.targets('string with observables ("8A32950CD96C5EF88F
 Switch .private_intel and .global_intel base on your configuration
 
 ```python
-client = TreatResponse(
+client = ThreatResponse(
     client_id='<YOUR TR CLIENT ID>',  # required
     client_password='<YOUR TR CLIENT PASSWORD>',  # required
     region='<YOUR TR REGION>',  # optional

@@ -16,6 +16,6 @@ before_script:
 - sed -i "s|ctr_client_id=.*|ctr_client_id=$CLIENT_ID|" ~/build/CiscoSecurity/project.properties
 - sed -i "s|ctr_client_password=.*|ctr_client_password=$CLIENT_PASSWORD|" ~/build/CiscoSecurity/project.properties
 script:
-- pytest threatresponse --pep8
+- flake8  threatresponse/
 - pytest tests/unit -v
 - if [[ $TRAVIS_PYTHON_VERSION != 2.7 ]]; then pytest tests/functional -v; fi
