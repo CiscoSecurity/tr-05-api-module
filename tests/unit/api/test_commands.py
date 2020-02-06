@@ -2,7 +2,7 @@ from threatresponse.api import CommandsAPI
 from threatresponse.api.commands import build_array_for_targets, \
     build_array_for_verdicts
 
-from assertions import *
+from .assertions import *
 
 
 def test_command_verdict_succeeds():
