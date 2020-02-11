@@ -34,14 +34,11 @@ def module_tool_client():
         client_password=settings.server.ctr_client_password
     )
 
-# TODO Add some test coverage for VirusTotal module once we can get stable
-# TODO response from CTR server
 
-
+IP = '95.95.0.1'
 SHA256_HASH = (
-    '6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86')
-
-DOMAIN = 'cpi-istanbul.com'
+    '10745318f9dd601ab76f029cbc41c7e13c9754f87eb2c85948734b2b0b148140')
+DOMAIN = 'anotheratqcdata.com'
 
 
 def test_ctr_positive_smoke_inspect(module_headers):
@@ -59,12 +56,11 @@ def test_ctr_positive_smoke_inspect(module_headers):
 
     Importance: High
     """
-    request_content = 'cisco.com'
     response = inspect(
-        payload={'content': request_content},
+        payload={'content': DOMAIN},
         **{'headers': module_headers}
     )
-    assert response[0]['value'] == request_content
+    assert response[0]['value'] == DOMAIN
     assert response[0]['type'] == 'domain'
 
 
@@ -83,15 +79,14 @@ def test_ctr_positive_timeout_support(module_headers):
 
     Importance: High
     """
-    request_content = 'cisco.com'
     response = inspect(
-        payload={'content': request_content},
+        payload={'content': DOMAIN},
         **{
-                'headers': module_headers,
-                'timeout': 5
-           }
+            'headers': module_headers,
+            'timeout': 5
+        }
     )
-    assert response[0]['value'] == request_content
+    assert response[0]['value'] == DOMAIN
     assert response[0]['type'] == 'domain'
 
 
@@ -135,16 +130,15 @@ def test_python_module_positive_inspect(module_headers, module_tool_client):
 
     Importance: Critical
     """
-    request_content = gen_sha256(gen_string())
     direct_response = inspect(
-        payload={'content': request_content},
+        payload={'content': SHA256_HASH},
         **{'headers': module_headers}
     )
     tool_response = module_tool_client.inspect.inspect(
-        {'content': request_content})
+        {'content': SHA256_HASH})
     assert direct_response[0]['value'] == tool_response[0]['value']
     assert direct_response[0]['type'] == tool_response[0]['type']
-    assert tool_response[0]['value'] == request_content
+    assert tool_response[0]['value'] == SHA256_HASH
     assert tool_response[0]['type'] == 'sha256'
 
 
@@ -173,12 +167,12 @@ def test_python_module_positive_enrich_observe_observables(
     )['data']
     tool_response = module_tool_client.enrich.observe.observables(
         [{'type': 'sha256', 'value': SHA256_HASH}])['data']
-    direct_observables = get_observables(response, 'AMP File Reputation')
-    tool_observables = get_observables(tool_response, 'AMP File Reputation')
+    direct_observables = get_observables(response, 'Private Intelligence')
+    tool_observables = get_observables(tool_response, 'Private Intelligence')
     assert tool_observables['data']['verdicts']['count'] > 0, (
-        'No observables returned from server. Check hash value')
+        'No observable verdicts returned from server. Check hash value')
     assert tool_observables['data']['judgements']['count'] > 0, (
-        'No observables returned from server. Check hash value')
+        'No observable judgements returned from server. Check hash value')
     assert tool_observables[
         'data']['verdicts']['docs'][0]['disposition_name'] == 'Malicious'
     assert direct_observables['data']['judgements'][
@@ -210,8 +204,8 @@ def test_python_module_positive_enrich_deliberate_observables(
     )['data']
     tool_response = module_tool_client.enrich.deliberate.observables(
         [{'type': 'sha256', 'value': SHA256_HASH}])['data']
-    direct_observables = get_observables(response, 'AMP File Reputation')
-    tool_observables = get_observables(tool_response, 'AMP File Reputation')
+    direct_observables = get_observables(response, 'Private Intelligence')
+    tool_observables = get_observables(tool_response, 'Private Intelligence')
     assert tool_observables['data']['verdicts']['count'] > 0, (
         'No observables returned from server. Check hash value')
     assert 'judgements' not in tool_observables['data'].keys()
@@ -240,13 +234,12 @@ def test_python_module_positive_enrich_refer_observables(
 
     Importance: Critical
     """
-    request_content = 'cisco.com'
     response = enrich_refer_observables(
-        payload=[{'type': 'domain', 'value': request_content}],
+        payload=[{'type': 'domain', 'value': DOMAIN}],
         **{'headers': module_headers}
     )['data'][0]
     tool_response = module_tool_client.enrich.refer.observables(
-        [{'type': 'domain', 'value': request_content}])['data'][0]
+        [{'type': 'domain', 'value': DOMAIN}])['data'][0]
     assert tool_response['module']
     assert tool_response['title'] == 'Search for this domain'
     assert response == tool_response
@@ -314,7 +307,7 @@ def test_python_module_positive_response_respond_observables_by_domain(
         [{'type': 'domain', 'value': DOMAIN}])['data']
     assert len(tool_response) > 0
     assert tool_response[0]['module'] == 'Umbrella'
-    assert tool_response[0]['title'] == 'Unblock this domain'
+    assert tool_response[0]['title'] == 'Block this domain'
     assert response == tool_response
 
 
@@ -337,19 +330,19 @@ def test_python_module_positive_commands_verdict(module_tool_client):
     """
     tool_response = module_tool_client.enrich.deliberate.observables(
         [{'type': 'sha256', 'value': SHA256_HASH}])['data']
-    tool_observables = get_observables(tool_response, 'AMP File Reputation')
+    tool_observables = get_observables(tool_response, 'Private Intelligence')
     assert tool_observables['data']['verdicts']['count'] > 0, (
-        'No observables returned from server. Check hash value')
+        'No observable verdicts returned from server. Check hash value')
     assert tool_observables[
         'data']['verdicts']['docs'][0]['disposition_name'] == 'Malicious'
 
     tool_command_response = module_tool_client.commands.verdict(SHA256_HASH)
     tool_command_observable = get_observables(
-        tool_command_response['verdicts'], 'AMP File Reputation')
+        tool_command_response['verdicts'], 'Private Intelligence')
     assert tool_command_observable['observable_value'] == SHA256_HASH
     assert tool_command_observable['observable_type'] == 'sha256'
     assert tool_command_observable['expiration'] is not None
-    assert tool_command_observable['module'] == 'AMP File Reputation'
+    assert tool_command_observable['module'] == 'Private Intelligence'
     assert tool_command_observable['disposition_name'] == 'Malicious'
 
 
@@ -369,19 +362,25 @@ def test_python_module_positive_commands_verdict_multiple(module_tool_client):
 
     Importance: Critical
     """
-    ip = '97.74.4.114'
     tool_command_response = module_tool_client.commands.verdict((
-        SHA256_HASH, ip))
-    tool_command_hash_observable = get_observables(
-        tool_command_response['verdicts'], 'AMP File Reputation')
-    assert tool_command_hash_observable['observable_value'] == SHA256_HASH
+        SHA256_HASH, IP))
+    tool_command_hash_observable = [
+        d
+        for d in tool_command_response['verdicts']
+        if d['observable_value'] == SHA256_HASH
+        and d['module'] == 'Private Intelligence'
+    ][0]
+    tool_command_ip_observable = [
+        d
+        for d in tool_command_response['verdicts']
+        if d['observable_value'] == IP
+        and d['module'] == 'Private Intelligence'
+    ][0]
+    assert tool_command_hash_observable['observable_type'] == 'sha256'
     assert tool_command_hash_observable['disposition_name'] == 'Malicious'
-    tool_command_ip_observable = get_observables(
-        tool_command_response['verdicts'], 'Umbrella')
-    assert tool_command_ip_observable['observable_value'] == ip
+    assert tool_command_ip_observable['observable_value'] == IP
     assert tool_command_ip_observable['observable_type'] == 'ip'
-    assert tool_command_ip_observable['module'] == 'Umbrella'
-    assert tool_command_ip_observable['disposition_name'] == 'Unknown'
+    assert tool_command_ip_observable['disposition_name'] == 'Malicious'
 
 
 def test_python_module_positive_commands_target(module_tool_client):
@@ -399,29 +398,16 @@ def test_python_module_positive_commands_target(module_tool_client):
 
     Importance: Critical
     """
-    HASH_WITH_TARGET = (
-        '5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124')
-    DEMO_TARGET = [
-        {'value': 'Demo_AMP_Threat_Audit', 'type': 'hostname'},
-        {
-            'value': '2e1d4e1b-0577-4fe6-9e07-7d08375c9275',
-            'type': 'amp_computer_guid'
-        },
-        {'value': '151.126.157.6', 'type': 'ip'},
-        {'value': '5f:99:5f:43:5e:6b', 'type': 'mac_address'}
+    expected_target = [
+        {'value': 'new_demo_endpoint', 'type': 'hostname'},
+        {'value': '44:cc:7a:aa:1d:bb', 'type': 'mac_address'},
+        {'value': '192.168.4.4', 'type': 'ip'}
     ]
     tool_command_response = module_tool_client.commands.targets(
-        HASH_WITH_TARGET)['targets']
+        SHA256_HASH)['targets']
     tool_command_targets = get_observables(
-        tool_command_response, 'AMP for Endpoints')['targets']
-    # We expect 2 targets for observable
-    assert len(tool_command_targets) == 2
-    # Get one target from the list and compare values to expected ones
-    target = [
-        d for d
-        in tool_command_targets
-        if d['observables'][0]['value'] == 'Demo_AMP_Threat_Audit'
-    ][0]
-    assert target['type'] == 'endpoint'
-    assert target['observables'] == DEMO_TARGET
-    assert target['os'] == 'Windows 10, SP 0.0'
+        tool_command_response, 'Private Intelligence')['targets']
+    # We expect 1 target for observable
+    assert len(tool_command_targets) == 1
+    assert tool_command_targets[0]['type'] == 'endpoint'
+    assert tool_command_targets[0]['observables'] == expected_target
