@@ -1,4 +1,4 @@
 mock
 pytest
-pytest-pep8
+flake8
 git+ssh://git@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary
