@@ -1,6 +1,7 @@
 dist: xenial
 language: python
 python:
+- '2.6'
 - '2.7'
 - '3.5'
 - '3.6'
@@ -18,4 +19,4 @@ before_script:
 script:
 - flake8  threatresponse/
 - pytest tests/unit -v
-- if [[ $TRAVIS_PYTHON_VERSION != 2.7 ]]; then pytest tests/functional -v; fi
+- if [[ $TRAVIS_PYTHON_VERSION != 2.7 ] and [ $TRAVIS_PYTHON_VERSION != 2.7 ]]; then pytest tests/functional -v; fi
