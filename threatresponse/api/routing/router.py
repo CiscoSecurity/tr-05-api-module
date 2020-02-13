@@ -15,7 +15,9 @@ class Router(object):
         def register(method):
             if route in self._routes:
                 raise RouteError(
-                    'Route {} has already been registered.'.format(repr(route))
+                    'Route {route} has already been registered.'.format(
+                        route=repr(route)
+                    )
                 )
 
             self._routes[route] = method
@@ -32,7 +34,9 @@ class Router(object):
         if not route:
             raise RouteError('Route cannot be empty.')
         if route not in self._routes:
-            raise RouteError('Route {} is not registered.'.format(repr(route)))
+            raise RouteError('Route {route} is not registered.'.format(
+                route=repr(route))
+            )
 
         return self._routes[route]
 
@@ -40,12 +44,20 @@ class Router(object):
     def merged(x, y):
         """ Merges two instances of `Router` into a single one. """
 
-        message = 'Expected {} to be of type {}, but got {}.'
+        message = 'Expected {obj} to be of type {router}, but got {type}.'
 
         if x is not None and not isinstance(x, Router):
-            raise TypeError(message.format(repr('x'), Router, type(x)))
+            raise TypeError(message.format(
+                obj=repr('x'),
+                router=Router,
+                type=type(x))
+            )
         if y is not None and not isinstance(y, Router):
-            raise TypeError(message.format(repr('y'), Router, type(y)))
+            raise TypeError(message.format(
+                obj=repr('y'),
+                router=Router,
+                type=type(y))
+            )
 
         x = x._routes if x is not None else {}
         y = y._routes if y is not None else {}

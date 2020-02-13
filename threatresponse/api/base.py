@@ -33,9 +33,10 @@ class API(object):
 
         if response_type not in response_types:
             raise ResponseTypeError(
-                'Unsupported response type {}, must be one of: {}.'.format(
-                    repr(response_type),
-                    ', '.join(map(repr, response_types.keys())),
+                'Unsupported response type {type}, must be one of:'
+                ' {types}.'.format(
+                    type=repr(response_type),
+                    types=', '.join(map(repr, response_types.keys())),
                 )
             )
 
@@ -59,14 +60,19 @@ class API(object):
         router = None
 
         for cls in type(self).mro():
-            attribute = '_{}__{}'.format(cls.__name__, 'router')
+            attribute = '_{class_name}__{router}'.format(
+                class_name=cls.__name__,
+                router='router'
+            )
 
             if hasattr(cls, attribute):
                 router = Router.merged(router, getattr(cls, attribute))
 
         if router is None:
             raise Exception(
-                'Could not build a resolution for {}.'.format(type(self))
+                'Could not build a resolution for {type}.'.format(
+                    type=type(self)
+                )
             )
 
         return Resolution(self, router)
