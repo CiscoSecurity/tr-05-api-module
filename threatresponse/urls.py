@@ -22,7 +22,7 @@ _urls_by_region = dict(
     for region in (
         '',
         'eu',
-        'apjc'
+        'apjc',
     )
 )
 
