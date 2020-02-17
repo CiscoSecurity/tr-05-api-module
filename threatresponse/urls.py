@@ -16,7 +16,7 @@ def _url_for_region(url_pattern, region):
 
 _urls_by_region = dict(
     (region, dict(
-        (api_family,  _url_for_region(url_pattern, region))
+        (api_family, _url_for_region(url_pattern, region))
         for api_family, url_pattern in _url_patterns_by_api_family.items()
     ))
     for region in (
