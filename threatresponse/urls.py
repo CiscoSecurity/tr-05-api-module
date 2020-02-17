@@ -10,32 +10,21 @@ _url_patterns_by_api_family = {
 }
 
 
-_urls_by_region = {
-    '': {
-        'visibility':
-            _url_patterns_by_api_family['visibility'].format(region=''),
-        'private_intel':
-            _url_patterns_by_api_family['private_intel'].format(region=''),
-        'global_intel':
-            _url_patterns_by_api_family['global_intel'].format(region='')
-    },
-    'eu': {
-        'visibility':
-            _url_patterns_by_api_family['visibility'].format(region='eu'),
-        'private_intel':
-            _url_patterns_by_api_family['private_intel'].format(region='eu'),
-        'global_intel':
-            _url_patterns_by_api_family['global_intel'].format(region='eu')
-    },
-    'apjc': {
-        'visibility':
-            _url_patterns_by_api_family['visibility'].format(region='apjc'),
-        'private_intel':
-            _url_patterns_by_api_family['private_intel'].format(region='apjc'),
-        'global_intel':
-            _url_patterns_by_api_family['global_intel'].format(region='apjc')
-    }
-}
+def _url_for_region(url_pattern, region):
+    return url_pattern.format(region='.' + region if region != '' else '')
+
+
+_urls_by_region = dict(
+    (region, dict(
+        (api_family,  _url_for_region(url_pattern, region))
+        for api_family, url_pattern in _url_patterns_by_api_family.items()
+    ))
+    for region in (
+        '',
+        'eu',
+        'apjc'
+    )
+)
 
 
 def url_for(region, family):
