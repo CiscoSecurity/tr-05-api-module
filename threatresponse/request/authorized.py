@@ -52,7 +52,7 @@ class AuthorizedRequest(Request):
 
     @property
     def _headers(self):
-        return {'Authorization': 'Bearer {}'.format(self._token)}
+        return {'Authorization': 'Bearer {token}'.format(token=self._token)}
 
     def _perform(self, method, url, headers, **kwargs):
         headers.update(self._headers)

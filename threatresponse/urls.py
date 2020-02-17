@@ -14,17 +14,17 @@ def _url_for_region(url_pattern, region):
     return url_pattern.format(region='.' + region if region != '' else '')
 
 
-_urls_by_region = {
-    region: {
-        api_family: _url_for_region(url_pattern, region)
+_urls_by_region = dict(
+    (region, dict(
+        (api_family, _url_for_region(url_pattern, region))
         for api_family, url_pattern in _url_patterns_by_api_family.items()
-    }
+    ))
     for region in (
         '',
         'eu',
         'apjc',
     )
-}
+)
 
 
 def url_for(region, family):
