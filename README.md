@@ -50,7 +50,7 @@ The official documentation on how to create such a client can be found
 [here](https://visibility.amp.cisco.com/#/help/integration).
 Make sure to properly set some scopes which will grant the client
 different (ideally minimum) privileges.
-- `region` must be one of: `''` (default), `'eu'`, `'apjc'`.
+- `region` must be one of: `''` or `'us'` (default), `'eu'`, `'apjc'`.
 Other regions are not supported yet.
 - `logger` must be an (already configured) instance of the built-in
 `logging.Logger` class (or one of its descendants).
