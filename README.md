@@ -65,16 +65,6 @@ each call to any endpoint.
 
 Inspect allows to find an observable in a concrete string :
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
-)
 response = client.inspect.inspect({'content': 'example.com'})
 ```
 
@@ -82,36 +72,18 @@ response = client.inspect.inspect({'content': 'example.com'})
 
 Observe returns summary for an observable 
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
-)
 response = client.enrich.observe.observables(
-        [{'type': 'sha256', 'value': '8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9'}])
+    [{'type': 'sha256', 'value': '8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9'}]
+)
 ```
 
 - Deliberate
 
 Deliberate returns judgments based on added modules 
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
-)
 response = client.enrich.deliberate.observables(
-        [{'type': 'sha256', 'value': '8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9'}])
+    [{'type': 'sha256', 'value': '8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9'}]
+)
 ```
 ### Commands
 For your convenience, we have made some predefined commands that you can use 
@@ -120,49 +92,23 @@ For your convenience, we have made some predefined commands that you can use
 
 Verdicts returns verdicts from all modules if the modules are configured. Accepts multiple observables.
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
+response = client.commands.verdict(
+    'string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")'
 )
-response = client.commands.verdict('string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")')
 ```
  
 - Targets
 
 Targets returns all available targets if the modules are configured. Accepts multiple observables.
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
+response = client.commands.targets(
+    'string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")'
 )
-response = client.commands.targets('string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")')
 ```
 
 ### Available endpoints 
 
 Switch .private_intel and .global_intel base on your configuration
-
-```python
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
-)
-```
 
 # Actor 
     actor = client.private_intel.actor
