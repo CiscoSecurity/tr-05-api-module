@@ -270,18 +270,6 @@ Available methods:
   - judgment.search()
   - judgment.judgments()
 
-# Judgement
-    judgement = client.private_intel.judgement
-Available methods:
-  - judgement.post()
-  - judgement.get()
-  - judgement.put()
-  - judgement.delete()
-  - judgement.external_id()
-  - judgement.search()
-  - judgement.judgments()
-  
-
 # Malware
     malware = client.private_intel.malware
 Available methods:
@@ -301,7 +289,6 @@ Available methods:
     properties = client.private_intel.properties
 Available methods:
   - properties.get()
- 
 
 # Relationship
     relationship = client.private_intel.relationship
@@ -365,7 +352,7 @@ Available methods:
   - vulnerability.external_id()
   - vulnerability.search()
 
-# Weaknsess
+# Weakness
     weakness = client.private_intel.weakness
 Available methods:
   - weakness.post()
