@@ -1,35 +1,36 @@
-[![Gitter chat](https://img.shields.io/badge/gitter-join%20chat-brightgreen.svg)](https://gitter.im/CiscoSecurity/Threat-Response "Gitter chat")
-[![Travis build](https://travis-ci.com/CiscoSecurity/tr-05-api-module.svg)](https://travis-ci.com/CiscoSecurity/tr-05-api-module)
-[![PyPi version](https://img.shields.io/pypi/v/threatresponse.svg)](https://pypi.python.org/pypi/threatresponse)
+[![Gitter Chat](https://img.shields.io/badge/gitter-join%20chat-brightgreen.svg)](https://gitter.im/CiscoSecurity/Threat-Response "Gitter Chat")
+[![Travis CI Build Status](https://travis-ci.com/CiscoSecurity/tr-05-api-module.svg?branch=develop)](https://travis-ci.com/CiscoSecurity/tr-05-api-module)
+[![PyPi Version](https://img.shields.io/pypi/v/threatresponse.svg)](https://pypi.python.org/pypi/threatresponse)
+[![Python Versions](https://img.shields.io/pypi/pyversions/threatresponse.svg)](https://pypi.python.org/pypi/threatresponse)
 
-### Threat Response Python API Module:
+# Threat Response Python API Module
 
 Python API Module for Threat Response APIs
 
-### Installation:
+## Installation
 
-* Local:
+* Local
 
 ```bash
 pip install -U .
 pip show threatresponse
 ```
 
-* GitHub:
+* GitHub
 
 ```bash
-pip install git+https://github.com/CiscoSecurity/tr-05-api-module.git[@branch_name_or_release_version]
+pip install -U git+https://github.com/CiscoSecurity/tr-05-api-module.git[@branch_name_or_release_version]
 pip show threatresponse
 ```
 
-* PyPi:
+* PyPi
 
 ```bash
-pip install threatresponse[==release_version]
+pip install -U threatresponse[==release_version]
 pip show threatresponse
 ```
 
-### Usage:
+## Usage
 
 ```python
 from threatresponse import ThreatResponse
@@ -59,112 +60,60 @@ raising an exception. Can be overwritten by explicitly specifying `timeout` on
 each call to any endpoint.
 - `proxy` must be a URL in the format: `http[s]://[username[:password]@]host[:port]`.
 
-### Concrete usage
+### Concrete Usage
 
 - Inspect
 
-Inspect allows to find an observable in a concrete string :
+Inspect allows to find an observable in a concrete string.
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
-)
 response = client.inspect.inspect({'content': 'example.com'})
 ```
 
 - Observe
 
-Observe returns summary for an observable 
+Observe returns summary for an observable.
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
-)
 response = client.enrich.observe.observables(
-        [{'type': 'sha256', 'value': '8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9'}])
+    [{'type': 'sha256', 'value': '8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9'}]
+)
 ```
 
 - Deliberate
 
-Deliberate returns judgments based on added modules 
+Deliberate returns judgments based on added modules.
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
-)
 response = client.enrich.deliberate.observables(
-        [{'type': 'sha256', 'value': '8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9'}])
+    [{'type': 'sha256', 'value': '8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9'}]
+)
 ```
+
 ### Commands
-For your convenience, we have made some predefined commands that you can use 
+
+For your convenience, we have made some predefined commands that you can use.
 
 - Verdicts
 
 Verdicts returns verdicts from all modules if the modules are configured. Accepts multiple observables.
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
+response = client.commands.verdict(
+    'string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")'
 )
-response = client.commands.verdict('string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")')
 ```
  
 - Targets
 
 Targets returns all available targets if the modules are configured. Accepts multiple observables.
 ```python
-
-from threatresponse import ThreatResponse
-
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
-)
-response = client.commands.targets('string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")')
-```
-
-### Available endpoints 
-
-Switch .private_intel and .global_intel base on your configuration
-
-```python
-client = ThreatResponse(
-    client_id='<YOUR TR CLIENT ID>',  # required
-    client_password='<YOUR TR CLIENT PASSWORD>',  # required
-    region='<YOUR TR REGION>',  # optional
-    logger=<SOME LOGGER INSTANCE>,  # optional
-    proxy='<SOME PROXY URL>',  # optional
+response = client.commands.targets(
+    'string with observables ("8A32950CD96C5EF88F9DCBB66A08F59A7E8D8E5FECCDE9E115FBAA46D9AF88F9, cisco.com")'
 )
 ```
 
-# Actor 
+### Available Endpoints
+
+Switch between `.private_intel` and `.global_intel` if necessary.
+
+# Actor
     actor = client.private_intel.actor
 Available methods:
   - actor.post()
@@ -174,7 +123,7 @@ Available methods:
   - actor.external_id()
   - actor.search()
 
-# Attack Pattern 
+# Attack Pattern
     attack_pattern = client.private_intel.attack_pattern
 Available methods:
   - attack_pattern.post()
