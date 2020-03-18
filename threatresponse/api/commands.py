@@ -54,6 +54,17 @@ class CommandsAPI(API):
 
 def build_array_for_verdicts(verdict_dict):
     verdicts = []
+
+    # According to the official documentation, `disposition_name` is
+    # optional, so simply infer it from required `disposition`.
+    disposition_map = {
+        1: 'Clean',
+        2: 'Malicious',
+        3: 'Suspicious',
+        4: 'Common',
+        5: 'Unknown',
+    }
+
     for module in verdict_dict.get('data', []):
         module_name = module['module']
 
@@ -63,10 +74,11 @@ def build_array_for_verdicts(verdict_dict):
             verdicts.append({
                 'observable_value': doc['observable']['value'],
                 'observable_type': doc['observable']['type'],
-                'expiration': doc['valid_time']['end_time'],
+                'expiration': doc['valid_time'].get('end_time', ''),
                 'module': module_name,
-                'disposition_name': doc['disposition_name']
+                'disposition_name': disposition_map[doc['disposition']],
             })
+
     return verdicts
 
 

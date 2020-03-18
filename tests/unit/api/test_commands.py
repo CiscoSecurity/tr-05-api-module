@@ -34,7 +34,7 @@ def test_command_targets_succeeds():
 def test_build_array_for_a_verdict():
     json = {'data': [{'data':
                           {'verdicts':
-                               {'cont': 1,
+                               {'count': 1,
                                 'docs': [
                                     {'valid_time':
                                         {
@@ -43,13 +43,25 @@ def test_build_array_for_a_verdict():
                                         'observable': {'type': 'domain',
                                                        'value': 'value'},
                                         'type': 'verdict',
-                                        'disposition': 5,
-                                        'disposition_name': 'unknown'}]}},
+                                        'disposition': 5}]}},
                       'module-type': 'module_type',
                       'module': 'first_module'},
                      {'data':
                           {'verdicts':
-                               {'cont': 1,
+                               {'count': 1,
+                                'docs': [
+                                    {'valid_time':
+                                        {
+                                            'start_time': '2020-02-06T13:19:39.499Z'},
+                                        'observable': {'type': 'domain',
+                                                       'value': 'value'},
+                                        'type': 'verdict',
+                                        'disposition': 3}]}},
+                      'module-type': 'module_type',
+                      'module': 'second_module'},
+                     {'data':
+                          {'verdicts':
+                               {'count': 1,
                                 'docs': [
                                     {'valid_time':
                                         {
@@ -58,18 +70,20 @@ def test_build_array_for_a_verdict():
                                         'observable': {'type': 'domain',
                                                        'value': 'value'},
                                         'type': 'verdict',
-                                        'disposition': 1,
-                                        'disposition_name': 'Clean'}]}},
+                                        'disposition': 1}]}},
                       'module-type': 'module_type',
-                      'module': 'second_module'}]}
+                      'module': 'third_module'}]}
     array_for_a_verdict = build_array_for_verdicts(json)
     assert array_for_a_verdict == [
-        {'disposition_name': 'unknown', 'observable_value': 'value',
+        {'disposition_name': 'Unknown', 'observable_value': 'value',
          'expiration': '2020-03-07T13:19:39.499Z',
          'module': 'first_module', 'observable_type': 'domain'},
+        {'disposition_name': 'Suspicious', 'observable_value': 'value',
+         'expiration': '',  # N/A
+         'module': 'second_module', 'observable_type': 'domain'},
         {'disposition_name': 'Clean', 'observable_value': 'value',
          'expiration': '2020-03-07T13:19:39.875Z',
-         'module': 'second_module', 'observable_type': 'domain'}]
+         'module': 'third_module', 'observable_type': 'domain'}]
 
 
 def test_build_array_for_targets():
