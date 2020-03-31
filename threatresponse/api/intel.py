@@ -8,6 +8,7 @@ from .indicator import IndicatorAPI
 from .judgement import JudgementAPI
 from .routing import Router
 from .sighting import SightingAPI
+from .feed import FeedAPI
 from .. import urls
 
 
@@ -82,6 +83,7 @@ class IntelAPI(API):
         self._judgement = JudgementAPI(request)
         self._casebook = CasebookAPI(request)
         self._sighting = SightingAPI(request)
+        self._feed = FeedAPI(request)
 
     @property
     def actor(self):
@@ -110,6 +112,10 @@ class IntelAPI(API):
     @property
     def feedback(self):
         return self._feedback
+
+    @property
+    def feed(self):
+        return self._feed
 
     @property
     def graphql(self):
