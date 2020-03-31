@@ -76,6 +76,11 @@ class IntelAPI(API):
         self._weakness.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Weakness"
 
+        self._identity_assertion = \
+            EntityAPI(request, '/ctia/identity-assertion')
+        self._identity_assertion.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/IdentityAssertion"
+
         self._bundle = BundleAPI(request)
         self._event = EventAPI(request)
         self._incident = IncidentAPI(request)
@@ -124,6 +129,10 @@ class IntelAPI(API):
     @property
     def event(self):
         return self._event
+
+    @property
+    def identity_assertion(self):
+        return self._identity_assertion
 
     @property
     def incident(self):
