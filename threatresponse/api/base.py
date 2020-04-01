@@ -28,6 +28,7 @@ class API(object):
         response_types = {
             'raw': lambda response: response,
             'json': lambda response: response.json(),
+            'text': lambda response: response.text,
         }
         response_type = kwargs.pop('response_type', 'json')
 

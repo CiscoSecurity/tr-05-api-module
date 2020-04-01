@@ -15,7 +15,8 @@ def test_feed_view_with_id_succeeds():
 
 def test_feed_view_txt_with_id_succeeds():
     request = invoke(IntelAPI,
-                     lambda api: api.feed.view.txt('12', 'test'))
+                     lambda api: api.feed.view.txt('12', 'test'),
+                     response_type='text')
     request.perform.assert_called_once_with(
         'GET',
         '/ctia/feed/12/view.txt',

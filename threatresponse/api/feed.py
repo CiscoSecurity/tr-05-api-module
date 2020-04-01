@@ -24,5 +24,6 @@ class FeedAPI(EntityAPI):
         return self._get(
             urls.join(self._url, id_, 'view.txt'),
             params={'s': share_token},
+            response_type='text',
             **kwargs
         )
