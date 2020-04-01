@@ -44,9 +44,6 @@ class API(object):
         response = self._request.perform(method, *args, **kwargs)
         response.raise_for_status()
 
-        if 'text' in response.headers.get('Content-Type'):
-            response_type = 'text'
-
         processed = response_types[response_type]
 
         return processed(response)
