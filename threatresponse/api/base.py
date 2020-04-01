@@ -27,7 +27,8 @@ class API(object):
     def __perform(self, method, *args, **kwargs):
         response_types = {
             'raw': lambda response: response,
-            'json': lambda response: response.json(),
+            'json': lambda response: response.json() if (
+                        'txt' not in response.headers['Content-Type']) else '',
         }
         response_type = kwargs.pop('response_type', 'json')
 
