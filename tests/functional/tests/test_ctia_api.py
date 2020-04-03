@@ -3,6 +3,7 @@ import random
 from requests import HTTPError
 
 from ctrlibrary.core import settings
+from ctrlibrary.core.datafactory import gen_ip
 from ctrlibrary.core.utils import delayed_return
 from ctrlibrary.threatresponse import token
 from ctrlibrary.ctia.base import ctia_get_data
@@ -13,7 +14,9 @@ from ctrlibrary.ctia.endpoints import (
     CASEBOOK,
     COA,
     DATA_TABLE,
+    FEED,
     FEEDBACK,
+    IDENTITY_ASSERTION,
     INCIDENT,
     INDICATOR,
     INVESTIGATION,
@@ -677,6 +680,150 @@ def test_python_module_ctia_positive_event(module_tool_client):
     assert get_tool_response['timestamp']
 
 
+def test_python_module_ctia_positive_feed(module_headers, module_tool_client):
+    """Perform testing for feed entity of custom threat intelligence python
+    module
+
+    ID: CCTRI-906-e0114e1d-bfad-4776-810c-66ca351027d7
+
+    Steps:
+
+        1. Send POST request to create one judgement entity with one observable
+        2. Send POST request to create one indicator entity to be used for
+            feed functionality
+        3. Send POST request to create new relationship between judgement and
+            indicator
+        4. Send POST request to create new feed entity using custom python
+            module
+        5. Send GET request using custom python module to read just created
+            entity back.
+        5. Send same GET request, but using direct access to the server
+        6. Compare results
+        7. Update relationship entity using custom python module
+        8. Repeat GET request using python module and validate that entity was
+            updated
+        9. Send GET request using custom python module to read view endpoint
+        10. Send GET request using custom python module to read view txt
+            endpoint
+        11. Delete entity from the system
+
+    Expectedresults: Feed entity can be created, fetched, updated and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    # Prepare data for judgement
+    observable = {'type': 'ip', 'value': gen_ip()}
+    judgement = module_tool_client.private_intel.judgement
+    payload = {
+        'confidence': 'High',
+        'disposition': 2,
+        'disposition_name': 'Malicious',
+        'observable': observable,
+        'priority': 99,
+        'schema_version': SERVER_VERSION,
+        'severity': 'Medium',
+        'source': 'source',
+        'type': 'judgement',
+    }
+    # Create new entity using provided payload
+    judgement_post_response = judgement.post(
+        payload=payload, params={'wait_for': 'true'})
+    # Prepare data for indicator
+    indicator = module_tool_client.private_intel.indicator
+    payload = {
+        "description": "The IP Blacklist",
+        "producer": "ATQC team",
+        "source": "ATQC generated test data",
+        "source_uri": "https://atqc.com/bad",
+        "title": "ATQC Bad IP",
+        "type": "indicator",
+        "valid_time": {
+            "end_time": "2525-01-01T00:00:00.000Z",
+            "start_time": "2019-03-01T22:26:29.229Z"
+        }
+    }
+    # Create new indicator using provided payload
+    indicator_post_response = indicator.post(
+        payload=payload, params={'wait_for': 'true'})
+    # Use created entities for relationship
+    relationship = module_tool_client.private_intel.relationship
+    payload = {
+        'description': 'Demo relation',
+        'schema_version': SERVER_VERSION,
+        'type': 'relationship',
+        'source_ref': judgement_post_response['id'],
+        'target_ref': indicator_post_response['id'],
+        'relationship_type': 'indicates',
+    }
+    # Create new entity using provided payload
+    relationship.post(payload=payload, params={'wait_for': 'true'})
+    # Prepare data for feed
+    feed = module_tool_client.private_intel.feed
+    payload = {
+        "schema_version": SERVER_VERSION,
+        "revision": 0,
+        "indicator_id": indicator_post_response['id'],
+        "type": "feed",
+        "output": "observables",
+        "feed_type": "indicator",
+    }
+    # Create new entity using provided payload
+    post_tool_response = feed.post(
+        payload=payload, params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'schema_version',
+            'revision',
+            'output',
+            'type',
+            'indicator_id',
+            'feed_type'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = feed.get(entity_id)
+    get_direct_response = ctia_get_data(
+        target_url=FEED,
+        entity_id=entity_id,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Update entity values
+    put_tool_response = delayed_return(
+        feed.put(
+            id_=entity_id,
+            payload={
+                "revision": 1,
+                "indicator_id": indicator_post_response['id'],
+                "type": "feed",
+                "output": "observables",
+                "feed_type": "indicator",
+            }
+        )
+    )
+    assert put_tool_response['revision'] == 1
+    get_tool_response = feed.get(entity_id)
+    assert get_tool_response['revision'] == 1
+    # Get information from feed view endpoint
+    assert (
+        feed.view(entity_id, get_tool_response['secret']) ==
+        {'observables': [observable]}
+    )
+    # Get information from feed view text endpoint
+    assert feed.view.txt(
+        entity_id, get_tool_response['secret']) == observable['value']
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(feed.delete(entity_id))
+    with pytest.raises(HTTPError):
+        feed.get(entity_id)
+
+
 def test_python_module_ctia_positive_feedback(
         module_headers, module_tool_client):
     """Perform testing for feedback entity of custom threat intelligence python
@@ -782,6 +929,107 @@ def test_python_module_ctia_positive_graphql(module_tool_client):
     post_tool_response = module_tool_client.private_intel.graphql.post(
         payload=payload, params={'wait_for': 'true'})
     assert post_tool_response
+
+
+def test_python_module_ctia_positive_identity_assertion(
+        module_headers, module_tool_client):
+    """Perform testing for identity assertion entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-906-3fed238c-cd4c-45b5-a4c9-06c9ac29eb9a
+
+    Steps:
+
+        1. Send POST request to create new identity assertion entity using
+            custom python module
+        2. Send GET request using custom python module to read just created
+            entity back.
+        3. Send same GET request, but using direct access to the server
+        4. Compare results
+        5. Update identity assertion entity using custom python module
+        6. Repeat GET request using python module and validate that entity was
+            updated
+        7. Delete entity from the system
+
+    Expectedresults: Identity assertion entity can be created, fetched,
+        updated and deleted using custom python module. Data stored in the
+        entity is the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    identity_assertion = module_tool_client.private_intel.identity_assertion
+    payload = {
+        'identity': {
+            'observables': [
+                {
+                    'type': 'ip',
+                    'value': '10.0.0.1'
+                },
+            ]
+        },
+        'schema_version': SERVER_VERSION,
+        'type': 'identity-assertion',
+        'source': 'ATQC data',
+        'assertions': [
+            {
+                'name': 'severity',
+                'value': 'Medium'
+            }
+        ],
+    }
+    # Create new entity using provided payload
+    post_tool_response = identity_assertion.post(
+        payload=payload, params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'identity',
+            'assertions',
+            'schema_version',
+            'source',
+            'type'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = identity_assertion.get(entity_id)
+    get_direct_response = ctia_get_data(
+        target_url=IDENTITY_ASSERTION,
+        entity_id=entity_id,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Update entity values
+    put_tool_response = delayed_return(
+        identity_assertion.put(
+            id_=entity_id,
+            payload={
+                'identity': {
+                    'observables': [
+                        {
+                            'type': 'ip',
+                            'value': '10.0.0.1'
+                        },
+                    ]
+                },
+                'assertions': [
+                    {
+                        'name': 'severity',
+                        'value': 'Low'
+                    }
+                ],
+            }
+        )
+    )
+    assert put_tool_response['assertions'][0]['value'] == 'Low'
+    get_tool_response = identity_assertion.get(entity_id)
+    assert get_tool_response['assertions'][0]['value'] == 'Low'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(identity_assertion.delete(entity_id))
+    with pytest.raises(HTTPError):
+        identity_assertion.get(entity_id)
 
 
 def test_python_module_ctia_positive_incident(

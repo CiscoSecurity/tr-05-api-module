@@ -367,14 +367,14 @@ def test_python_module_positive_commands_verdict_multiple(module_tool_client):
     tool_command_hash_observable = [
         d
         for d in tool_command_response['verdicts']
-        if d['observable_value'] == SHA256_HASH
-        and d['module'] == 'Private Intelligence'
+        if d['observable_value'] == SHA256_HASH and
+        d['module'] == 'Private Intelligence'
     ][0]
     tool_command_ip_observable = [
         d
         for d in tool_command_response['verdicts']
-        if d['observable_value'] == IP
-        and d['module'] == 'Private Intelligence'
+        if d['observable_value'] == IP and
+        d['module'] == 'Private Intelligence'
     ][0]
     assert tool_command_hash_observable['observable_type'] == 'sha256'
     assert tool_command_hash_observable['disposition_name'] == 'Malicious'
