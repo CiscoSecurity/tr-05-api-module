@@ -93,7 +93,7 @@ def auth_response(status_code):
     else:
         error = HTTPError('Some error message here.', response=mocked)
 
-        mocked.json.return_value = {'error': 'ERROR'}
+        mocked.text = '{"error": "ERROR"}'
         mocked.raise_for_status.side_effect = error
 
     return mocked

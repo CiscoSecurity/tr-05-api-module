@@ -19,7 +19,7 @@ def test_that_getattr_and_setattr_are_delegated():
 
 def test_that_raise_for_status_extends_error_message():
     inner_response = MagicMock()
-    inner_response.json.return_value = {'foo': 'bar', 'spam': ['eggs']}
+    inner_response.text = '{"foo": "bar", "spam": ["eggs"]}'
 
     error = HTTPError('Something went wrong.')
     error.response = inner_response
@@ -31,7 +31,6 @@ def test_that_raise_for_status_extends_error_message():
         response.raise_for_status()
 
     inner_response.raise_for_status.assert_called_once_with()
-    inner_response.json.assert_called_once_with()
     assert error.args == (
         'Something went wrong.\n'
         '{\n'

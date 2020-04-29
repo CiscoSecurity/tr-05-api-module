@@ -39,7 +39,7 @@ class Response(object):
         # in order to give the user more insight about what went wrong.
 
         try:
-            payload = error.response.json()
+            payload = json.loads(error.response.text)
         except json.JSONDecodeError:
             return error
 
