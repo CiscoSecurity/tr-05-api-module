@@ -1723,6 +1723,9 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
     delayed_return(tool.delete(entity_id))
     with pytest.raises(HTTPError):
         tool.get(entity_id)
+    # Validate CCTRI-1036 defect
+    with pytest.raises(HTTPError):
+        tool.delete(entity_id)
 
 
 def test_python_module_ctia_positive_verdict(
