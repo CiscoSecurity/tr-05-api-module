@@ -1,4 +1,5 @@
 from .api.enrich import EnrichAPI
+from .api.int import IntAPI
 from .api.inspect import InspectAPI
 from .api.intel import IntelAPI
 from .api.response import ResponseAPI
@@ -32,6 +33,7 @@ class ThreatResponse(object):
 
         self._inspect = InspectAPI(request_for('visibility'))
         self._enrich = EnrichAPI(request_for('visibility'))
+        self._int = IntAPI(request_for('visibility'))
         self._response = ResponseAPI(request_for('visibility'))
         self._private_intel = IntelAPI(request_for('private_intel'))
         self._global_intel = IntelAPI(request_for('global_intel'))
@@ -44,6 +46,10 @@ class ThreatResponse(object):
     @property
     def enrich(self):
         return self._enrich
+
+    @property
+    def int(self):
+        return self._int
 
     @property
     def response(self):
