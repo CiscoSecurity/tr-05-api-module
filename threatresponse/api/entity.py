@@ -46,6 +46,9 @@ class EntityAPI(API):
             **kwargs
         )
 
+
+class IntelEntityAPI(EntityAPI):
+
     def search(self, **kwargs):
         return self._get(
             urls.join(self._url, 'search'),

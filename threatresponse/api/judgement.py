@@ -1,9 +1,9 @@
-from .entity import EntityAPI
+from .entity import IntelEntityAPI
 from .routing import Router
 from .. import urls
 
 
-class JudgementAPI(EntityAPI):
+class JudgementAPI(IntelEntityAPI):
     """https://private.intel.amp.cisco.com/index.html#/Judgement"""
 
     __router, route = Router.new()

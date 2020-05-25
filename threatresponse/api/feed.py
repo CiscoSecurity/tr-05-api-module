@@ -1,9 +1,9 @@
-from .entity import EntityAPI
+from .entity import IntelEntityAPI
 from .routing import Router
 from .. import urls
 
 
-class FeedAPI(EntityAPI):
+class FeedAPI(IntelEntityAPI):
     """https://private.intel.amp.cisco.com/index.html#/Feed"""
 
     __router, route = Router.new()
