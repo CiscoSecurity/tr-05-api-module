@@ -62,15 +62,3 @@ class EnrichAPI(API):
             '/iroh/iroh-enrich/settings',
             **kwargs
         )
-
-    @route('settings.post')
-    def _perform(self, payload, **kwargs):
-        """
-        https://visibility.amp.cisco.com/iroh/iroh-enrich/index.html#/Settings/post_iroh_iroh_enrich_settings
-        """
-
-        return self._post(
-            '/iroh/iroh-enrich/settings',
-            json=payload,
-            **kwargs
-        )
