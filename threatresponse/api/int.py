@@ -11,18 +11,18 @@ class IntAPI(API):
 
         self._integration = ModuleEntityAPI(
             request, '/iroh/iroh-int/integration')
-        self._integration.__doc__ = \
-            "https://visibility.amp.cisco.com/iroh/iroh-int/index.html#/Integration"
+        self._integration.__doc__ = "https://visibility.amp.cisco.com/iroh/" \
+                                    "iroh-int/index.html#/Integration"
 
         self._module_instance = ModuleEntityAPI(
             request, '/iroh/iroh-int/module-instance')
-        self._integration.__doc__ = \
-            "https://visibility.amp.cisco.com/iroh/iroh-int/index.html#/ModuleInstance"
+        self._integration.__doc__ = "https://visibility.amp.cisco.com/iroh/" \
+                                    "iroh-int/index.html#/ModuleInstance"
 
         self._module_type = ModuleEntityAPI(
             request, '/iroh/iroh-int/module-type')
-        self._integration.__doc__ = \
-            "https://visibility.amp.cisco.com/iroh/iroh-int/index.html#/ModuleType"
+        self._integration.__doc__ = "https://visibility.amp.cisco.com/iroh/" \
+                                    "iroh-int/index.html#/ModuleType"
 
     @property
     def integration(self):
