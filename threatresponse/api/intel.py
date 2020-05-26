@@ -1,7 +1,7 @@
 from .base import API
 from .bundle import BundleAPI
 from .casebook import CasebookAPI
-from .entity import EntityAPI
+from .entity import IntelEntityAPI
 from .event import EventAPI
 from .incident import IncidentAPI
 from .indicator import IndicatorAPI
@@ -20,64 +20,64 @@ class IntelAPI(API):
     def __init__(self, request):
         super(IntelAPI, self).__init__(request)
 
-        self._actor = EntityAPI(request, '/ctia/actor')
+        self._actor = IntelEntityAPI(request, '/ctia/actor')
         self._actor.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Actor"
 
-        self._campaign = EntityAPI(request, '/ctia/campaign')
+        self._campaign = IntelEntityAPI(request, '/ctia/campaign')
         self._campaign.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Campaign"
 
-        self._coa = EntityAPI(request, '/ctia/coa')
+        self._coa = IntelEntityAPI(request, '/ctia/coa')
         self._coa.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/COA"
 
-        self._data_table = EntityAPI(request, '/ctia/data-table')
+        self._data_table = IntelEntityAPI(request, '/ctia/data-table')
         self._data_table.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/DataTable"
 
-        self._attack_pattern = EntityAPI(request, '/ctia/attack-pattern')
+        self._attack_pattern = IntelEntityAPI(request, '/ctia/attack-pattern')
         self._attack_pattern.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Attack_Pattern"
 
-        self._feedback = EntityAPI(request, '/ctia/feedback')
+        self._feedback = IntelEntityAPI(request, '/ctia/feedback')
         self._feedback.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Feedback"
 
-        self._graphql = EntityAPI(request, '/ctia/graphql')
+        self._graphql = IntelEntityAPI(request, '/ctia/graphql')
         self._graphql.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/GraphQL"
 
-        self._bulk = EntityAPI(request, '/ctia/bulk')
+        self._bulk = IntelEntityAPI(request, '/ctia/bulk')
         self._bulk.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Bulk"
 
-        self._malware = EntityAPI(request, '/ctia/malware')
+        self._malware = IntelEntityAPI(request, '/ctia/malware')
         self._malware.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Malware"
 
-        self._relationship = EntityAPI(request, '/ctia/relationship')
+        self._relationship = IntelEntityAPI(request, '/ctia/relationship')
         self._relationship.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Relationship"
 
-        self._tool = EntityAPI(request, '/ctia/tool')
+        self._tool = IntelEntityAPI(request, '/ctia/tool')
         self._tool.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Tool"
 
-        self._investigation = EntityAPI(request, '/ctia/investigation')
+        self._investigation = IntelEntityAPI(request, '/ctia/investigation')
         self._investigation.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Investigation"
 
-        self._vulnerability = EntityAPI(request, '/ctia/vulnerability')
+        self._vulnerability = IntelEntityAPI(request, '/ctia/vulnerability')
         self._vulnerability.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Vulnerability"
 
-        self._weakness = EntityAPI(request, '/ctia/weakness')
+        self._weakness = IntelEntityAPI(request, '/ctia/weakness')
         self._weakness.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Weakness"
 
         self._identity_assertion = \
-            EntityAPI(request, '/ctia/identity-assertion')
+            IntelEntityAPI(request, '/ctia/identity-assertion')
         self._identity_assertion.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/IdentityAssertion"
 
