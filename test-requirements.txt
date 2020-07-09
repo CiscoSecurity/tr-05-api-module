@@ -1,4 +1,4 @@
 mock
 pytest
 flake8
-git+ssh://git@github.com/threatgrid/softserve-atqc/tree/improve_get_observables.git#egg=ctrlibrary
+git+ssh://git@github.com/threatgrid/softserve-atqc.git#improve_get_observables/egg=ctrlibrary
