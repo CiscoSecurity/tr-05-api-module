@@ -44,7 +44,8 @@ def test_build_array_for_a_verdict():
                                                        'value': 'value'},
                                         'type': 'verdict',
                                         'disposition': 5}]}},
-                      'module-type': 'module_type',
+                      'module_instance_id': 'first_instance_id',
+                      'module_type_id': 'first_type_id',
                       'module': 'first_module'},
                      {'data':
                           {'verdicts':
@@ -57,7 +58,8 @@ def test_build_array_for_a_verdict():
                                                        'value': 'value'},
                                         'type': 'verdict',
                                         'disposition': 3}]}},
-                      'module-type': 'module_type',
+                      'module_instance_id': 'second_instance_id',
+                      'module_type_id': 'second_type_id',
                       'module': 'second_module'},
                      {'data':
                           {'verdicts':
@@ -71,19 +73,23 @@ def test_build_array_for_a_verdict():
                                                        'value': 'value'},
                                         'type': 'verdict',
                                         'disposition': 1}]}},
-                      'module-type': 'module_type',
+                      'module_instance_id': 'third_instance_id',
+                      'module_type_id': 'third_type_id',
                       'module': 'third_module'}]}
     array_for_a_verdict = build_array_for_verdicts(json)
     assert array_for_a_verdict == [
         {'disposition_name': 'Unknown', 'observable_value': 'value',
          'expiration': '2020-03-07T13:19:39.499Z',
-         'module': 'first_module', 'observable_type': 'domain'},
+         'module': 'first_module', 'module_instance_id': 'first_instance_id',
+         'module_type_id': 'first_type_id', 'observable_type': 'domain'},
         {'disposition_name': 'Suspicious', 'observable_value': 'value',
          'expiration': '',  # N/A
-         'module': 'second_module', 'observable_type': 'domain'},
+         'module': 'second_module', 'module_instance_id': 'second_instance_id',
+         'module_type_id': 'second_type_id', 'observable_type': 'domain'},
         {'disposition_name': 'Clean', 'observable_value': 'value',
          'expiration': '2020-03-07T13:19:39.875Z',
-         'module': 'third_module', 'observable_type': 'domain'}]
+         'module': 'third_module', 'module_instance_id': 'third_instance_id',
+         'module_type_id': 'third_type_id', 'observable_type': 'domain'}]
 
 
 def test_build_array_for_targets():
@@ -110,7 +116,8 @@ def test_build_array_for_targets():
                         ]
                     }
                 },
-                'module-type': 'module_type',
+                'module_instance_id': 'module_instance_id',
+                'module_type_id': 'module_type_id',
                 'module': 'module'
             }
         ]
@@ -118,4 +125,7 @@ def test_build_array_for_targets():
     array_for_a_targets = build_array_for_targets(json)
     assert array_for_a_targets == [{'targets': [
         {'observables': [{'type': 'email', 'value': 'example.com'}],
-         'type': 'email'}], 'module': 'module'}]
+         'type': 'email'}], 'module': 'module',
+        'module_instance_id': 'module_instance_id',
+        'module_type_id': 'module_type_id'
+    }]
