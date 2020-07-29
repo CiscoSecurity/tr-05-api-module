@@ -158,5 +158,4 @@ def test_build_array_for_targets():
         {'observables': [{'type': 'email', 'value': 'example.com'}],
          'type': 'email'}], 'module': 'module',
         'module_instance_id': 'module_instance_id',
-        'module_type_id': 'module_type_id'
-    }]
+        'module_type_id': 'module_type_id'}]
