@@ -32,50 +32,81 @@ def test_command_targets_succeeds():
 
 
 def test_build_array_for_a_verdict():
-    json = {'data': [{'data':
-                          {'verdicts':
-                               {'count': 1,
-                                'docs': [
-                                    {'valid_time':
-                                        {
-                                            'start_time': '2020-02-06T13:19:39.499Z',
-                                            'end_time': '2020-03-07T13:19:39.499Z'},
-                                        'observable': {'type': 'domain',
-                                                       'value': 'value'},
-                                        'type': 'verdict',
-                                        'disposition': 5}]}},
-                      'module_instance_id': 'first_instance_id',
-                      'module_type_id': 'first_type_id',
-                      'module': 'first_module'},
-                     {'data':
-                          {'verdicts':
-                               {'count': 1,
-                                'docs': [
-                                    {'valid_time':
-                                        {
-                                            'start_time': '2020-02-06T13:19:39.499Z'},
-                                        'observable': {'type': 'domain',
-                                                       'value': 'value'},
-                                        'type': 'verdict',
-                                        'disposition': 3}]}},
-                      'module_instance_id': 'second_instance_id',
-                      'module_type_id': 'second_type_id',
-                      'module': 'second_module'},
-                     {'data':
-                          {'verdicts':
-                               {'count': 1,
-                                'docs': [
-                                    {'valid_time':
-                                        {
-                                            'start_time': '2020-02-06T13:19:39.875Z',
-                                            'end_time': '2020-03-07T13:19:39.875Z'},
-                                        'observable': {'type': 'domain',
-                                                       'value': 'value'},
-                                        'type': 'verdict',
-                                        'disposition': 1}]}},
-                      'module_instance_id': 'third_instance_id',
-                      'module_type_id': 'third_type_id',
-                      'module': 'third_module'}]}
+    json = {
+        'data': [
+            {
+                'data': {
+                    'verdicts': {
+                        'count': 1,
+                        'docs': [
+                            {
+                                'valid_time': {
+                                    'start_time': '2020-02-06T13:19:39.499Z',
+                                    'end_time': '2020-03-07T13:19:39.499Z'
+                                },
+                                'observable': {
+                                    'type': 'domain',
+                                    'value': 'value'
+                                },
+                                'type': 'verdict',
+                                'disposition': 5
+                            }
+                        ]
+                    }
+                },
+                'module_instance_id': 'first_instance_id',
+                'module_type_id': 'first_type_id',
+                'module': 'first_module'
+            },
+            {
+                'data': {
+                    'verdicts': {
+                        'count': 1,
+                        'docs': [
+                            {
+                                'valid_time': {
+                                    'start_time': '2020-02-06T13:19:39.499Z'
+                                },
+                                'observable': {
+                                    'type': 'domain',
+                                    'value': 'value'
+                                },
+                                'type': 'verdict',
+                                'disposition': 3
+                            }
+                        ]
+                    }
+                },
+                'module_instance_id': 'second_instance_id',
+                'module_type_id': 'second_type_id',
+                'module': 'second_module'
+            },
+            {
+                'data': {
+                    'verdicts': {
+                        'count': 1,
+                        'docs': [
+                            {
+                                'valid_time': {
+                                    'start_time': '2020-02-06T13:19:39.875Z',
+                                    'end_time': '2020-03-07T13:19:39.875Z'
+                                },
+                                'observable': {
+                                    'type': 'domain',
+                                    'value': 'value'
+                                },
+                                'type': 'verdict',
+                                'disposition': 1
+                            }
+                        ]
+                    }
+                },
+                'module_instance_id': 'third_instance_id',
+                'module_type_id': 'third_type_id',
+                'module': 'third_module'
+            }
+        ]
+    }
     array_for_a_verdict = build_array_for_verdicts(json)
     assert array_for_a_verdict == [
         {'disposition_name': 'Unknown', 'observable_value': 'value',
