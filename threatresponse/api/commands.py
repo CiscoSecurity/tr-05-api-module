@@ -67,6 +67,8 @@ def build_array_for_verdicts(verdict_dict):
 
     for module in verdict_dict.get('data', []):
         module_name = module['module']
+        module_type_id = module['module_type_id']
+        module_instance_id = module['module_instance_id']
 
         for doc in module.get('data', {}) \
                 .get('verdicts', {}) \
@@ -76,6 +78,8 @@ def build_array_for_verdicts(verdict_dict):
                 'observable_type': doc['observable']['type'],
                 'expiration': doc['valid_time'].get('end_time', ''),
                 'module': module_name,
+                'module_type_id': module_type_id,
+                'module_instance_id': module_instance_id,
                 'disposition_name': disposition_map[doc['disposition']],
             })
 
@@ -87,6 +91,8 @@ def build_array_for_targets(targets_dict):
 
     for module in targets_dict.get('data', []):
         module_name = module['module']
+        module_type_id = module['module_type_id']
+        module_instance_id = module['module_instance_id']
         targets = []
 
         for doc in module.get('data', {}) \
@@ -101,6 +107,8 @@ def build_array_for_targets(targets_dict):
 
         result.append({
             'module': module_name,
+            'module_type_id': module_type_id,
+            'module_instance_id': module_instance_id,
             'targets': targets
         })
     return result
