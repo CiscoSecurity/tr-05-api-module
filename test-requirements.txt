@@ -1,4 +1,4 @@
-mock
-pytest
-flake8
-git+ssh://git@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary
+mock==4.0.2
+flake8==3.8.3
+coverage==5.1
+pytest==5.4.3
