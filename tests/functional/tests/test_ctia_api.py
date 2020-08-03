@@ -335,9 +335,9 @@ def test_python_module_ctia_positive_bundle(module_tool_client):
     assert post_tool_response['type'] == 'bundle'
     assert post_tool_response['source'] == 'ctia'
     assert post_tool_response[
-        'incidents'][0]['id'] == incident_post_response['id']
+               'incidents'][0]['id'] == incident_post_response['id']
     assert post_tool_response[
-        'indicators'][0]['id'] == indicator_post_response['id']
+               'indicators'][0]['id'] == indicator_post_response['id']
     # Validate import endpoint
     payload = {
         'schema_version': SERVER_VERSION,
@@ -811,8 +811,8 @@ def test_python_module_ctia_positive_feed(module_headers, module_tool_client):
     assert get_tool_response['revision'] == 1
     # Get information from feed view endpoint
     assert (
-        feed.view(entity_id, get_tool_response['secret']) ==
-        {'observables': [observable]}
+        feed.view(entity_id, get_tool_response['secret']
+                  ) == {'observables': [observable]}
     )
     # Get information from feed view text endpoint
     assert feed.view.txt(

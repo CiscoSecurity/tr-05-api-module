@@ -9,10 +9,10 @@ def test_getattr():
 
     def check(resolution, route):
         assert (
-            isinstance(resolution, Resolution) and
-            resolution._owner is owner and
-            resolution._router is router and
-            resolution._route == route
+            isinstance(resolution, Resolution) and (
+                resolution._owner is owner) and (
+                resolution._router is router) and (
+                resolution._route == route)
         )
 
     resolution = Resolution(owner, router)

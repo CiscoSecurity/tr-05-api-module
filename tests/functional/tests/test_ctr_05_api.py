@@ -343,6 +343,8 @@ def test_python_module_positive_commands_verdict(module_tool_client):
     assert tool_command_observable['observable_type'] == 'sha256'
     assert tool_command_observable['expiration'] is not None
     assert tool_command_observable['module'] == 'Private Intelligence'
+    assert tool_command_observable['module_type_id']
+    assert tool_command_observable['module_instance_id']
     assert tool_command_observable['disposition_name'] == 'Malicious'
 
 
@@ -367,19 +369,21 @@ def test_python_module_positive_commands_verdict_multiple(module_tool_client):
     tool_command_hash_observable = [
         d
         for d in tool_command_response['verdicts']
-        if d['observable_value'] == SHA256_HASH and
-        d['module'] == 'Private Intelligence'
+        if d['observable_value'] == SHA256_HASH and (
+                d['module'] == 'Private Intelligence')
     ][0]
     tool_command_ip_observable = [
         d
         for d in tool_command_response['verdicts']
-        if d['observable_value'] == IP and
-        d['module'] == 'Private Intelligence'
+        if d['observable_value'] == IP and (
+                d['module'] == 'Private Intelligence')
     ][0]
     assert tool_command_hash_observable['observable_type'] == 'sha256'
     assert tool_command_hash_observable['disposition_name'] == 'Malicious'
     assert tool_command_ip_observable['observable_value'] == IP
     assert tool_command_ip_observable['observable_type'] == 'ip'
+    assert tool_command_ip_observable['module_type_id']
+    assert tool_command_ip_observable['module_instance_id']
     assert tool_command_ip_observable['disposition_name'] == 'Malicious'
 
 
@@ -406,8 +410,12 @@ def test_python_module_positive_commands_target(module_tool_client):
     tool_command_response = module_tool_client.commands.targets(
         SHA256_HASH)['targets']
     tool_command_targets = get_observables(
-        tool_command_response, 'Private Intelligence')['targets']
+        tool_command_response, 'Private Intelligence')
+
+    assert tool_command_targets['module'] == 'Private Intelligence'
+    assert tool_command_targets['module_type_id']
+    assert tool_command_targets['module_instance_id']
     # We expect 1 target for observable
-    assert len(tool_command_targets) == 1
-    assert tool_command_targets[0]['type'] == 'endpoint'
-    assert tool_command_targets[0]['observables'] == expected_target
+    assert len(tool_command_targets['targets']) == 1
+    assert tool_command_targets['targets'][0]['type'] == 'endpoint'
+    assert tool_command_targets['targets'][0]['observables'] == expected_target
