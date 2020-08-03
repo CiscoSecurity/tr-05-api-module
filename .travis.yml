@@ -18,5 +18,5 @@ before_script:
 - sed -i "s|ctr_client_password=.*|ctr_client_password=$CLIENT_PASSWORD|" ~/build/CiscoSecurity/project.properties
 script:
 - flake8 .
-- coverage run --source api/ -m pytest --verbose tests/unit/ && coverage report
+- coverage run --source threatresponse/ -m pytest --verbose tests/unit/ && coverage report
 - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pytest tests/functional -v; fi
