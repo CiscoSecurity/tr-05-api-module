@@ -1,21 +1,25 @@
-dist: xenial
 language: python
+
 python:
 - '2.7'
 - '3.5'
 - '3.6'
 - '3.7'
+
 before_install:
 - openssl aes-256-cbc -k "$travis_key_password" -d -md sha256 -a -in travis_key.enc -out ~/.ssh/id_rsa
 - chmod 400 ~/.ssh/id_rsa
+
 install:
-- pip install -U .
-- pip install -U -r test-requirements.txt
+- pip install --upgrade --requirement requirements.txt
+- pip install --upgrade --requirement test-requirements.txt
 - pip install --upgrade git+ssh://git@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary
+
 before_script:
 - cp ~/build/CiscoSecurity/tr-05-api-module/tests/functional/project.properties.sample ~/build/CiscoSecurity/project.properties
 - sed -i "s|ctr_client_id=.*|ctr_client_id=$CLIENT_ID|" ~/build/CiscoSecurity/project.properties
 - sed -i "s|ctr_client_password=.*|ctr_client_password=$CLIENT_PASSWORD|" ~/build/CiscoSecurity/project.properties
+
 script:
 - flake8 .
 - coverage run --source threatresponse/ -m pytest --verbose tests/unit/ && coverage report
