@@ -1,4 +1,4 @@
+coverage
+flake8
 mock
 pytest
-flake8
-git+ssh://git@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary

@@ -20,7 +20,10 @@ def test_health_fails():
 
 
 def test_deliberate_observables_succeeds():
-    request = invoke(EnrichAPI, lambda api: api.deliberate.observables(payload))
+    request = invoke(
+        EnrichAPI,
+        lambda api: api.deliberate.observables(payload)
+    )
     request.perform.assert_called_once_with(
         'POST',
         '/iroh/iroh-enrich/deliberate/observables',
@@ -29,7 +32,10 @@ def test_deliberate_observables_succeeds():
 
 
 def test_deliberate_observables_fails():
-    request = invoke_with_failure(EnrichAPI, lambda api: api.deliberate.observables(payload))
+    request = invoke_with_failure(
+        EnrichAPI,
+        lambda api: api.deliberate.observables(payload)
+    )
     request.perform.assert_called_once_with(
         'POST',
         '/iroh/iroh-enrich/deliberate/observables',
@@ -47,7 +53,10 @@ def test_observe_observables_succeeds():
 
 
 def test_observe_observables_fails():
-    request = invoke_with_failure(EnrichAPI, lambda api: api.observe.observables(payload))
+    request = invoke_with_failure(
+        EnrichAPI,
+        lambda api: api.observe.observables(payload)
+    )
     request.perform.assert_called_once_with(
         'POST',
         '/iroh/iroh-enrich/observe/observables',
@@ -65,7 +74,10 @@ def test_refer_observables_succeeds():
 
 
 def test_refer_observables_fails():
-    request = invoke_with_failure(EnrichAPI, lambda api: api.refer.observables(payload))
+    request = invoke_with_failure(
+        EnrichAPI,
+        lambda api: api.refer.observables(payload)
+    )
     request.perform.assert_called_once_with(
         'POST',
         '/iroh/iroh-enrich/refer/observables',

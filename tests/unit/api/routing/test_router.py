@@ -19,9 +19,14 @@ def test_new():
 def test_register_resolve():
     router, register = Router.new()
 
-    def a(): pass
-    def ab(): pass
-    def abc(): pass
+    def a():
+        pass
+
+    def ab():
+        pass
+
+    def abc():
+        pass
 
     # Check that `register` returns a function and can be used as a decorator.
     register('a')(a)
@@ -43,10 +48,17 @@ def test_register_resolve():
 
 
 def test_merged():
-    def a_x(): pass
-    def b_x(): pass
-    def b_y(): pass
-    def c_y(): pass
+    def a_x():
+        pass
+
+    def b_x():
+        pass
+
+    def b_y():
+        pass
+
+    def c_y():
+        pass
 
     x = Router({'a': a_x, 'b': b_x})
     y = Router({'b': b_y, 'c': c_y})
