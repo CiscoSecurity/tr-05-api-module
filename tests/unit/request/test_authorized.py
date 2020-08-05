@@ -50,7 +50,7 @@ def test_that_authorized_request_retrieves_token_on_expiration_and_retries():
 
     assert request.post.call_count == 2
     assert (
-            request.post.call_args_list[0] == request.post.call_args_list[1]
+        request.post.call_args_list[0] == request.post.call_args_list[1]
     )
 
     assert request.perform.call_count == 2
