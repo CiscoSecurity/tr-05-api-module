@@ -337,8 +337,8 @@ def test_python_module_ctia_positive_bundle(module_tool_client):
     assert post_tool_response['incidents'][0]['id'] == (
         incident_post_response['id']
     )
-    assert post_tool_response[
-        'indicators'][0]['id'] == indicator_post_response['id']
+    assert post_tool_response['indicators'][0]['id'] == (
+        indicator_post_response['id'])
     # Validate import endpoint
     payload = {
         'schema_version': SERVER_VERSION,

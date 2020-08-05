@@ -1,4 +1,4 @@
-mock
-flake8
 coverage
+flake8
+mock
 pytest
