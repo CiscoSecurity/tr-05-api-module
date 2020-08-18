@@ -3,30 +3,30 @@
 [![PyPi Version](https://img.shields.io/pypi/v/threatresponse.svg)](https://pypi.python.org/pypi/threatresponse)
 [![Python Versions](https://img.shields.io/pypi/pyversions/threatresponse.svg)](https://pypi.python.org/pypi/threatresponse)
 
-# Threat Response Python API Module
+# Threat Response API Module
 
-Python API Module for Threat Response APIs
+Python API Module for Threat Response APIs.
 
 ## Installation
 
 * Local
 
 ```bash
-pip install -U .
+pip install --upgrade .
 pip show threatresponse
 ```
 
 * GitHub
 
 ```bash
-pip install -U git+https://github.com/CiscoSecurity/tr-05-api-module.git[@branch_name_or_release_version]
+pip install --upgrade git+https://github.com/CiscoSecurity/tr-05-api-module.git[@branch_name_or_release_version]
 pip show threatresponse
 ```
 
 * PyPi
 
 ```bash
-pip install -U threatresponse[==release_version]
+pip install --upgrade threatresponse[==release_version]
 pip show threatresponse
 ```
 
