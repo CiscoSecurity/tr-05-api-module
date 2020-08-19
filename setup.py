@@ -30,7 +30,7 @@ NAME = 'threatresponse'
 
 VERSION = read_version()
 
-DESCRIPTION = 'Python API Module for Threat Response APIs'
+DESCRIPTION = 'Threat Response API Module'
 
 LONG_DESCRIPTION = read_readme()
 
@@ -40,6 +40,8 @@ URL = 'https://github.com/CiscoSecurity/tr-05-api-module'
 
 AUTHOR = 'Cisco Security'
 
+AUTHOR_EMAIL = 'https://gitter.im/CiscoSecurity/Threat-Response'
+
 LICENSE = 'MIT'
 
 PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'])
@@ -48,7 +50,12 @@ PYTHON_REQUIRES = '>=2.6'
 
 INSTALL_REQUIRES = read_requirements()
 
-KEYWORDS = ['cisco', 'security', 'python', 'threat', 'response', 'api']
+KEYWORDS = [
+    'cisco', 'security',
+    'threat', 'response',
+    'api', 'module',
+    'python',
+]
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
@@ -74,6 +81,7 @@ setuptools.setup(
     long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
     url=URL,
     author=AUTHOR,
+    author_email=AUTHOR_EMAIL,
     license=LICENSE,
     packages=PACKAGES,
     python_requires=PYTHON_REQUIRES,

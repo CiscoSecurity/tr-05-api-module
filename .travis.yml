@@ -12,8 +12,8 @@ before_install:
 - chmod 400 ~/.ssh/id_rsa
 
 install:
-- pip install -U .
-- pip install -U -r test-requirements.txt
+- pip install --upgrade .
+- pip install --upgrade --requirement test-requirements.txt
 - pip install --upgrade git+ssh://git@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary
 
 before_script:
@@ -22,6 +22,7 @@ before_script:
 - sed -i "s|ctr_client_password=.*|ctr_client_password=$CLIENT_PASSWORD|" ~/build/CiscoSecurity/project.properties
 
 script:
+- pip show threatresponse
 - flake8 .
 - coverage run --source threatresponse/ -m pytest --verbose tests/unit/ && coverage report
-- if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pytest tests/functional -v; fi
+- if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pytest --verbose tests/functional/; fi
