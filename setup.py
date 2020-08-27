@@ -40,8 +40,6 @@ URL = 'https://github.com/CiscoSecurity/tr-05-api-module'
 
 AUTHOR = 'Cisco Security'
 
-AUTHOR_EMAIL = 'https://gitter.im/CiscoSecurity/Threat-Response'
-
 LICENSE = 'MIT'
 
 PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'])
@@ -81,7 +79,6 @@ setuptools.setup(
     long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
     url=URL,
     author=AUTHOR,
-    author_email=AUTHOR_EMAIL,
     license=LICENSE,
     packages=PACKAGES,
     python_requires=PYTHON_REQUIRES,
