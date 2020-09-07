@@ -51,7 +51,7 @@ def module_tool_client():
     )
 
 
-SERVER_VERSION = '1.0.18'
+SERVER_VERSION = '1.0.19'
 
 
 def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
