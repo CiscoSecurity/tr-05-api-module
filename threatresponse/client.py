@@ -15,8 +15,9 @@ from .urls import url_for
 
 class ThreatResponse(object):
 
-    def __init__(self, client_id, client_password, **options):
-        credentials = (client_id, client_password)
+    def __init__(self, client_id=None, client_password=None, oauth2_token=None,
+                 **options):
+        credentials = (client_id, client_password, oauth2_token)
 
         proxy = options.get('proxy')
         timeout = options.get('timeout')

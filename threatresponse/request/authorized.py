@@ -3,6 +3,7 @@ from six.moves.urllib.parse import urljoin
 
 from .base import Request
 from ..urls import url_for
+from ..exceptions import CredentialsNotFoundError
 
 
 class AuthorizedRequest(Request):
@@ -10,7 +11,8 @@ class AuthorizedRequest(Request):
     Provides authorization header for inner request.
     """
 
-    def __init__(self, request, client_id, client_password, region=None):
+    def __init__(self, request, client_id=None, client_password=None,
+                 oauth2_token=None, region=None):
         self._request = request
         self._client_id = client_id
         self._client_password = client_password
@@ -20,7 +22,7 @@ class AuthorizedRequest(Request):
             '/iroh/oauth2/token',
         )
 
-        self._token = self._request_token()
+        self._token = oauth2_token or self._request_token()
 
     def perform(self, method, url, **kwargs):
         headers = kwargs.pop('headers', {})
@@ -36,6 +38,11 @@ class AuthorizedRequest(Request):
         return response
 
     def _request_token(self):
+        if not self._client_id or not self._client_password:
+            raise CredentialsNotFoundError(
+                "Not found client_id and client_password or "
+                "oauth2 token that doesn't expired."
+            )
         data = {'grant_type': 'client_credentials'}
         headers = {'Content-Type': 'application/x-www-form-urlencoded',
                    'Accept': 'application/json'}
