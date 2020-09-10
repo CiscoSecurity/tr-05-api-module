@@ -4,11 +4,11 @@ from six.moves.http_client import UNAUTHORIZED
 from threatresponse.request.authorized import AuthorizedRequest
 
 
-def test_that_authorized_request_provides_header_with_token():
+def test_that_authorized_by_id_and_pass_request_provides_header_with_token():
     request = MagicMock()
     request.post.return_value = token('Cake')
 
-    authorized = AuthorizedRequest(request, 'x', 'y')
+    authorized = AuthorizedRequest(request, client_id='x', client_password='y')
     authorized.post('/some', headers={'Just': 'Test'})
 
     request.perform.assert_called_once_with(
@@ -17,6 +17,22 @@ def test_that_authorized_request_provides_header_with_token():
         headers={
             'Just': 'Test',
             'Authorization': 'Bearer Cake'
+        }
+    )
+
+
+def test_that_authorized_by_token_request_provides_header_with_this_token():
+    request = MagicMock()
+
+    authorized = AuthorizedRequest(request, oauth2_token='test')
+    authorized.post('/some', headers={'Just': 'Test'})
+
+    request.perform.assert_called_once_with(
+        'POST',
+        '/some',
+        headers={
+            'Just': 'Test',
+            'Authorization': 'Bearer test'
         }
     )
 
