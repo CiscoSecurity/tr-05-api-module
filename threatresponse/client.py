@@ -4,19 +4,22 @@ from .api.inspect import InspectAPI
 from .api.intel import IntelAPI
 from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
-from .request.authorized import AuthorizedRequest
+from .request.authorized import AuthorizedRequest, TokenAuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.proxied import ProxiedRequest
 from .request.relative import RelativeRequest
 from .request.standard import StandardRequest
 from .request.timed import TimedRequest
 from .urls import url_for
+from .exceptions import CredentialsNotFoundError
 
 
 class ThreatResponse(object):
 
-    def __init__(self, client_id, client_password, **options):
+    def __init__(self, client_id=None, client_password=None,
+                 oauth2_token=None, **options):
         credentials = (client_id, client_password)
+        oauth2_token = oauth2_token
 
         proxy = options.get('proxy')
         timeout = options.get('timeout')
@@ -26,7 +29,15 @@ class ThreatResponse(object):
         request = ProxiedRequest(proxy) if proxy else StandardRequest()
         request = TimedRequest(request, timeout) if timeout else request
         request = LoggedRequest(request, logger) if logger else request
-        request = AuthorizedRequest(request, *credentials, region=region)
+        if oauth2_token:
+            request = TokenAuthorizedRequest(request, oauth2_token)
+        elif client_id and client_password:
+            request = AuthorizedRequest(request, *credentials, region=region)
+        else:
+            raise CredentialsNotFoundError(
+                "Not found client_id and client_password or "
+                "oauth2 token that doesn't expired."
+            )
 
         def request_for(family):
             return RelativeRequest(request, url_for(region, family))

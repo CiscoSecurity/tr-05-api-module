@@ -3,6 +3,7 @@ from six.moves.urllib.parse import urljoin
 
 from .base import Request
 from ..urls import url_for
+from ..exceptions import CredentialsNotFoundError
 
 
 class AuthorizedRequest(Request):
@@ -49,6 +50,37 @@ class AuthorizedRequest(Request):
         response.raise_for_status()
 
         return response.json()['access_token']  # OK
+
+    @property
+    def _headers(self):
+        return {'Authorization': 'Bearer {token}'.format(token=self._token)}
+
+    def _perform(self, method, url, headers, **kwargs):
+        headers.update(self._headers)
+        kwargs['headers'] = headers
+        return self._request.perform(method, url, **kwargs)
+
+
+class TokenAuthorizedRequest(Request):
+    """
+    Provides authorization header for inner request.
+    """
+
+    def __init__(self, request, oauth2_token):
+        self._request = request
+        self._token = oauth2_token
+
+    def perform(self, method, url, **kwargs):
+        headers = kwargs.pop('headers', {})
+
+        response = self._perform(method, url, headers, **kwargs)
+
+        if response.status_code == UNAUTHORIZED:
+            raise CredentialsNotFoundError(
+                "Not found oauth2 token that doesn't expired."
+            )
+
+        return response
 
     @property
     def _headers(self):
