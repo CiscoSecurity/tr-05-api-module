@@ -69,6 +69,10 @@ class TokenAuthorizedRequest(Request):
     def __init__(self, request, token, region=None):
         self._request = request
         self._token = token
+        self._check_url = urljoin(
+            url_for(region, 'visibility'),
+            '/iroh/iroh-inspect/inspect',
+        )
         self._check_token(token)
 
     def perform(self, method, url, **kwargs):
@@ -76,15 +80,11 @@ class TokenAuthorizedRequest(Request):
         response = self._perform(method, url, headers, **kwargs)
         return response
 
-    def _check_token(self, token, **kwargs):
+    def _check_token(self):
         headers = {'Accept': 'application/json'}
         headers.update(self._headers)
-        url = urljoin(
-            url_for(region, 'visibility'),
-            '/iroh/iroh-inspect/inspect',
-        )
 
-        response = self._perform('POST', url, headers, **kwargs)
+        response = self._perform('POST', self._check_url, headers)
 
         if response.status_code == UNAUTHORIZED:
             raise CredentialsError(
