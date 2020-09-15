@@ -85,11 +85,7 @@ class TokenAuthorizedRequest(Request):
         headers.update(self._headers)
 
         response = self._perform('POST', self._check_url, headers)
-
-        if response.status_code == UNAUTHORIZED:
-            raise CredentialsError(
-                "Not found oauth2 token that doesn't expired."
-            )
+        response.raise_for_status()
 
     @property
     def _headers(self):
