@@ -30,7 +30,8 @@ class ThreatResponse(object):
         request = TimedRequest(request, timeout) if timeout else request
         request = LoggedRequest(request, logger) if logger else request
         if token:
-            request = TokenAuthorizedRequest(request, oauth2_token)
+            request = TokenAuthorizedRequest(request, oauth2_token,
+                                             region=region)
         elif client_id and client_password:
             request = ClientAuthorizedRequest(request, *credentials,
                                               region=region)
