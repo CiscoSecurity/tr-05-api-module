@@ -4,6 +4,7 @@ from .api.inspect import InspectAPI
 from .api.intel import IntelAPI
 from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
+from .exceptions import CredentialsError
 from .request.authorized import ClientAuthorizedRequest, TokenAuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.proxied import ProxiedRequest
@@ -11,7 +12,6 @@ from .request.relative import RelativeRequest
 from .request.standard import StandardRequest
 from .request.timed import TimedRequest
 from .urls import url_for
-from .exceptions import CredentialsError
 
 
 class ThreatResponse(object):
