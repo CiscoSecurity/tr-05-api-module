@@ -3,7 +3,6 @@ from six.moves.urllib.parse import urljoin
 
 from .base import Request
 from ..urls import url_for
-from ..exceptions import CredentialsError
 
 
 class ClientAuthorizedRequest(Request):

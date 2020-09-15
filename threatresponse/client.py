@@ -32,7 +32,8 @@ class ThreatResponse(object):
         if token:
             request = TokenAuthorizedRequest(request, oauth2_token)
         elif client_id and client_password:
-            request = ClientAuthorizedRequest(request, *credentials, region=region)
+            request = ClientAuthorizedRequest(request, *credentials,
+                                              region=region)
         else:
             raise CredentialsError(
                 'Credentials must be supplied either '
