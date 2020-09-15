@@ -18,8 +18,6 @@ class ThreatResponse(object):
 
     def __init__(self, client_id=None, client_password=None,
                  token=None, **options):
-        credentials = (client_id, client_password)
-        oauth2_token = token
 
         proxy = options.get('proxy')
         timeout = options.get('timeout')
@@ -30,10 +28,13 @@ class ThreatResponse(object):
         request = TimedRequest(request, timeout) if timeout else request
         request = LoggedRequest(request, logger) if logger else request
         if token:
-            request = TokenAuthorizedRequest(request, oauth2_token,
+            request = TokenAuthorizedRequest(request,
+                                             token,
                                              region=region)
         elif client_id and client_password:
-            request = ClientAuthorizedRequest(request, *credentials,
+            request = ClientAuthorizedRequest(request,
+                                              client_id,
+                                              client_password,
                                               region=region)
         else:
             raise CredentialsError(
