@@ -3,10 +3,10 @@ from six.moves.urllib.parse import urljoin
 
 from .base import Request
 from ..urls import url_for
-from ..exceptions import CredentialsNotFoundError
+from ..exceptions import CredentialsError
 
 
-class AuthorizedRequest(Request):
+class ClientAuthorizedRequest(Request):
     """
     Provides authorization header for inner request.
     """
@@ -66,21 +66,30 @@ class TokenAuthorizedRequest(Request):
     Provides authorization header for inner request.
     """
 
-    def __init__(self, request, oauth2_token):
+    def __init__(self, request, token, region=None):
         self._request = request
-        self._token = oauth2_token
+        self._token = token
+        self._check_token(token)
 
     def perform(self, method, url, **kwargs):
         headers = kwargs.pop('headers', {})
-
         response = self._perform(method, url, headers, **kwargs)
+        return response
+
+    def _check_token(self, token, **kwargs):
+        headers = {'Accept': 'application/json'}
+        headers.update(self._headers)
+        url = urljoin(
+            url_for(region, 'visibility'),
+            '/iroh/iroh-inspect/inspect',
+        )
+
+        response = self._perform('POST', url, headers, **kwargs)
 
         if response.status_code == UNAUTHORIZED:
-            raise CredentialsNotFoundError(
+            raise CredentialsError(
                 "Not found oauth2 token that doesn't expired."
             )
-
-        return response
 
     @property
     def _headers(self):

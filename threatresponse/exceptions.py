@@ -10,5 +10,5 @@ class ResponseTypeError(ValueError):
     pass
 
 
-class CredentialsNotFoundError(ValueError):
+class CredentialsError(ValueError):
     pass

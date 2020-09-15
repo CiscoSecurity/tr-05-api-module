@@ -4,22 +4,22 @@ from .api.inspect import InspectAPI
 from .api.intel import IntelAPI
 from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
-from .request.authorized import AuthorizedRequest, TokenAuthorizedRequest
+from .request.authorized import ClientAuthorizedRequest, TokenAuthorizedRequest
 from .request.logged import LoggedRequest
 from .request.proxied import ProxiedRequest
 from .request.relative import RelativeRequest
 from .request.standard import StandardRequest
 from .request.timed import TimedRequest
 from .urls import url_for
-from .exceptions import CredentialsNotFoundError
+from .exceptions import CredentialsError
 
 
 class ThreatResponse(object):
 
     def __init__(self, client_id=None, client_password=None,
-                 oauth2_token=None, **options):
+                 token=None, **options):
         credentials = (client_id, client_password)
-        oauth2_token = oauth2_token
+        oauth2_token = token
 
         proxy = options.get('proxy')
         timeout = options.get('timeout')
@@ -29,14 +29,15 @@ class ThreatResponse(object):
         request = ProxiedRequest(proxy) if proxy else StandardRequest()
         request = TimedRequest(request, timeout) if timeout else request
         request = LoggedRequest(request, logger) if logger else request
-        if oauth2_token:
+        if token:
             request = TokenAuthorizedRequest(request, oauth2_token)
         elif client_id and client_password:
-            request = AuthorizedRequest(request, *credentials, region=region)
+            request = ClientAuthorizedRequest(request, *credentials, region=region)
         else:
-            raise CredentialsNotFoundError(
-                "Not found client_id and client_password or "
-                "oauth2 token that doesn't expired."
+            raise CredentialsError(
+                'Credentials must be supplied either '
+                'as a pair of client_id and client_password or '
+                'as a single token.'
             )
 
         def request_for(family):

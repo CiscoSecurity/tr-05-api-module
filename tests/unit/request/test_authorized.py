@@ -1,14 +1,14 @@
 from mock import MagicMock
 from six.moves.http_client import UNAUTHORIZED
 
-from threatresponse.request.authorized import AuthorizedRequest
+from threatresponse.request.authorized import ClientAuthorizedRequest
 
 
 def test_that_authorized_request_provides_header_with_token():
     request = MagicMock()
     request.post.return_value = token('Cake')
 
-    authorized = AuthorizedRequest(request, 'x', 'y')
+    authorized = ClientAuthorizedRequest(request, 'x', 'y')
     authorized.post('/some', headers={'Just': 'Test'})
 
     request.perform.assert_called_once_with(
@@ -24,7 +24,7 @@ def test_that_authorized_request_provides_header_with_token():
 def test_that_authorized_request_retrieves_token_on_init():
     request = MagicMock()
 
-    AuthorizedRequest(request, 'x', 'y')
+    ClientAuthorizedRequest(request, 'x', 'y')
 
     request.post.assert_called_once_with(
         'https://visibility.amp.cisco.com/iroh/oauth2/token',
@@ -45,7 +45,7 @@ def test_that_authorized_request_retrieves_token_on_expiration_and_retries():
     request.post.return_value = token('Cake')
     request.perform.return_value = response
 
-    authorized = AuthorizedRequest(request, 'x', 'y')
+    authorized = ClientAuthorizedRequest(request, 'x', 'y')
     authorized.post('/some')
 
     assert request.post.call_count == 2
