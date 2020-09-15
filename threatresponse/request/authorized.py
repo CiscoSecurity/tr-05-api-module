@@ -70,7 +70,7 @@ class TokenAuthorizedRequest(Request):
         self._token = token
         self._check_url = urljoin(
             url_for(region, 'visibility'),
-            '/iroh/iroh-inspect/inspect',
+            '/iroh/iroh-enrich/health',
         )
         self._check_token()
 
