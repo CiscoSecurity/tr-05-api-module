@@ -73,7 +73,7 @@ class TokenAuthorizedRequest(Request):
             url_for(region, 'visibility'),
             '/iroh/iroh-inspect/inspect',
         )
-        self._check_token(token)
+        self._check_token()
 
     def perform(self, method, url, **kwargs):
         headers = kwargs.pop('headers', {})
