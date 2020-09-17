@@ -5,7 +5,7 @@ from .base import Request
 from ..urls import url_for
 
 
-class AuthorizedRequest(Request):
+class ClientAuthorizedRequest(Request):
     """
     Provides authorization header for inner request.
     """
@@ -49,6 +49,42 @@ class AuthorizedRequest(Request):
         response.raise_for_status()
 
         return response.json()['access_token']  # OK
+
+    @property
+    def _headers(self):
+        return {'Authorization': 'Bearer {token}'.format(token=self._token)}
+
+    def _perform(self, method, url, headers, **kwargs):
+        headers.update(self._headers)
+        kwargs['headers'] = headers
+        return self._request.perform(method, url, **kwargs)
+
+
+class TokenAuthorizedRequest(Request):
+    """
+    Provides authorization header for inner request.
+    """
+
+    def __init__(self, request, token, region=None):
+        self._request = request
+        self._token = token
+        self._check_url = urljoin(
+            url_for(region, 'visibility'),
+            '/iroh/iroh-enrich/settings',
+        )
+        self._check_token()
+
+    def perform(self, method, url, **kwargs):
+        headers = kwargs.pop('headers', {})
+        response = self._perform(method, url, headers, **kwargs)
+        return response
+
+    def _check_token(self):
+        headers = {'Accept': 'application/json'}
+        headers.update(self._headers)
+
+        response = self._perform('GET', self._check_url, headers)
+        response.raise_for_status()
 
     @property
     def _headers(self):

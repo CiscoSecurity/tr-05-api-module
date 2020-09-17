@@ -8,3 +8,7 @@ class RouteError(ValueError):
 
 class ResponseTypeError(ValueError):
     pass
+
+
+class CredentialsError(ValueError):
+    pass
