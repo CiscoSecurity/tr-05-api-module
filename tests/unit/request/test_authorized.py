@@ -1,10 +1,13 @@
 from mock import MagicMock
 from six.moves.http_client import UNAUTHORIZED
 
-from threatresponse.request.authorized import ClientAuthorizedRequest
+from threatresponse.request.authorized import (
+    ClientAuthorizedRequest,
+    TokenAuthorizedRequest
+)
 
 
-def test_that_authorized_request_provides_header_with_token():
+def test_that_client_authorized_request_provides_header_with_token():
     request = MagicMock()
     request.post.return_value = token('Cake')
 
@@ -17,6 +20,38 @@ def test_that_authorized_request_provides_header_with_token():
         headers={
             'Just': 'Test',
             'Authorization': 'Bearer Cake'
+        }
+    )
+
+
+def test_that_token_authorized_request_provides_header_with_token():
+    request = MagicMock()
+    request.post.side_effect = ({'data': 'test'}, {})
+
+    authorized = TokenAuthorizedRequest(request, 'test_token')
+    authorized.post('/some')
+
+    request.perform.assert_called_with(
+        'POST',
+        '/some',
+        headers={
+            'Authorization': 'Bearer test_token'
+        }
+    )
+
+
+def test_that_token_authorized_request_check_token():
+    request = MagicMock()
+    request.post.return_value = {'data': 'test'}
+
+    TokenAuthorizedRequest(request, 'test_token')
+
+    request.perform.assert_called_once_with(
+        'GET',
+        'https://visibility.amp.cisco.com/iroh/iroh-enrich/settings',
+        headers={
+            'Accept': 'application/json',
+            'Authorization': 'Bearer test_token'
         }
     )
 

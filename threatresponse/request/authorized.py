@@ -70,7 +70,7 @@ class TokenAuthorizedRequest(Request):
         self._token = token
         self._check_url = urljoin(
             url_for(region, 'visibility'),
-            '/iroh/iroh-enrich/health',
+            '/iroh/iroh-enrich/settings',
         )
         self._check_token()
 
@@ -83,7 +83,7 @@ class TokenAuthorizedRequest(Request):
         headers = {'Accept': 'application/json'}
         headers.update(self._headers)
 
-        response = self._perform('POST', self._check_url, headers)
+        response = self._perform('GET', self._check_url, headers)
         response.raise_for_status()
 
     @property
