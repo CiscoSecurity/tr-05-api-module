@@ -1,7 +1,3 @@
-import pytest
-
-from ctrlibrary.core import settings
-from ctrlibrary.threatresponse import token
 from ctrlibrary.core.utils import get_observables
 from ctrlibrary.threatresponse.int import (
     int_get_integration,
@@ -20,26 +16,6 @@ from ctrlibrary.threatresponse.int import (
     int_patch_module_type,
     int_delete_module_type,
 )
-from threatresponse import ThreatResponse
-
-
-@pytest.fixture(scope='module')
-def module_token():
-    return token.request_token(
-        settings.server.ctr_client_id, settings.server.ctr_client_password)
-
-
-@pytest.fixture(scope='module')
-def module_headers(module_token):
-    return {'Authorization': 'Bearer {}'.format(module_token)}
-
-
-@pytest.fixture(scope='module')
-def module_tool_client():
-    return ThreatResponse(
-        client_id=settings.server.ctr_client_id,
-        client_password=settings.server.ctr_client_password
-    )
 
 
 CUSTOM_RELAY_MODULE_TYPE = 'a14ae422-01b6-5013-9876-695ff1b0ebe0'

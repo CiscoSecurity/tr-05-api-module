@@ -1,11 +1,8 @@
 import pytest
 import random
 from requests import HTTPError
-
-from ctrlibrary.core import settings
 from ctrlibrary.core.datafactory import gen_ip
 from ctrlibrary.core.utils import delayed_return
-from ctrlibrary.threatresponse import token
 from ctrlibrary.ctia.base import ctia_get_data
 from ctrlibrary.ctia.endpoints import (
     ACTOR,
@@ -29,27 +26,6 @@ from ctrlibrary.ctia.endpoints import (
     VULNERABILITY,
     WEAKNESS,
 )
-from threatresponse import ThreatResponse
-
-
-@pytest.fixture(scope='module')
-def module_token():
-    return token.request_token(
-        settings.server.ctr_client_id, settings.server.ctr_client_password)
-
-
-@pytest.fixture(scope='module')
-def module_headers(module_token):
-    return {'Authorization': 'Bearer {}'.format(module_token)}
-
-
-@pytest.fixture(scope='module')
-def module_tool_client():
-    return ThreatResponse(
-        client_id=settings.server.ctr_client_id,
-        client_password=settings.server.ctr_client_password
-    )
-
 
 SERVER_VERSION = '1.0.19'
 

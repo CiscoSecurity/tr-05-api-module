@@ -1,9 +1,6 @@
+import time
 import pytest
-
-from requests import ReadTimeout
-
-from ctrlibrary.core import settings
-from ctrlibrary.threatresponse import token
+from requests import ReadTimeout, HTTPError
 from ctrlibrary.core.datafactory import gen_sha256, gen_string
 from ctrlibrary.core.utils import get_observables
 from ctrlibrary.threatresponse.inspect import inspect
@@ -13,27 +10,9 @@ from ctrlibrary.threatresponse.enrich import (
     enrich_refer_observables
 )
 from ctrlibrary.threatresponse.response import response_respond_observables
+from tests.functional.tests.conftest import gen_random_token
 from threatresponse import ThreatResponse
-
-
-@pytest.fixture(scope='module')
-def module_token():
-    return token.request_token(
-        settings.server.ctr_client_id, settings.server.ctr_client_password)
-
-
-@pytest.fixture(scope='module')
-def module_headers(module_token):
-    return {'Authorization': 'Bearer {}'.format(module_token)}
-
-
-@pytest.fixture(scope='module')
-def module_tool_client():
-    return ThreatResponse(
-        client_id=settings.server.ctr_client_id,
-        client_password=settings.server.ctr_client_password
-    )
-
+from threatresponse.exceptions import CredentialsError
 
 IP = '95.95.0.1'
 SHA256_HASH = (
@@ -419,3 +398,63 @@ def test_python_module_positive_commands_target(module_tool_client):
     assert len(tool_command_targets['targets']) == 1
     assert tool_command_targets['targets'][0]['type'] == 'endpoint'
     assert tool_command_targets['targets'][0]['observables'] == expected_target
+
+
+def test_python_module_positive_token(module_tool_client_token):
+    """Perform testing of availability perform request to the Threat response
+    using token
+
+    ID: CCTRI-1579-8f1c20ea-fe40-11ea-adc1-0242ac120002
+
+    Steps:
+
+        1. Inspect observable using token
+        2. Sleep and wait until token will expired
+
+    Expectedresults: Inspect for provided observable returns expected
+        values, wait until token will expired and check that exception
+        raises
+
+    Importance: Critical
+    """
+    assert module_tool_client_token.inspect.inspect(
+        {'content': '1.1.1.1'}) == [
+               {'type': 'ip', 'value': '1.1.1.1'}
+           ]
+    time.sleep(601)
+    try:
+        assert not module_tool_client_token.inspect.inspect(
+            {'content': '1.1.1.1'}) == [
+                       {'type': 'ip', 'value': '1.1.1.1'}
+        ]
+    except HTTPError:
+        pass
+
+
+@pytest.mark.parametrize(
+    'token',
+    ('',
+     gen_random_token())
+)
+def test_python_module_negative_token(module_tool_client_token, token):
+    """Perform testing of availability perform request to the Threat response
+    using invalid token
+
+    ID: CCTRI-1579-4ca2a94f-db81-44c9-bf5b-53146cfd127a
+
+    Steps:
+
+        1. Inspect observable using empty token
+        2. Inspect observable using invalid token
+
+    Expectedresults: Inspect for provided observable doesn't returns expected
+        values, because token is invalid
+
+    Importance: Critical
+    """
+    try:
+        assert not (ThreatResponse(
+            token=token).inspect.inspect({'content': '1.1.1.1'})) == [
+            {'type': 'ip', 'value': '1.1.1.1'}]
+    except (HTTPError, CredentialsError):
+        pass
