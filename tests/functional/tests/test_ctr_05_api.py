@@ -1,7 +1,7 @@
 import time
 import pytest
 from requests import ReadTimeout, HTTPError
-from tests.utils import gen_random_token
+from utils import gen_random_token
 from ctrlibrary.core.datafactory import gen_sha256, gen_string
 from ctrlibrary.core.utils import get_observables
 from ctrlibrary.threatresponse.inspect import inspect
