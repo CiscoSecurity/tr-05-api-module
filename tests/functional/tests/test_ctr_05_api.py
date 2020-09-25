@@ -11,7 +11,7 @@ from ctrlibrary.threatresponse.enrich import (
     enrich_refer_observables
 )
 from ctrlibrary.threatresponse.response import response_respond_observables
-from tests.functional.tests.utils import gen_random_token
+# from tests.functional.tests.utils import gen_random_token
 from threatresponse import ThreatResponse
 from threatresponse.exceptions import CredentialsError
 
@@ -435,7 +435,7 @@ def test_python_module_positive_token(module_tool_client_token):
 @pytest.mark.parametrize(
     'token',
     ('',
-     gen_random_token())
+     'dsadasd')
 )
 def test_python_module_negative_token(module_tool_client_token, token):
     """Perform testing of availability perform request to the Threat response
