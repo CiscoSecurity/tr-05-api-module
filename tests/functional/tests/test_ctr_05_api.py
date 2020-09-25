@@ -10,7 +10,7 @@ from ctrlibrary.threatresponse.enrich import (
     enrich_refer_observables
 )
 from ctrlibrary.threatresponse.response import response_respond_observables
-from tests.functional.tests.conftest import gen_random_token
+from tests.functional.tests.utils import gen_random_token
 from threatresponse import ThreatResponse
 from threatresponse.exceptions import CredentialsError
 

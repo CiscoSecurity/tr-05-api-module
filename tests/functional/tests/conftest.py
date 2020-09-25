@@ -1,8 +1,5 @@
 # coding: utf-8
 """Configurations for py.test runner"""
-import random
-import string
-
 import pytest
 from ctrlibrary.threatresponse import token
 from ctrlibrary.core import settings
@@ -39,8 +36,3 @@ def module_tool_client_token(module_token):
     return ThreatResponse(
         token=module_token
     )
-
-
-def gen_random_token():
-    return ''.join(random.SystemRandom().choice(
-        string.ascii_letters + string.digits) for _ in range(3437))
