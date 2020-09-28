@@ -12,7 +12,6 @@ before_install:
 - chmod 400 ~/.ssh/id_rsa
 
 install:
-- travis_wait 11 mvn install
 - pip install --upgrade .
 - pip install --upgrade --requirement test-requirements.txt
 - pip install --upgrade git+ssh://git@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary
@@ -26,4 +25,4 @@ script:
 - pip show threatresponse
 - flake8 .
 - coverage run --source threatresponse/ -m pytest --verbose tests/unit/ && coverage report
-- if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pytest --verbose tests/functional/; fi
+- travis_wait 11 if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pytest --verbose tests/functional/; fi
