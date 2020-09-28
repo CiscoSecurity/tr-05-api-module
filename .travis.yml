@@ -11,8 +11,7 @@ before_install:
 - openssl aes-256-cbc -k "$travis_key_password" -d -md sha256 -a -in travis_key.enc -out ~/.ssh/id_rsa
 - chmod 400 ~/.ssh/id_rsa
 
-install:
-- travis_wait 11 mvn install
+install: travis_wait 11 mvn install
 - pip install --upgrade .
 - pip install --upgrade --requirement test-requirements.txt
 - pip install --upgrade git+ssh://git@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary
