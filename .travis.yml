@@ -25,4 +25,4 @@ script:
 - pip show threatresponse
 - flake8 .
 - coverage run --source threatresponse/ -m pytest --verbose tests/unit/ && coverage report
-- if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then travis_wait 11 pytest --verbose tests/functional/; fi
+- if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then travis_wait 15 pytest --verbose tests/functional/; fi
