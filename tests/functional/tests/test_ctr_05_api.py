@@ -422,25 +422,22 @@ def test_python_module_positive_token(module_tool_client_token):
     Importance: Critical
     """
     assert module_tool_client_token.inspect.inspect(
-        {'content': '1.1.1.1'}) == [
-               {'type': 'ip', 'value': '1.1.1.1'}
-           ]
+        {'content': '1.1.1.1'}) == [{'type': 'ip', 'value': '1.1.1.1'}]
+
+    # wait till token will expired
     time.sleep(601)
-    try:
-        assert not module_tool_client_token.inspect.inspect(
-            {'content': '1.1.1.1'}) == [
-                       {'type': 'ip', 'value': '1.1.1.1'}
-        ]
-    except HTTPError:
-        pass
+
+    with pytest.raises(HTTPError):
+        assert module_tool_client_token.inspect.inspect(
+            {'content': '1.1.1.1'}) != [{'type': 'ip', 'value': '1.1.1.1'}]
 
 
 @pytest.mark.parametrize(
-    'token',
-    (gen_random_ctr_token(token_length=0),
-     gen_random_ctr_token())
+    'token, error',
+    ((gen_random_ctr_token(token_length=0), CredentialsError),
+     (gen_random_ctr_token(), HTTPError))
 )
-def test_python_module_negative_token(module_tool_client_token, token):
+def test_python_module_negative_token(token, error):
     """Perform testing of availability perform request to the Threat response
     using invalid token
 
@@ -456,9 +453,6 @@ def test_python_module_negative_token(module_tool_client_token, token):
 
     Importance: Critical
     """
-    try:
-        assert not (ThreatResponse(
-            token=token).inspect.inspect({'content': '1.1.1.1'})) == [
-            {'type': 'ip', 'value': '1.1.1.1'}]
-    except (HTTPError, CredentialsError):
-        pass
+    with pytest.raises(error):
+        assert ThreatResponse(token=token).inspect.inspect(
+            {'content': '1.1.1.1'}) != [{'type': 'ip', 'value': '1.1.1.1'}]
