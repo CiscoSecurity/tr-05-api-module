@@ -44,7 +44,10 @@ def test_org_post_succeeds():
 
 
 def test_org_post_fails():
-    request = invoke_with_failure(ProfileAPI, lambda api: api.org.post(payload))
+    request = invoke_with_failure(
+        ProfileAPI,
+        lambda api: api.org.post(payload)
+    )
     request.perform.assert_called_once_with(
         'POST',
         '/iroh/profile/org',
