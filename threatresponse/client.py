@@ -2,6 +2,7 @@ from .api.enrich import EnrichAPI
 from .api.int import IntAPI
 from .api.inspect import InspectAPI
 from .api.intel import IntelAPI
+from .api.profile import ProfileAPI
 from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
 from .exceptions import CredentialsError
@@ -51,6 +52,7 @@ class ThreatResponse(object):
         self._int = IntAPI(request_for('visibility'))
         self._response = ResponseAPI(request_for('visibility'))
         self._private_intel = IntelAPI(request_for('private_intel'))
+        self._profile = ProfileAPI(request_for('visibility'))
         self._global_intel = IntelAPI(request_for('global_intel'))
         self._commands = CommandsAPI(request_for('visibility'))
 
@@ -73,6 +75,10 @@ class ThreatResponse(object):
     @property
     def private_intel(self):
         return self._private_intel
+
+    @property
+    def profile(self):
+        return self._profile
 
     @property
     def global_intel(self):
