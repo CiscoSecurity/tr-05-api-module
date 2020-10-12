@@ -38,38 +38,32 @@ class UserMgmtAPI(API):
         https://visibility.amp.cisco.com/iroh/user-mgmt/index.html#/User/get_iroh_user_mgmt_batch_users
         """
 
-        query = kwargs.pop('params', {})
-        query.update({
-            'id': user_ids,
-        })
-
         return self._get(
             '/iroh/user-mgmt/batch/users',
-            params=query,
+            params={'id': user_ids},
             **kwargs
         )
 
     @route('search.users')
     def _perform(self,
                  payload,
-                 sort_by,
-                 sort_order,
-                 offset,
-                 search_after,
-                 limit,
+                 sort_by=None,
+                 sort_order=None,
+                 offset=None,
+                 search_after=None,
+                 limit=None,
                  **kwargs):
         """
         https://visibility.amp.cisco.com/iroh/user-mgmt/index.html#/User/post_iroh_user_mgmt_search_users
         """
 
-        query = kwargs.pop('params', {})
-        query.update({
+        query = {
             'sort_by': sort_by,
             'sort_order': sort_order,
             'offset': offset,
             'search_after': search_after,
             'limit': limit
-        })
+        }
 
         return self._post(
             '/iroh/user-mgmt/search/users',
