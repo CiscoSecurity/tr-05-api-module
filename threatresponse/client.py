@@ -5,6 +5,7 @@ from .api.intel import IntelAPI
 from .api.profile import ProfileAPI
 from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
+from .api.user_mgmt import UserMgmtAPI
 from .exceptions import CredentialsError
 from .request.authorized import ClientAuthorizedRequest, TokenAuthorizedRequest
 from .request.logged import LoggedRequest
@@ -55,6 +56,7 @@ class ThreatResponse(object):
         self._profile = ProfileAPI(request_for('visibility'))
         self._global_intel = IntelAPI(request_for('global_intel'))
         self._commands = CommandsAPI(request_for('visibility'))
+        self._user_mgmt = UserMgmtAPI(request_for('visibility'))
 
     @property
     def inspect(self):
@@ -87,3 +89,7 @@ class ThreatResponse(object):
     @property
     def commands(self):
         return self._commands
+
+    @property
+    def user_mgmt(self):
+        return self._user_mgmt
