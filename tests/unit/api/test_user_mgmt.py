@@ -57,7 +57,7 @@ def test_batch_users_succeeds():
     )
     request.perform.assert_called_once_with(
         'GET',
-        f'/iroh/user-mgmt/batch/users',
+        '/iroh/user-mgmt/batch/users',
         params={'id': ['00000000-0000-0000-0000-000000000000']}
     )
 
@@ -69,7 +69,7 @@ def test_batch_users_fails():
     )
     request.perform.assert_called_once_with(
         'GET',
-        f'/iroh/user-mgmt/batch/users',
+        '/iroh/user-mgmt/batch/users',
         params={'id': ['00000000-0000-0000-0000-000000000000']}
     )
 
