@@ -11,7 +11,7 @@ def test_users_get_succeeds():
     )
     request.perform.assert_called_once_with(
         'GET',
-        f'/iroh/user-mgmt/users/{test_user_id}',
+        '/iroh/user-mgmt/users/{}'.format(test_user_id),
     )
 
 
@@ -22,7 +22,7 @@ def test_users_get_fails():
     )
     request.perform.assert_called_once_with(
         'GET',
-        f'/iroh/user-mgmt/users/{test_user_id}',
+        '/iroh/user-mgmt/users/{}'.format(test_user_id),
     )
 
 
@@ -33,7 +33,7 @@ def test_users_post_succeeds():
     )
     request.perform.assert_called_once_with(
         'POST',
-        f'/iroh/user-mgmt/users/{test_user_id}',
+        '/iroh/user-mgmt/users/{}'.format(test_user_id),
         json=payload,
     )
 
@@ -45,7 +45,7 @@ def test_users_post_fails():
     )
     request.perform.assert_called_once_with(
         'POST',
-        f'/iroh/user-mgmt/users/{test_user_id}',
+        '/iroh/user-mgmt/users/{}'.format(test_user_id),
         json=payload,
     )
 
