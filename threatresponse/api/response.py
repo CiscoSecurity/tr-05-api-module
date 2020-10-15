@@ -22,8 +22,8 @@ class ResponseAPI(API):
     def _perform(self,
                  module_name,
                  action_id,
-                 observable_type,
-                 observable_value,
+                 observable_type=None,
+                 observable_value=None,
                  **kwargs):
         """
         https://visibility.amp.cisco.com/iroh/iroh-response/index.html#/Response/post_iroh_iroh_response_respond_trigger__module_name___action_id_
@@ -37,9 +37,10 @@ class ResponseAPI(API):
 
         # Extend optional module-specific query params with the required ones.
         query = kwargs.pop('params', {})
-        query.update({
-            'observable_type': observable_type,
-            'observable_value': observable_value,
-        })
+        if observable_type and observable_value:
+            query.update({
+                'observable_type': observable_type,
+                'observable_value': observable_value,
+            })
 
         return self._post(url, params=query, **kwargs)
