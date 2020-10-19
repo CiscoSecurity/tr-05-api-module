@@ -510,7 +510,7 @@ def test_python_module_positive_profile_whoami(module_headers):
 def test_python_module_positive_profile_org(module_headers):
     """Perform testing for enrich profile endpoint to check user information
 
-    ID: CCTRI-b12cee8e-1200-11eb-adc1-0242ac120002
+    ID: CCTRI-1720-b12cee8e-1200-11eb-adc1-0242ac120002
 
     Steps:
 
@@ -538,7 +538,7 @@ def test_python_module_positive_profile_change_org(update_org_name,
     """Perform testing for enrich profile endpoint to check possibility of
     updating org name
 
-    ID: CCTRI-b12cf140-1200-11eb-adc1-0242ac120002
+    ID: CCTRI-1720-b12cf140-1200-11eb-adc1-0242ac120002
 
     Steps:
 
@@ -558,7 +558,7 @@ def test_python_module_negative_profile_change_org(module_headers):
     """Perform testing for enrich profile endpoint to check inability to change
     org name with wrong payload
 
-    ID: CCTRI-b12cf258-1200-11eb-adc1-0242ac120002
+    ID: CCTRI-1720-b12cf258-1200-11eb-adc1-0242ac120002
 
     Steps:
 
