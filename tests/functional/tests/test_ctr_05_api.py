@@ -570,16 +570,6 @@ def test_python_module_negative_profile_change_org(module_headers):
 
     Importance: Critical
     """
-    wrong_payload = {
-        "name": "Test EU ORG",
-        "allow-all-role-to-login": True,
-        "address": {
-            "street1": "",
-            "street2": "",
-            "postal-code": "",
-            "city": "",
-        }
-    }
-
-    response = update_org(payload=wrong_payload, **{'headers': module_headers})
-    assert response['error'] == 'update_org_error'
+    response = update_org(payload={"invalid_key": "invalid_value"},
+                          **{'headers': module_headers})
+    assert response['errors'] == {'invalid_key': 'disallowed-key'}
