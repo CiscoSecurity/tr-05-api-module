@@ -40,7 +40,7 @@ def module_tool_client_token(module_token):
     )
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def update_org_name(module_headers):
 
     default_org_name = 'cisco'
