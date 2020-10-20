@@ -44,7 +44,7 @@ def module_tool_client_token(module_token):
 @pytest.fixture(scope='module')
 def update_org_name(module_headers):
 
-    default_org_name = get_org(**{'headers': module_headers})['name']
+    default_org_name = 'cisco'
 
     updated_org_name = update_org(payload={"name": "{0}".format(gen_string())},
                                   **{'headers': module_headers})['name']
