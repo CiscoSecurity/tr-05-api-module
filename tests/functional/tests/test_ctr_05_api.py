@@ -14,6 +14,11 @@ from ctrlibrary.threatresponse.enrich import (
     enrich_observe_observables,
     enrich_refer_observables
 )
+from ctrlibrary.threatresponse.profile import (
+    get_profile,
+    get_org,
+    update_org
+)
 from ctrlibrary.threatresponse.response import response_respond_observables
 from threatresponse import ThreatResponse
 from threatresponse.exceptions import CredentialsError
@@ -402,6 +407,118 @@ def test_python_module_positive_commands_target(module_tool_client):
     assert len(tool_command_targets['targets']) == 1
     assert tool_command_targets['targets'][0]['type'] == 'endpoint'
     assert tool_command_targets['targets'][0]['observables'] == expected_target
+
+
+def test_python_module_positive_profile_whoami(module_headers):
+    """Perform testing for enrich profile endpoint to check user information
+
+    ID: CCTRI-1720-3487d4de-e647-4dc5-9b79-70a73381949d
+
+    Steps:
+
+        1. Send GET request to enrich profile endpoint
+
+    Expectedresults: The response body contains all needed data
+
+    Importance: Critical
+    """
+    response = get_profile(**{'headers': module_headers})
+
+    user = response['user']
+    org = response['org']
+
+    assert user['role'] == 'admin'
+    assert user['scopes']
+    assert user['updated-at']
+    assert user['user-email'] == 'olshtaie+qasandbox@cisco.com'
+    assert user['org-id']
+    assert user['user-id']
+    assert user['enabled?'] is True
+    assert user['created-at']
+    assert user['user-nick'] == 'ATQC account'
+    assert user['idp-mappings'][0]['idp']
+    assert user['idp-mappings'][0]['user-identity-id']
+    assert user['idp-mappings'][0]['organization-id']
+    assert user['idp-mappings'][0]['enabled?'] is True
+    assert user['last-logged-at']
+
+    assert org['updated-at']
+    assert org['name'] == 'cisco'
+    assert org['allow-all-role-to-login'] is False
+    assert org['enabled?'] is True
+    assert org['activation-status'] == 'activated'
+    assert org['scim-status'] == 'activated'
+    assert org['id']
+    assert org['created-at']
+    assert org['allow-all-role-to-login-editable?'] is True
+
+
+def test_python_module_positive_profile_org(module_headers):
+    """Perform testing for enrich profile endpoint to check user information
+
+    ID: CCTRI-1720-b12cee8e-1200-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send GET request to enrich profile endpoint
+
+    Expectedresults: The response body contains all needed data
+
+    Importance: Critical
+    """
+    response = get_org(**{'headers': module_headers})
+
+    assert response['updated-at']
+    assert response['name'] == 'cisco'
+    assert response['allow-all-role-to-login'] is False
+    assert response['enabled?'] is True
+    assert response['activation-status'] == 'activated'
+    assert response['scim-status'] == 'activated'
+    assert response['id']
+    assert response['created-at']
+    assert response['allow-all-role-to-login-editable?'] is True
+
+
+def test_python_module_positive_profile_change_org(update_org_name,
+                                                   module_headers):
+    """Perform testing for enrich profile endpoint to check possibility of
+    updating org name
+
+    ID: CCTRI-1720-b12cf140-1200-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send POST request with random string of org name
+        2. Check that default name isn't equal with updated one
+
+    Expectedresults: The default name isn't equal with updated one
+
+    Importance: Critical
+    """
+    default_org_name, updated_org_name = update_org_name
+
+    assert default_org_name != updated_org_name
+
+
+def test_python_module_negative_profile_change_org(module_headers):
+    """Perform testing for enrich profile endpoint to check inability to change
+    org name with wrong payload
+
+    ID: CCTRI-1720-b12cf258-1200-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send POST request with wrong payload
+        2. Check that response body contains the error
+
+
+    Expectedresults: The response body contains the error
+
+    Importance: Critical
+    """
+    response = update_org(payload={"invalid_key": "invalid_value"},
+                          **{'headers': module_headers})
+    assert response['errors'] == {'invalid_key': 'disallowed-key'}
 
 
 def test_python_module_positive_token(module_tool_client_token):
