@@ -1,11 +1,10 @@
 # coding: utf-8
 """Configurations for py.test runner"""
 import pytest
-
 from ctrlibrary.core.datafactory import gen_string
 from ctrlibrary.threatresponse import token
 from ctrlibrary.core import settings
-from ctrlibrary.threatresponse.profile import get_org, update_org
+from ctrlibrary.threatresponse.profile import update_org
 from threatresponse import ThreatResponse
 
 
