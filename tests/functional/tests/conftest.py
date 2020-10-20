@@ -46,7 +46,7 @@ def update_org_name(module_headers):
 
     default_org_name = get_org(**{'headers': module_headers})['name']
 
-    updated_org_name = update_org(payload={"name": "".format(gen_string())},
+    updated_org_name = update_org(payload={"name": "{0}".format(gen_string())},
                                   **{'headers': module_headers})['name']
 
     yield default_org_name, updated_org_name
