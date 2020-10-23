@@ -20,6 +20,11 @@ from ctrlibrary.threatresponse.profile import (
     update_org
 )
 from ctrlibrary.threatresponse.response import response_respond_observables
+from ctrlibrary.threatresponse.user_mgmt import (
+    get_user_info,
+    get_users_info,
+    search_users
+)
 from threatresponse import ThreatResponse
 from threatresponse.exceptions import CredentialsError
 
@@ -430,7 +435,7 @@ def test_python_module_positive_profile_whoami(module_headers):
     assert user['role'] == 'admin'
     assert user['scopes']
     assert user['updated-at']
-    assert user['user-email'] == 'olshtaie+qasandbox@cisco.com'
+    assert user['user-email']
     assert user['org-id']
     assert user['user-id']
     assert user['enabled?'] is True
@@ -519,6 +524,98 @@ def test_python_module_negative_profile_change_org(module_headers):
     response = update_org(payload={"invalid_key": "invalid_value"},
                           **{'headers': module_headers})
     assert response['errors'] == {'invalid_key': 'disallowed-key'}
+
+
+def test_python_module_positive_user_mgmt_user(module_headers):
+    """Perform testing for enrich user management endpoint to check getting
+    information about the user using user id
+
+    ID: CCTRI-1698-d6fd0f29-34cd-4ad9-bc4c-5136ed4544b8
+
+    Steps:
+
+        1. Send GET request to profile endpoint for getting current user id
+        2. Send GET request to user_mgmt endpoint with user id for getting user
+        info from user_mgmt endpoint
+        3. Check that we able to get user info from user_mgmt endpoint by id
+        and this info is match with user info from profile endpoint
+
+    Expectedresults: The user info can be obtained from user_mgmt endpoint by
+    id and it's match with user info that was received from profile endpoint
+
+    Importance: Critical
+    """
+    whoami_user = get_profile(**{'headers': module_headers})['user']
+    user_mgmt_user = get_user_info(whoami_user['user-id'],
+                                   **{'headers': module_headers})
+
+    assert user_mgmt_user['role'] == whoami_user['role']
+    assert user_mgmt_user['scopes'] == whoami_user['scopes']
+    assert user_mgmt_user['user-email'] == whoami_user['user-email']
+    assert user_mgmt_user['user-name'] == whoami_user['user-name']
+    assert user_mgmt_user['org-id'] == whoami_user['org-id']
+    assert user_mgmt_user['user-id'] == whoami_user['user-id']
+    assert user_mgmt_user['enabled?'] == whoami_user['enabled?']
+    assert user_mgmt_user['created-at'] == whoami_user['created-at']
+    assert user_mgmt_user['user-nick'] == whoami_user['user-nick']
+
+
+def test_python_module_positive_user_mgmt_users(module_headers):
+    """Perform testing for enrich user management endpoint to check getting
+    information about the batch of users using users ids
+
+    ID: CCTRI-1698-7be98c52-1451-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send GET request to profile endpoint for getting current user id
+        2. Send GET request to user_mgmt endpoint with users ids list for
+        getting users info from user_mgmt endpoint
+        3. Check that we able to query a list with users id's on user_mgmt
+        endpoint and this info is match with users info from profile endpoint
+
+    Expectedresults: The users info can be obtained from user_mgmt endpoint by
+    querying the list of ids and it's match with user info that was received
+    from profile endpoint
+
+    Importance: Critical
+    """
+    whoami_user = get_profile(**{'headers': module_headers})['user']
+
+    user_mgmt_users = get_users_info(
+        [whoami_user['user-id'], whoami_user['user-id']],
+        **{'headers': module_headers})
+
+    assert user_mgmt_users[0]['role'] == whoami_user['role']
+    assert user_mgmt_users[0]['scopes'] == whoami_user['scopes']
+    assert user_mgmt_users[0]['user-email'] == whoami_user['user-email']
+    assert user_mgmt_users[0]['user-name'] == whoami_user['user-name']
+    assert user_mgmt_users[0]['org-id'] == whoami_user['org-id']
+    assert user_mgmt_users[0]['user-id'] == whoami_user['user-id']
+    assert user_mgmt_users[0]['enabled?'] == whoami_user['enabled?']
+    assert user_mgmt_users[0]['created-at'] == whoami_user['created-at']
+    assert user_mgmt_users[0]['user-nick'] == whoami_user['user-nick']
+
+
+def test_python_module_positive_user_mgmt_search_users(module_headers):
+    """Perform testing for enrich user management endpoint to check ability to
+     search users by their roles
+
+    ID: CCTRI-1698-ff55fd2a-1454-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send POST request to user_mgmt endpoint for getting users with admin
+        role
+        2. Check that response contains status code 200
+
+    Expectedresults: The search method of user management endpoint is able to
+    search users with admin role
+
+    Importance: Critical
+    """
+    admins = search_users(**{'headers': module_headers})
+    assert admins.status_code == 200
 
 
 def test_python_module_positive_token(module_tool_client_token):
