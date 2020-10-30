@@ -395,7 +395,7 @@ def test_ctr_positive_module_instance_investigate(
     try:
         # Check that created module can return data for investigation process
         response = module_tool_client.enrich.observe.observables(
-            [{'type': 'sha256', 'value': SHA256_HASH}])['data']
+            [{'type': 'sha256', 'value': SHA256_HASH}])
         observables = get_observables(response, module_instance['name'])
         assert observables['data']['verdicts']['count'] > 0, (
             'No observable verdicts returned from server. Check hash value')
