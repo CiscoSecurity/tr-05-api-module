@@ -157,9 +157,9 @@ def test_python_module_positive_enrich_observe_observables(
     response = enrich_observe_observables(
         payload=[{'type': 'sha256', 'value': SHA256_HASH}],
         **{'headers': module_headers}
-    )['data']
+    )
     tool_response = module_tool_client.enrich.observe.observables(
-        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
+        [{'type': 'sha256', 'value': SHA256_HASH}])
     direct_observables = get_observables(response, 'Private Intelligence')
     tool_observables = get_observables(tool_response, 'Private Intelligence')
     assert tool_observables['data']['verdicts']['count'] > 0, (
@@ -194,9 +194,9 @@ def test_python_module_positive_enrich_deliberate_observables(
     response = enrich_deliberate_observables(
         payload=[{'type': 'sha256', 'value': SHA256_HASH}],
         **{'headers': module_headers}
-    )['data']
+    )
     tool_response = module_tool_client.enrich.deliberate.observables(
-        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
+        [{'type': 'sha256', 'value': SHA256_HASH}])
     direct_observables = get_observables(response, 'Private Intelligence')
     tool_observables = get_observables(tool_response, 'Private Intelligence')
     assert tool_observables['data']['verdicts']['count'] > 0, (
@@ -322,7 +322,7 @@ def test_python_module_positive_commands_verdict(module_tool_client):
     Importance: Critical
     """
     tool_response = module_tool_client.enrich.deliberate.observables(
-        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
+        [{'type': 'sha256', 'value': SHA256_HASH}])
     tool_observables = get_observables(tool_response, 'Private Intelligence')
     assert tool_observables['data']['verdicts']['count'] > 0, (
         'No observable verdicts returned from server. Check hash value')
@@ -330,15 +330,19 @@ def test_python_module_positive_commands_verdict(module_tool_client):
         'data']['verdicts']['docs'][0]['disposition_name'] == 'Malicious'
 
     tool_command_response = module_tool_client.commands.verdict(SHA256_HASH)
-    tool_command_observable = get_observables(
-        tool_command_response['verdicts'], 'Private Intelligence')
-    assert tool_command_observable['observable_value'] == SHA256_HASH
-    assert tool_command_observable['observable_type'] == 'sha256'
-    assert tool_command_observable['expiration'] is not None
-    assert tool_command_observable['module'] == 'Private Intelligence'
-    assert tool_command_observable['module_type_id']
-    assert tool_command_observable['module_instance_id']
-    assert tool_command_observable['disposition_name'] == 'Malicious'
+    tool_command_private_intel = get_observables(
+        tool_command_response['response'], 'Private Intelligence')
+    assert tool_command_private_intel['module'] == 'Private Intelligence'
+    assert tool_command_private_intel['module_type_id']
+    assert tool_command_private_intel['module_instance_id']
+
+    tool_command_verdict = (
+        tool_command_private_intel['data']['verdicts']['docs'][0])
+
+    assert tool_command_verdict['observable']['value'] == SHA256_HASH
+    assert tool_command_verdict['observable']['type'] == 'sha256'
+    assert tool_command_verdict['valid_time'] is not None
+    assert tool_command_verdict['disposition_name'] == 'Malicious'
 
 
 def test_python_module_positive_commands_verdict_multiple(module_tool_client):
@@ -401,17 +405,19 @@ def test_python_module_positive_commands_target(module_tool_client):
         {'value': '192.168.4.4', 'type': 'ip'}
     ]
     tool_command_response = module_tool_client.commands.targets(
-        SHA256_HASH)['targets']
-    tool_command_targets = get_observables(
+        SHA256_HASH)['response']
+    tool_command_private_intel = get_observables(
         tool_command_response, 'Private Intelligence')
 
-    assert tool_command_targets['module'] == 'Private Intelligence'
-    assert tool_command_targets['module_type_id']
-    assert tool_command_targets['module_instance_id']
+    assert tool_command_private_intel['module'] == 'Private Intelligence'
+    assert tool_command_private_intel['module_type_id']
+    assert tool_command_private_intel['module_instance_id']
+    tool_command_targets = (
+        tool_command_private_intel['data']['sightings']['docs'][0]['targets'])
     # We expect 1 target for observable
-    assert len(tool_command_targets['targets']) == 1
-    assert tool_command_targets['targets'][0]['type'] == 'endpoint'
-    assert tool_command_targets['targets'][0]['observables'] == expected_target
+    assert len(tool_command_targets) == 1
+    assert tool_command_targets[0]['type'] == 'endpoint'
+    assert tool_command_targets[0]['observables'] == expected_target
 
 
 def test_python_module_positive_profile_whoami(module_headers):
