@@ -1,10 +1,12 @@
+import time
 import pytest
+from requests import ReadTimeout, HTTPError
 
-from requests import ReadTimeout
-
-from ctrlibrary.core import settings
-from ctrlibrary.threatresponse import token
-from ctrlibrary.core.datafactory import gen_sha256, gen_string
+from ctrlibrary.core.datafactory import (
+    gen_sha256,
+    gen_string,
+    gen_random_ctr_token
+)
 from ctrlibrary.core.utils import get_observables
 from ctrlibrary.threatresponse.inspect import inspect
 from ctrlibrary.threatresponse.enrich import (
@@ -12,28 +14,19 @@ from ctrlibrary.threatresponse.enrich import (
     enrich_observe_observables,
     enrich_refer_observables
 )
+from ctrlibrary.threatresponse.profile import (
+    get_profile,
+    get_org,
+    update_org
+)
 from ctrlibrary.threatresponse.response import response_respond_observables
+from ctrlibrary.threatresponse.user_mgmt import (
+    get_user_info,
+    get_users_info,
+    search_users
+)
 from threatresponse import ThreatResponse
-
-
-@pytest.fixture(scope='module')
-def module_token():
-    return token.request_token(
-        settings.server.ctr_client_id, settings.server.ctr_client_password)
-
-
-@pytest.fixture(scope='module')
-def module_headers(module_token):
-    return {'Authorization': 'Bearer {}'.format(module_token)}
-
-
-@pytest.fixture(scope='module')
-def module_tool_client():
-    return ThreatResponse(
-        client_id=settings.server.ctr_client_id,
-        client_password=settings.server.ctr_client_password
-    )
-
+from threatresponse.exceptions import CredentialsError
 
 IP = '95.95.0.1'
 SHA256_HASH = (
@@ -164,9 +157,9 @@ def test_python_module_positive_enrich_observe_observables(
     response = enrich_observe_observables(
         payload=[{'type': 'sha256', 'value': SHA256_HASH}],
         **{'headers': module_headers}
-    )['data']
+    )
     tool_response = module_tool_client.enrich.observe.observables(
-        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
+        [{'type': 'sha256', 'value': SHA256_HASH}])
     direct_observables = get_observables(response, 'Private Intelligence')
     tool_observables = get_observables(tool_response, 'Private Intelligence')
     assert tool_observables['data']['verdicts']['count'] > 0, (
@@ -201,9 +194,9 @@ def test_python_module_positive_enrich_deliberate_observables(
     response = enrich_deliberate_observables(
         payload=[{'type': 'sha256', 'value': SHA256_HASH}],
         **{'headers': module_headers}
-    )['data']
+    )
     tool_response = module_tool_client.enrich.deliberate.observables(
-        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
+        [{'type': 'sha256', 'value': SHA256_HASH}])
     direct_observables = get_observables(response, 'Private Intelligence')
     tool_observables = get_observables(tool_response, 'Private Intelligence')
     assert tool_observables['data']['verdicts']['count'] > 0, (
@@ -329,7 +322,7 @@ def test_python_module_positive_commands_verdict(module_tool_client):
     Importance: Critical
     """
     tool_response = module_tool_client.enrich.deliberate.observables(
-        [{'type': 'sha256', 'value': SHA256_HASH}])['data']
+        [{'type': 'sha256', 'value': SHA256_HASH}])
     tool_observables = get_observables(tool_response, 'Private Intelligence')
     assert tool_observables['data']['verdicts']['count'] > 0, (
         'No observable verdicts returned from server. Check hash value')
@@ -337,15 +330,19 @@ def test_python_module_positive_commands_verdict(module_tool_client):
         'data']['verdicts']['docs'][0]['disposition_name'] == 'Malicious'
 
     tool_command_response = module_tool_client.commands.verdict(SHA256_HASH)
-    tool_command_observable = get_observables(
-        tool_command_response['verdicts'], 'Private Intelligence')
-    assert tool_command_observable['observable_value'] == SHA256_HASH
-    assert tool_command_observable['observable_type'] == 'sha256'
-    assert tool_command_observable['expiration'] is not None
-    assert tool_command_observable['module'] == 'Private Intelligence'
-    assert tool_command_observable['module_type_id']
-    assert tool_command_observable['module_instance_id']
-    assert tool_command_observable['disposition_name'] == 'Malicious'
+    tool_command_private_intel = get_observables(
+        tool_command_response['response'], 'Private Intelligence')
+    assert tool_command_private_intel['module'] == 'Private Intelligence'
+    assert tool_command_private_intel['module_type_id']
+    assert tool_command_private_intel['module_instance_id']
+
+    tool_command_verdict = (
+        tool_command_private_intel['data']['verdicts']['docs'][0])
+
+    assert tool_command_verdict['observable']['value'] == SHA256_HASH
+    assert tool_command_verdict['observable']['type'] == 'sha256'
+    assert tool_command_verdict['valid_time'] is not None
+    assert tool_command_verdict['disposition_name'] == 'Malicious'
 
 
 def test_python_module_positive_commands_verdict_multiple(module_tool_client):
@@ -408,14 +405,274 @@ def test_python_module_positive_commands_target(module_tool_client):
         {'value': '192.168.4.4', 'type': 'ip'}
     ]
     tool_command_response = module_tool_client.commands.targets(
-        SHA256_HASH)['targets']
-    tool_command_targets = get_observables(
+        SHA256_HASH)['response']
+    tool_command_private_intel = get_observables(
         tool_command_response, 'Private Intelligence')
 
-    assert tool_command_targets['module'] == 'Private Intelligence'
-    assert tool_command_targets['module_type_id']
-    assert tool_command_targets['module_instance_id']
+    assert tool_command_private_intel['module'] == 'Private Intelligence'
+    assert tool_command_private_intel['module_type_id']
+    assert tool_command_private_intel['module_instance_id']
+    tool_command_targets = (
+        tool_command_private_intel['data']['sightings']['docs'][0]['targets'])
     # We expect 1 target for observable
-    assert len(tool_command_targets['targets']) == 1
-    assert tool_command_targets['targets'][0]['type'] == 'endpoint'
-    assert tool_command_targets['targets'][0]['observables'] == expected_target
+    assert len(tool_command_targets) == 1
+    assert tool_command_targets[0]['type'] == 'endpoint'
+    assert tool_command_targets[0]['observables'] == expected_target
+
+
+def test_python_module_positive_profile_whoami(module_headers):
+    """Perform testing for enrich profile endpoint to check user information
+
+    ID: CCTRI-1720-3487d4de-e647-4dc5-9b79-70a73381949d
+
+    Steps:
+
+        1. Send GET request to enrich profile endpoint
+
+    Expectedresults: The response body contains all needed data
+
+    Importance: Critical
+    """
+    response = get_profile(**{'headers': module_headers})
+
+    user = response['user']
+    org = response['org']
+
+    assert user['role'] == 'admin'
+    assert user['scopes']
+    assert user['updated-at']
+    assert user['user-email']
+    assert user['org-id']
+    assert user['user-id']
+    assert user['enabled?'] is True
+    assert user['created-at']
+    assert user['user-nick'] == 'ATQC account'
+    assert user['idp-mappings'][0]['idp']
+    assert user['idp-mappings'][0]['user-identity-id']
+    assert user['idp-mappings'][0]['organization-id']
+    assert user['idp-mappings'][0]['enabled?'] is True
+    assert user['last-logged-at']
+
+    assert org['updated-at']
+    assert org['name'] == 'cisco'
+    assert org['allow-all-role-to-login'] is False
+    assert org['enabled?'] is True
+    assert org['activation-status'] == 'activated'
+    assert org['scim-status'] == 'activated'
+    assert org['id']
+    assert org['created-at']
+    assert org['allow-all-role-to-login-editable?'] is True
+
+
+def test_python_module_positive_profile_org(module_headers):
+    """Perform testing for enrich profile endpoint to check user information
+
+    ID: CCTRI-1720-b12cee8e-1200-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send GET request to enrich profile endpoint
+
+    Expectedresults: The response body contains all needed data
+
+    Importance: Critical
+    """
+    response = get_org(**{'headers': module_headers})
+
+    assert response['updated-at']
+    assert response['name'] == 'cisco'
+    assert response['allow-all-role-to-login'] is False
+    assert response['enabled?'] is True
+    assert response['activation-status'] == 'activated'
+    assert response['scim-status'] == 'activated'
+    assert response['id']
+    assert response['created-at']
+    assert response['allow-all-role-to-login-editable?'] is True
+
+
+def test_python_module_positive_profile_change_org(update_org_name,
+                                                   module_headers):
+    """Perform testing for enrich profile endpoint to check possibility of
+    updating org name
+
+    ID: CCTRI-1720-b12cf140-1200-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send POST request with random string of org name
+        2. Check that default name isn't equal with updated one
+
+    Expectedresults: The default name isn't equal with updated one
+
+    Importance: Critical
+    """
+    default_org_name, updated_org_name = update_org_name
+
+    assert default_org_name != updated_org_name
+
+
+def test_python_module_negative_profile_change_org(module_headers):
+    """Perform testing for enrich profile endpoint to check inability to change
+    org name with wrong payload
+
+    ID: CCTRI-1720-b12cf258-1200-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send POST request with wrong payload
+        2. Check that response body contains the error
+
+
+    Expectedresults: The response body contains the error
+
+    Importance: Critical
+    """
+    response = update_org(payload={"invalid_key": "invalid_value"},
+                          **{'headers': module_headers})
+    assert response['errors'] == {'invalid_key': 'disallowed-key'}
+
+
+def test_python_module_positive_user_mgmt_user(module_headers):
+    """Perform testing for enrich user management endpoint to check getting
+    information about the user using user id
+
+    ID: CCTRI-1698-d6fd0f29-34cd-4ad9-bc4c-5136ed4544b8
+
+    Steps:
+
+        1. Send GET request to profile endpoint for getting current user id
+        2. Send GET request to user_mgmt endpoint with user id for getting user
+        info from user_mgmt endpoint
+        3. Check that we able to get user info from user_mgmt endpoint by id
+        and this info is match with user info from profile endpoint
+
+    Expectedresults: The user info can be obtained from user_mgmt endpoint by
+    id and it's match with user info that was received from profile endpoint
+
+    Importance: Critical
+    """
+    whoami_user = get_profile(**{'headers': module_headers})['user']
+    user_mgmt_user = get_user_info(whoami_user['user-id'],
+                                   **{'headers': module_headers})
+
+    assert user_mgmt_user['role'] == whoami_user['role']
+    assert user_mgmt_user['scopes'] == whoami_user['scopes']
+    assert user_mgmt_user['user-email'] == whoami_user['user-email']
+    assert user_mgmt_user['user-name'] == whoami_user['user-name']
+    assert user_mgmt_user['org-id'] == whoami_user['org-id']
+    assert user_mgmt_user['user-id'] == whoami_user['user-id']
+    assert user_mgmt_user['enabled?'] == whoami_user['enabled?']
+    assert user_mgmt_user['created-at'] == whoami_user['created-at']
+    assert user_mgmt_user['user-nick'] == whoami_user['user-nick']
+
+
+def test_python_module_positive_user_mgmt_users(module_headers):
+    """Perform testing for enrich user management endpoint to check getting
+    information about the batch of users using users ids
+
+    ID: CCTRI-1698-7be98c52-1451-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send GET request to profile endpoint for getting current user id
+        2. Send GET request to user_mgmt endpoint with users ids list for
+        getting users info from user_mgmt endpoint
+        3. Check that we able to query a list with users id's on user_mgmt
+        endpoint and this info is match with users info from profile endpoint
+
+    Expectedresults: The users info can be obtained from user_mgmt endpoint by
+    querying the list of ids and it's match with user info that was received
+    from profile endpoint
+
+    Importance: Critical
+    """
+    whoami_user = get_profile(**{'headers': module_headers})['user']
+
+    user_mgmt_users = get_users_info(
+        [whoami_user['user-id'], whoami_user['user-id']],
+        **{'headers': module_headers})
+
+    assert user_mgmt_users[0]['role'] == whoami_user['role']
+    assert user_mgmt_users[0]['scopes'] == whoami_user['scopes']
+    assert user_mgmt_users[0]['user-email'] == whoami_user['user-email']
+    assert user_mgmt_users[0]['user-name'] == whoami_user['user-name']
+    assert user_mgmt_users[0]['org-id'] == whoami_user['org-id']
+    assert user_mgmt_users[0]['user-id'] == whoami_user['user-id']
+    assert user_mgmt_users[0]['enabled?'] == whoami_user['enabled?']
+    assert user_mgmt_users[0]['created-at'] == whoami_user['created-at']
+    assert user_mgmt_users[0]['user-nick'] == whoami_user['user-nick']
+
+
+def test_python_module_positive_user_mgmt_search_users(module_headers):
+    """Perform testing for enrich user management endpoint to check ability to
+     search users by their roles
+
+    ID: CCTRI-1698-ff55fd2a-1454-11eb-adc1-0242ac120002
+
+    Steps:
+
+        1. Send POST request to user_mgmt endpoint for getting users with admin
+        role
+        2. Check that response contains status code 200
+
+    Expectedresults: The search method of user management endpoint is able to
+    search users with admin role
+
+    Importance: Critical
+    """
+    admins = search_users(**{'headers': module_headers})
+    assert admins.status_code == 200
+
+
+def test_python_module_positive_token(module_tool_client_token):
+    """Perform testing of availability perform request to the Threat response
+    using token
+
+    ID: CCTRI-1579-8f1c20ea-fe40-11ea-adc1-0242ac120002
+
+    Steps:
+
+        1. Inspect observable using token
+        2. Sleep and wait until token will expired
+
+    Expectedresults: Inspect for provided observable returns expected
+        values, wait until token will expired and check that exception
+        raises
+
+    Importance: Critical
+    """
+    assert module_tool_client_token.inspect.inspect(
+        {'content': '1.1.1.1'}) == [{'type': 'ip', 'value': '1.1.1.1'}]
+
+    # wait till token will expired
+    time.sleep(601)
+
+    with pytest.raises(HTTPError):
+        assert module_tool_client_token.inspect.inspect(
+            {'content': '1.1.1.1'}) != [{'type': 'ip', 'value': '1.1.1.1'}]
+
+
+@pytest.mark.parametrize(
+    'token, error',
+    ((gen_random_ctr_token(token_length=0), CredentialsError),
+     (gen_random_ctr_token(), HTTPError))
+)
+def test_python_module_negative_token(token, error):
+    """Perform testing of availability perform request to the Threat response
+    using invalid token
+
+    ID: CCTRI-1579-4ca2a94f-db81-44c9-bf5b-53146cfd127a
+
+    Steps:
+
+        1. Inspect observable using empty token
+        2. Inspect observable using invalid token
+
+    Expectedresults: Inspect for provided observable doesn't returns expected
+        values, because token is invalid
+
+    Importance: Critical
+    """
+    with pytest.raises(error):
+        assert ThreatResponse(token=token).inspect.inspect(
+            {'content': '1.1.1.1'}) != [{'type': 'ip', 'value': '1.1.1.1'}]
