@@ -39,6 +39,7 @@ def url_for(region, family, environment=None):
     # Fall back to the default region.
     if region is None:
         region = ''
+    # Fall back to the default environment.
     if environment is None:
         environment = _url_patterns_by_api_family
     if region not in _urls_by_region(environment):
