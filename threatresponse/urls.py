@@ -35,22 +35,22 @@ def _urls_by_region(urls):
     )
 
 
-def url_for(region, family, urls=None):
+def url_for(region, family, environment=None):
     # Fall back to the default region.
     if region is None:
         region = ''
-    if urls is None:
-        urls = _url_patterns_by_api_family
-    if region not in _urls_by_region(urls):
+    if environment is None:
+        environment = _url_patterns_by_api_family
+    if region not in _urls_by_region(environment):
         # Use `repr` to make each region enclosed in quotes.
         raise RegionError(
             'Invalid region {}, must be one of: {}.'.format(
                 repr(region),
-                ', '.join(map(repr, _urls_by_region(urls).keys())),
+                ', '.join(map(repr, _urls_by_region(environment).keys())),
             )
         )
 
-    return _urls_by_region(urls)[region][family]
+    return _urls_by_region(environment)[region][family]
 
 
 def join(base, *parts):
