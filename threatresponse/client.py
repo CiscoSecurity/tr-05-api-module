@@ -25,6 +25,7 @@ class ThreatResponse(object):
         timeout = options.get('timeout')
         logger = options.get('logger')
         region = options.get('region')
+        environment = options.get('environment')
 
         request = ProxiedRequest(proxy) if proxy else StandardRequest()
         request = TimedRequest(request, timeout) if timeout else request
@@ -32,12 +33,14 @@ class ThreatResponse(object):
         if token:
             request = TokenAuthorizedRequest(request,
                                              token,
-                                             region=region)
+                                             region=region,
+                                             environment=environment)
         elif client_id and client_password:
             request = ClientAuthorizedRequest(request,
                                               client_id,
                                               client_password,
-                                              region=region)
+                                              region=region,
+                                              environment=environment)
         else:
             raise CredentialsError(
                 'Credentials must be supplied either '
@@ -46,7 +49,7 @@ class ThreatResponse(object):
             )
 
         def request_for(family):
-            return RelativeRequest(request, url_for(region, family))
+            return RelativeRequest(request, url_for(region, family, environment))
 
         self._inspect = InspectAPI(request_for('visibility'))
         self._enrich = EnrichAPI(request_for('visibility'))

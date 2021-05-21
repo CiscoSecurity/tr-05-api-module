@@ -10,14 +10,14 @@ class ClientAuthorizedRequest(Request):
     Provides authorization header for inner request.
     """
 
-    def __init__(self, request, client_id, client_password, region=None):
+    def __init__(self, request, client_id, client_password, region=None, environment=None):
         self._request = request
         self._client_id = client_id
         self._client_password = client_password
 
         self._token_url = urljoin(
-            url_for(region, 'visibility'),
-            '/iroh/oauth2/token',
+            url_for(region, 'visibility', environment),
+            '/iroh/oauth2/token'
         )
 
         self._token = self._request_token()
@@ -65,11 +65,11 @@ class TokenAuthorizedRequest(Request):
     Provides authorization header for inner request.
     """
 
-    def __init__(self, request, token, region=None):
+    def __init__(self, request, token, region=None, environment=None):
         self._request = request
         self._token = token
         self._check_url = urljoin(
-            url_for(region, 'visibility'),
+            url_for(region, 'visibility', environment),
             '/iroh/iroh-enrich/settings',
         )
         self._check_token()
