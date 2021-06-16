@@ -47,13 +47,53 @@ class EntityAPI(API):
         )
 
 
-class IntelEntityAPI(EntityAPI):
+class Search(EntityAPI):
 
-    def search(self, **kwargs):
+    def get(self, **kwargs):
         return self._get(
             urls.join(self._url, 'search'),
             **kwargs
         )
+
+    def delete(self, **kwargs):
+        return self._delete(
+            urls.join(self._url, 'search'),
+            **kwargs
+        )
+
+    def count(self, **kwargs):
+        return self._get(
+            urls.join(self._url, 'search', 'count'),
+            **kwargs
+        )
+
+
+class Metric(EntityAPI):
+    def histogram(self, **kwargs):
+        return self._get(
+            urls.join(self._url, 'metric', 'histogram'),
+            **kwargs
+        )
+
+    def topn(self, **kwargs):
+        return self._get(
+            urls.join(self._url, 'metric', 'topn'),
+            **kwargs
+        )
+
+    def cardinality(self, **kwargs):
+        return self._get(
+            urls.join(self._url, 'metric', 'cardinality'),
+            **kwargs
+        )
+
+
+class IntelEntityAPI(EntityAPI):
+
+    def __init__(self, request, url):
+        super(IntelEntityAPI, self).__init__(request, url)
+        self.search = Search(request, url)
+        self.metric = Metric(request, url)
 
     def external_id(self, id_, **kwargs):
         return self._get(
