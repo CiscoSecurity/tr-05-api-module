@@ -48,42 +48,45 @@ class EntityAPI(API):
 
 
 class Search(EntityAPI):
+    NAME = 'search'
 
     def get(self, **kwargs):
         return self._get(
-            urls.join(self._url, 'search'),
+            urls.join(self._url, self.NAME),
             **kwargs
         )
 
     def delete(self, **kwargs):
         return self._delete(
-            urls.join(self._url, 'search'),
+            urls.join(self._url, self.NAME),
             **kwargs
         )
 
     def count(self, **kwargs):
         return self._get(
-            urls.join(self._url, 'search', 'count'),
+            urls.join(self._url, self.NAME, 'count'),
             **kwargs
         )
 
 
 class Metric(EntityAPI):
+    NAME = 'metric'
+
     def histogram(self, **kwargs):
         return self._get(
-            urls.join(self._url, 'metric', 'histogram'),
+            urls.join(self._url, self.NAME, 'histogram'),
             **kwargs
         )
 
     def topn(self, **kwargs):
         return self._get(
-            urls.join(self._url, 'metric', 'topn'),
+            urls.join(self._url, self.NAME, 'topn'),
             **kwargs
         )
 
     def cardinality(self, **kwargs):
         return self._get(
-            urls.join(self._url, 'metric', 'cardinality'),
+            urls.join(self._url, self.NAME, 'cardinality'),
             **kwargs
         )
 
