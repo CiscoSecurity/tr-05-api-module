@@ -1,3 +1,4 @@
+from .asset import AssetAPI
 from .base import API
 from .bundle import BundleAPI
 from .casebook import CasebookAPI
@@ -23,6 +24,19 @@ class IntelAPI(API):
         self._actor = IntelEntityAPI(request, '/ctia/actor')
         self._actor.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Actor"
+
+        self._asset = IntelEntityAPI(request, '/ctia/asset')
+        self._asset.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Asset"
+
+        self._asset_mapping = AssetAPI(request, '/ctia/asset-mapping')
+        self._asset_mapping.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Asset%20Mapping"
+
+        self._asset_properties = AssetAPI(request, '/ctia/asset-properties')
+        self._asset_properties.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/" \
+            "Asset%20Properties"
 
         self._campaign = IntelEntityAPI(request, '/ctia/campaign')
         self._campaign.__doc__ = \
@@ -81,6 +95,10 @@ class IntelAPI(API):
         self._identity_assertion.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/IdentityAssertion"
 
+        self._target_record = IntelEntityAPI(request, '/ctia/target-record')
+        self._target_record.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Target%20Record"
+
         self._bundle = BundleAPI(request)
         self._event = EventAPI(request)
         self._incident = IncidentAPI(request)
@@ -93,6 +111,18 @@ class IntelAPI(API):
     @property
     def actor(self):
         return self._actor
+
+    @property
+    def asset(self):
+        return self._asset
+
+    @property
+    def asset_mapping(self):
+        return self._asset_mapping
+
+    @property
+    def asset_properties(self):
+        return self._asset_properties
 
     @property
     def bundle(self):
@@ -133,6 +163,10 @@ class IntelAPI(API):
     @property
     def identity_assertion(self):
         return self._identity_assertion
+
+    @property
+    def target_record(self):
+        return self._target_record
 
     @property
     def incident(self):

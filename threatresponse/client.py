@@ -49,7 +49,10 @@ class ThreatResponse(object):
             )
 
         def request_for(family):
-            return RelativeRequest(request, url_for(region, family, environment))
+            return RelativeRequest(
+                request,
+                url_for(region, family, environment)
+            )
 
         self._inspect = InspectAPI(request_for('visibility'))
         self._enrich = EnrichAPI(request_for('visibility'))
