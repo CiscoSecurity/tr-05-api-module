@@ -10,7 +10,8 @@ class ClientAuthorizedRequest(Request):
     Provides authorization header for inner request.
     """
 
-    def __init__(self, request, client_id, client_password, region=None, environment=None):
+    def __init__(self, request, client_id,
+                 client_password, region=None, environment=None):
         self._request = request
         self._client_id = client_id
         self._client_password = client_password
