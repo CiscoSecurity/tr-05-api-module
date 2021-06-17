@@ -41,6 +41,7 @@ client = ThreatResponse(
     region='<YOUR TR REGION>',  # optional
     logger=<SOME LOGGER INSTANCE>,  # optional
     proxy='<SOME PROXY URL>',  # optional
+    environment='<SPECIFIC ENVIRONMENT>' # optional
 )
 ```
 
@@ -59,7 +60,19 @@ time (in seconds) to wait for the server to send data before giving up and
 raising an exception. Can be overwritten by explicitly specifying `timeout` on
 each call to any endpoint.
 - `proxy` must be a URL in the format: `http[s]://[username[:password]@]host[:port]`.
-
+- `environment` must be a dict in the format:
+    {
+        'visibility': 'https://www.example.com',
+        'private_intel': 'https://www.example.come',
+        'global_intel': 'https://www.example.com',
+    }
+By default will be used: 
+    {
+        'visibility': 'https://visibility{region}.amp.cisco.com',
+        'private_intel': 'https://private.intel{region}.amp.cisco.com',
+        'global_intel': 'https://intel{region}.amp.cisco.com',
+    }
+  
 ### Concrete Usage
 
 - Inspect
