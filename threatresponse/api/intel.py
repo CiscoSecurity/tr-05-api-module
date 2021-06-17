@@ -10,6 +10,7 @@ from .judgement import JudgementAPI
 from .routing import Router
 from .sighting import SightingAPI
 from .feed import FeedAPI
+from .vulnerability import VulnerabilityAPI
 from .. import urls
 
 
@@ -82,10 +83,6 @@ class IntelAPI(API):
         self._investigation.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Investigation"
 
-        self._vulnerability = IntelEntityAPI(request, '/ctia/vulnerability')
-        self._vulnerability.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Vulnerability"
-
         self._weakness = IntelEntityAPI(request, '/ctia/weakness')
         self._weakness.__doc__ = \
             "https://private.intel.amp.cisco.com/index.html#/Weakness"
@@ -107,6 +104,7 @@ class IntelAPI(API):
         self._casebook = CasebookAPI(request)
         self._sighting = SightingAPI(request)
         self._feed = FeedAPI(request)
+        self._vulnerability = VulnerabilityAPI(request)
 
     @property
     def actor(self):
