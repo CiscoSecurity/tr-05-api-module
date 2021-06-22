@@ -32,7 +32,7 @@ def test_search_by_id_succeeds():
 
     request = invoke(
         intel_entity_api('/x'),
-        lambda api: api.search(params=params)
+        lambda api: api.search.get(params=params)
     )
     request.perform.assert_called_once_with(
         'GET',
@@ -42,7 +42,7 @@ def test_search_by_id_succeeds():
 
     request = invoke(
         intel_entity_api('/x'),
-        lambda api: api.search(params=params, response_type='raw'),
+        lambda api: api.search.get(params=params, response_type='raw'),
         'raw'
     )
     request.perform.assert_called_once_with(
@@ -57,7 +57,7 @@ def test_search_with_query_succeeds():
 
     request = invoke(
         intel_entity_api('/x'),
-        lambda api: api.search(params=params)
+        lambda api: api.search.get(params=params)
     )
     request.perform.assert_called_once_with(
         'GET',
@@ -67,7 +67,7 @@ def test_search_with_query_succeeds():
 
     request = invoke(
         intel_entity_api('/x'),
-        lambda api: api.search(params=params, response_type='raw'),
+        lambda api: api.search.get(params=params, response_type='raw'),
         'raw'
     )
     request.perform.assert_called_once_with(

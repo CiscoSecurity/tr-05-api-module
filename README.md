@@ -41,6 +41,7 @@ client = ThreatResponse(
     region='<YOUR TR REGION>',  # optional
     logger=<SOME LOGGER INSTANCE>,  # optional
     proxy='<SOME PROXY URL>',  # optional
+    environment='<SPECIFIC ENVIRONMENT>' # optional
 )
 ```
 
@@ -59,7 +60,19 @@ time (in seconds) to wait for the server to send data before giving up and
 raising an exception. Can be overwritten by explicitly specifying `timeout` on
 each call to any endpoint.
 - `proxy` must be a URL in the format: `http[s]://[username[:password]@]host[:port]`.
-
+- `environment` must be a dict in the format:
+    {
+        'visibility': 'https://www.example.com',
+        'private_intel': 'https://www.example.come',
+        'global_intel': 'https://www.example.com',
+    }
+By default will be used: 
+    {
+        'visibility': 'https://visibility{region}.amp.cisco.com',
+        'private_intel': 'https://private.intel{region}.amp.cisco.com',
+        'global_intel': 'https://intel{region}.amp.cisco.com',
+    }
+  
 ### Concrete Usage
 
 - Inspect
@@ -121,7 +134,59 @@ Available methods:
   - actor.put()
   - actor.delete()
   - actor.external_id()
-  - actor.search()
+  - actor.search.get()
+  - actor.search.delete()
+  - actor.search.count()
+  - actor.metric.histogram()
+  - actor.metric.topn()
+  - actor.metric.cardinality()
+
+# Asset
+    asset = client.private_intel.asset
+Available methods:
+  - asset.post()
+  - asset.get()
+  - asset.put()
+  - asset.delete()
+  - asset.external_id()
+  - asset.search.get()
+  - asset.search.delete()
+  - asset.search.count()
+  - asset.metric.histogram()
+  - asset.metric.topn()
+  - asset.metric.cardinality()
+
+# Asset mapping
+    asset_mapping = client.private_intel.asset_mapping
+Available methods:
+  - asset_mapping.post()
+  - asset_mapping.get()
+  - asset_mapping.put()
+  - asset_mapping.delete()
+  - asset_mapping.expire()  
+  - asset_mapping.external_id()
+  - asset_mapping.search.get()
+  - asset_mapping.search.delete()
+  - asset_mapping.search.count()
+  - asset_mapping.metric.histogram()
+  - asset_mapping.metric.topn()
+  - asset_mapping.metric.cardinality()
+
+# Asset properties
+    asset_properties = client.private_intel.asset_properties
+Available methods:
+  - asset_properties.post()
+  - asset_properties.get()
+  - asset_properties.put()
+  - asset_properties.delete()
+  - asset_properties.expire()  
+  - asset_properties.external_id()
+  - asset_properties.search.get()
+  - asset_properties.search.delete()
+  - asset_properties.search.count()
+  - asset_properties.metric.histogram()
+  - asset_properties.metric.topn()
+  - asset_properties.metric.cardinality()
 
 # Attack Pattern
     attack_pattern = client.private_intel.attack_pattern
@@ -131,7 +196,12 @@ Available methods:
   - attack_pattern.put()
   - attack_pattern.delete()
   - attack_pattern.external_id()
-  - attack_pattern.search()
+  - attack_pattern.search.get()
+  - attack_pattern.search.delete()
+  - attack_pattern.search.count()
+  - attack_pattern.metric.histogram()
+  - attack_pattern.metric.topn()
+  - attack_pattern.metric.cardinality()
 
 # Bulk 
     bulk = client.private_intel.bulk
@@ -154,7 +224,12 @@ Available methods:
   - campaign.put()
   - campaign.delete()
   - campaign.external_id()
-  - campaign.search()
+  - campaign.search.get()
+  - campaign.search.delete()
+  - campaign.search.count()
+  - campaign.metric.histogram()
+  - campaign.metric.topn()
+  - campaign.metric.cardinality()
 
 # Casebook
     casebook = client.private_intel.casebook
@@ -164,11 +239,16 @@ Available methods:
   - casebook.put()
   - casebook.delete()
   - casebook.external_id()
-  - casebook.search()
   - casebook.observables()
   - casebook.texts()
   - casebook.bundle()
-  - casebook.pathc()
+  - casebook.patch()
+  - casebook.search.get()
+  - casebook.search.delete()
+  - casebook.search.count()
+  - casebook.metric.histogram()
+  - casebook.metric.topn()
+  - casebook.metric.cardinality()
 
 # COA
     coa = client.private_intel.coa
@@ -178,7 +258,12 @@ Available methods:
   - coa.put()
   - coa.delete()
   - coa.external_id()
-  - coa.search()
+  - coa.search.get()
+  - coa.search.delete()
+  - coa.search.count()
+  - coa.metric.histogram()
+  - coa.metric.topn()
+  - coa.metric.cardinality()
 
 # DataTable
     data_table = client.private_intel.data_table
@@ -200,9 +285,11 @@ Available methods:
     event = client.private_intel.event
 Available methods:
   - event.history()
-  - event.search()
   - event.get()
   - event.delete()
+  - event.search.get()
+  - event.search.delete()
+  - event.search.count()
   
 # Feedback
     feedback = client.private_intel.feedback
@@ -226,11 +313,16 @@ Available methods:
   - incident.put()
   - incident.delete()
   - incident.external_id()
-  - incident.search()
   - incident.link()
   - incident.status()
   - incident.sightings.incidents()
   - incident.patch()
+  - incident.search.get()
+  - incident.search.delete()
+  - incident.search.count()
+  - incident.metric.histogram()
+  - incident.metric.topn()
+  - incident.metric.cardinality()
 
 # Indicator
     indicator = client.private_intel.indicator
@@ -240,9 +332,14 @@ Available methods:
   - indicator.put()
   - indicator.delete()
   - indicator.external_id()
-  - indicator.search()
   - indicator.judgements.indicators()
   - indicator.sightings.indicators()
+  - indicator.search.get()
+  - indicator.search.delete()
+  - indicator.search.count()
+  - indicator.metric.histogram()
+  - indicator.metric.topn()
+  - indicator.metric.cardinality()
   
 # Inspect
     inspect = client.inspect
@@ -257,7 +354,12 @@ Available methods:
   - investigation.put()
   - investigation.delete()
   - investigation.external_id()
-  - investigation.search()
+  - investigation.search.get()
+  - investigation.search.delete()
+  - investigation.search.count()
+  - investigation.metric.histogram()
+  - investigation.metric.topn()
+  - investigation.metric.cardinality()
 
 # Judgment
     judgment = client.private_intel.judgment
@@ -266,9 +368,15 @@ Available methods:
   - judgment.get()
   - judgment.put()
   - judgment.delete()
+  - judgment.expire()
   - judgment.external_id()
-  - judgment.search()
   - judgment.judgments()
+  - judgment.search.get()
+  - judgment.search.delete()
+  - judgment.search.count()
+  - judgment.metric.histogram()
+  - judgment.metric.topn()
+  - judgment.metric.cardinality()
 
 # Malware
     malware = client.private_intel.malware
@@ -278,7 +386,12 @@ Available methods:
   - malware.put()
   - malware.delete()
   - malware.external_id()
-  - malware.search()
+  - malware.search.get()
+  - malware.search.delete()
+  - malware.search.count()
+  - malware.metric.histogram()
+  - malware.metric.topn()
+  - malware.metric.cardinality()
 
 # Metrics
     metrics = client.private_intel.metrics
@@ -298,7 +411,12 @@ Available methods:
   - relationship.put()
   - relationship.delete()
   - relationship.external_id()
-  - relationship.search()
+  - relationship.search.get()
+  - relationship.search.delete()
+  - relationship.search.count()
+  - relationship.metric.histogram()
+  - relationship.metric.topn()
+  - relationship.metric.cardinality()
   
 # Response
     response = client.response
@@ -314,8 +432,28 @@ Available methods:
   - sighting.put()
   - sighting.delete()
   - sighting.external_id()
-  - sighting.search()
   - sighting.sightings()
+  - sighting.search.get()
+  - sighting.search.delete()
+  - sighting.search.count()
+  - sighting.metric.histogram()
+  - sighting.metric.topn()
+  - sighting.metric.cardinality()
+
+# Target record
+    target_record = client.private_intel.target_record
+Available methods:
+  - target_record.post()
+  - target_record.get()
+  - target_record.put()
+  - target_record.delete()
+  - target_record.external_id()
+  - target_record.search.get()
+  - target_record.search.delete()
+  - target_record.search.count()
+  - target_record.metric.histogram()
+  - target_record.metric.topn()
+  - target_record.metric.cardinality()
 
 # Status
     status = client.private_intel.status
@@ -330,7 +468,12 @@ Available methods:
   - tool.put()
   - tool.delete()
   - tool.external_id()
-  - tool.search()
+  - tool.search.get()
+  - tool.search.delete()
+  - tool.search.count()
+  - tool.metric.histogram()
+  - tool.metric.topn()
+  - tool.metric.cardinality()
 
 # Verdict
     verdict = client.private_intel.verdict
@@ -350,7 +493,12 @@ Available methods:
   - vulnerability.put()
   - vulnerability.delete()
   - vulnerability.external_id()
-  - vulnerability.search()
+  - vulnerability.search.get()
+  - vulnerability.search.delete()
+  - vulnerability.search.count()
+  - vulnerability.metric.histogram()
+  - vulnerability.metric.topn()
+  - vulnerability.metric.cardinality()
 
 # Weakness
     weakness = client.private_intel.weakness
@@ -360,4 +508,9 @@ Available methods:
   - weakness.put()
   - weakness.delete()
   - weakness.external_id()
-  - weakness.search()
+  - weakness.search.get()
+  - weakness.search.delete()
+  - weakness.search.count()
+  - weakness.metric.histogram()
+  - weakness.metric.topn()
+  - weakness.metric.cardinality()
