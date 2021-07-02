@@ -22,3 +22,11 @@ class JudgementAPI(IntelEntityAPI):
             ),
             **kwargs
         )
+
+    @route('expire')
+    def _perform(self, id_, payload, **kwargs):
+        return self._post(
+            urls.join(self._url, id_, 'expire'),
+            json=payload,
+            **kwargs
+        )
