@@ -15,7 +15,6 @@ from .. import urls
 
 
 class IntelAPI(API):
-    """https://private.intel.amp.cisco.com/index.html"""
 
     __router, route = Router.new()
 
@@ -24,7 +23,8 @@ class IntelAPI(API):
 
         self._actor = IntelEntityAPI(request, '/ctia/actor')
         self._actor.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Actor"
+            ("https://private.intel.amp.cisco.com/index.html#/Actor"
+             "https://intel.amp.cisco.com/index.html#/Actor")
 
         self._asset = IntelEntityAPI(request, '/ctia/asset')
         self._asset.__doc__ = \
@@ -41,56 +41,69 @@ class IntelAPI(API):
 
         self._campaign = IntelEntityAPI(request, '/ctia/campaign')
         self._campaign.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Campaign"
+            ("https://private.intel.amp.cisco.com/index.html#/Campaign"
+             "https://intel.amp.cisco.com/index.html#/Campaign")
 
         self._coa = IntelEntityAPI(request, '/ctia/coa')
         self._coa.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/COA"
+            ("https://private.intel.amp.cisco.com/index.html#/COA"
+             "https://intel.amp.cisco.com/index.html#/COA")
 
         self._data_table = IntelEntityAPI(request, '/ctia/data-table')
         self._data_table.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/DataTable"
+            ("https://private.intel.amp.cisco.com/index.html#/DataTable"
+             "https://intel.amp.cisco.com/index.html#/DataTable")
 
         self._attack_pattern = IntelEntityAPI(request, '/ctia/attack-pattern')
         self._attack_pattern.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Attack_Pattern"
+            ("https://private.intel.amp.cisco.com/index.html#/Attack_Pattern"
+             "https://intel.amp.cisco.com/index.html#/Attack_Pattern")
 
         self._feedback = IntelEntityAPI(request, '/ctia/feedback')
         self._feedback.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Feedback"
+            ("https://private.intel.amp.cisco.com/index.html#/Feedback"
+             "https://intel.amp.cisco.com/index.html#/Feedback")
 
         self._graphql = IntelEntityAPI(request, '/ctia/graphql')
         self._graphql.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/GraphQL"
+            ("https://private.intel.amp.cisco.com/index.html#/GraphQL"
+             "https://intel.amp.cisco.com/index.html#/GraphQL")
 
         self._bulk = IntelEntityAPI(request, '/ctia/bulk')
         self._bulk.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Bulk"
+            ("https://private.intel.amp.cisco.com/index.html#/Bulk"
+             "https://intel.amp.cisco.com/index.html#/Bulk")
 
         self._malware = IntelEntityAPI(request, '/ctia/malware')
         self._malware.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Malware"
+            ("https://private.intel.amp.cisco.com/index.html#/Malware"
+             "https://intel.amp.cisco.com/index.html#/Malware")
 
         self._relationship = IntelEntityAPI(request, '/ctia/relationship')
         self._relationship.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Relationship"
+            ("https://private.intel.amp.cisco.com/index.html#/Relationship"
+             "https://intel.amp.cisco.com/index.html#/Relationship")
 
         self._tool = IntelEntityAPI(request, '/ctia/tool')
         self._tool.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Tool"
+            ("https://private.intel.amp.cisco.com/index.html#/Tool"
+             "https://intel.amp.cisco.com/index.html#/Tool")
 
         self._investigation = IntelEntityAPI(request, '/ctia/investigation')
         self._investigation.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Investigation"
+            ("https://private.intel.amp.cisco.com/index.html#/Investigation"
+             "https://intel.amp.cisco.com/index.html#/Investigation")
 
         self._weakness = IntelEntityAPI(request, '/ctia/weakness')
         self._weakness.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/Weakness"
+            ("https://private.intel.amp.cisco.com/index.html#/Weakness"
+             "https://intel.amp.cisco.com/index.html#/Weakness")
 
         self._identity_assertion = \
             IntelEntityAPI(request, '/ctia/identity-assertion')
         self._identity_assertion.__doc__ = \
-            "https://private.intel.amp.cisco.com/index.html#/IdentityAssertion"
+            ("https://private.intel.amp.cisco.com/index.html#/IdentityAssertion"
+             "https://intel.amp.cisco.com/index.html#/IdentityAssertion")
 
         self._target_record = IntelEntityAPI(request, '/ctia/target-record')
         self._target_record.__doc__ = \
@@ -218,6 +231,7 @@ class IntelAPI(API):
     def _perform(self, **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Properties
+        https://intel.amp.cisco.com/index.html#/Properties
         """
 
         return self._get('/ctia/properties', **kwargs)
@@ -226,6 +240,7 @@ class IntelAPI(API):
     def _perform(self, **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Metrics
+        https://intel.amp.cisco.com/index.html#/Metrics
         """
 
         return self._get('/ctia/metrics', **kwargs)
@@ -237,6 +252,7 @@ class IntelAPI(API):
                  **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Verdict
+        https://intel.amp.cisco.com/index.html#/Verdict
         """
 
         return self._get(
@@ -248,6 +264,7 @@ class IntelAPI(API):
     def _perform(self, **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Status
+        https://intel.amp.cisco.com/index.html#/Status
         """
 
         return self._get('/ctia/status', **kwargs)
@@ -256,6 +273,54 @@ class IntelAPI(API):
     def _perform(self, **kwargs):
         """
         https://private.intel.amp.cisco.com/index.html#/Version
+        https://intel.amp.cisco.com/index.html#/Version
         """
 
         return self._get('/ctia/version', **kwargs)
+
+
+class PrivateIntel(IntelAPI):
+    """https://private.intel.amp.cisco.com/index.html"""
+
+    def __init__(self, request):
+        super(PrivateIntel, self).__init__(request)
+
+        self._asset = IntelEntityAPI(request, '/ctia/asset')
+        self._asset.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Asset"
+
+        self._asset_mapping = AssetAPI(request, '/ctia/asset-mapping')
+        self._asset_mapping.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Asset%20Mapping"
+
+        self._asset_properties = AssetAPI(request, '/ctia/asset-properties')
+        self._asset_properties.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/" \
+            "Asset%20Properties"
+
+        self._target_record = IntelEntityAPI(request, '/ctia/target-record')
+        self._target_record.__doc__ = \
+            "https://private.intel.amp.cisco.com/index.html#/Target%20Record"
+
+    @property
+    def asset(self):
+        return self._asset
+
+    @property
+    def asset_mapping(self):
+        return self._asset_mapping
+
+    @property
+    def asset_properties(self):
+        return self._asset_properties
+
+    @property
+    def target_record(self):
+        return self._target_record
+
+
+class GlobalIntel(IntelAPI):
+    """https://intel.amp.cisco.com/index.html"""
+
+    def __init__(self, request):
+        super(GlobalIntel, self).__init__(request)

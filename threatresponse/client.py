@@ -1,7 +1,7 @@
 from .api.enrich import EnrichAPI
 from .api.int import IntAPI
 from .api.inspect import InspectAPI
-from .api.intel import IntelAPI
+from .api.intel import PrivateIntel, GlobalIntel
 from .api.profile import ProfileAPI
 from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
@@ -58,9 +58,9 @@ class ThreatResponse(object):
         self._enrich = EnrichAPI(request_for('visibility'))
         self._int = IntAPI(request_for('visibility'))
         self._response = ResponseAPI(request_for('visibility'))
-        self._private_intel = IntelAPI(request_for('private_intel'))
+        self._private_intel = PrivateIntel(request_for('private_intel'))
         self._profile = ProfileAPI(request_for('visibility'))
-        self._global_intel = IntelAPI(request_for('global_intel'))
+        self._global_intel = GlobalIntel(request_for('global_intel'))
         self._commands = CommandsAPI(request_for('visibility'))
         self._user_mgmt = UserMgmtAPI(request_for('visibility'))
 
