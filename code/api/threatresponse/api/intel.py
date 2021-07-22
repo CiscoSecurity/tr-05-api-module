@@ -89,7 +89,8 @@ class IntelAPI(API):
         self._identity_assertion = \
             IntelEntityAPI(request, '/ctia/identity-assertion')
         self._identity_assertion.__doc__ = \
-            ("https://private.intel.amp.cisco.com/index.html#/IdentityAssertion"
+            ("https://private.intel.amp.cisco.com/index.html\
+                #/IdentityAssertion"
              "https://intel.amp.cisco.com/index.html#/IdentityAssertion")
 
         self._bundle = BundleAPI(request)
