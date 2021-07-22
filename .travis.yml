@@ -13,7 +13,7 @@ before_install:
 
 install:
 - pip install --upgrade .
-- pip install --upgrade --requirement test-requirements.txt
+- pip install --upgrade --requirement code/requirements.txt
 - pip install --upgrade git+ssh://git@github.com/threatgrid/softserve-atqc.git#egg=ctrlibrary
 
 before_script:
@@ -24,5 +24,5 @@ before_script:
 script:
 - pip show threatresponse
 - flake8 .
-- coverage run --source threatresponse/ -m pytest --verbose tests/unit/ && coverage report
+- coverage run --source api/ -m pytest --verbose tests/unit/ && coverage report
 - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then travis_wait 15 pytest --verbose tests/functional/; fi
