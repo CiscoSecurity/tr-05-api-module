@@ -44,7 +44,7 @@ LICENSE = 'MIT'
 
 PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'])
 
-PACKAGE_DIR = {"": "code"},
+PACKAGE_DIR = {"": "code"}
 
 PYTHON_REQUIRES = '>=2.6'
 
