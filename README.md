@@ -33,7 +33,7 @@ pip show threatresponse
 ## Usage
 
 ```python
-from threatresponse import ThreatResponse
+from code import ThreatResponse
 
 client = ThreatResponse(
     client_id='<YOUR TR CLIENT ID>',  # required
