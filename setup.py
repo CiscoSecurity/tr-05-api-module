@@ -3,7 +3,7 @@ import setuptools
 
 
 def read_version():
-    with open('code/api/threatresponse/version.py', 'r') as fin:
+    with open('api/threatresponse/version.py', 'r') as fin:
         return re.search(
             r"^__version__ = '(?P<version>.+)'$",
             fin.read().strip(),
