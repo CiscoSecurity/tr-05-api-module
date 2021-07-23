@@ -1,5 +1,5 @@
-requests~=2.19
-six~=1.12
+requests
+six
 coverage
 flake8
 mock

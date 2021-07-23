@@ -16,7 +16,7 @@ def read_readme():
 
 
 def read_requirements():
-    with open('code/requirements.txt', 'r') as fin:
+    with open('requirements.txt', 'r') as fin:
         requirements = []
         for line in fin:
             # Discard any comments (i.e. everything after the very first '#').
@@ -42,7 +42,7 @@ AUTHOR = 'Cisco Security'
 
 LICENSE = 'MIT'
 
-PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'], where='code')
+PACKAGES = setuptools.find_packages(exclude=['code/tests', 'code/tests.*'])
 
 PACKAGE_DIR = {"": "code"}
 
