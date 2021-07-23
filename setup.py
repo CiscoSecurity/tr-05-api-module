@@ -42,9 +42,9 @@ AUTHOR = 'Cisco Security'
 
 LICENSE = 'MIT'
 
-PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'])
+PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'], where='code')
 
-# PACKAGE_DIR = {"": "code"}
+PACKAGE_DIR = {"": "code"}
 
 PYTHON_REQUIRES = '>=2.6'
 
@@ -83,7 +83,7 @@ setuptools.setup(
     author=AUTHOR,
     license=LICENSE,
     packages=PACKAGES,
-    # package_dir=PACKAGE_DIR,
+    package_dir=PACKAGE_DIR,
     python_requires=PYTHON_REQUIRES,
     install_requires=INSTALL_REQUIRES,
     keywords=KEYWORDS,
