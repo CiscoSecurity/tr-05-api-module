@@ -42,7 +42,7 @@ AUTHOR = 'Cisco Security'
 
 LICENSE = 'MIT'
 
-PACKAGES = setuptools.find_packages(where='code', exclude=['tests', 'tests.*'])
+PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'])
 
 PYTHON_REQUIRES = '>=2.6'
 
