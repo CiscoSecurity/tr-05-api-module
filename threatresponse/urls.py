@@ -31,8 +31,6 @@ def _urls_by_region(urls):
             'us',
             'eu',
             'apjc',
-            'int',
-            'test',
         )
     )
 
