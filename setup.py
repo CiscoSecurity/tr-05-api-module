@@ -42,6 +42,8 @@ AUTHOR = 'Cisco Security'
 
 LICENSE = 'MIT'
 
+PACKAGE_DIR = {"": "code/api/threatresponse"}
+
 PACKAGES = setuptools.find_packages(exclude=['tests', 'tests.*'])
 
 PYTHON_REQUIRES = '>=2.6'
@@ -80,6 +82,7 @@ setuptools.setup(
     url=URL,
     author=AUTHOR,
     license=LICENSE,
+    package_dir=PACKAGE_DIR,
     packages=PACKAGES,
     python_requires=PYTHON_REQUIRES,
     install_requires=INSTALL_REQUIRES,
