@@ -16,7 +16,7 @@ def read_readme():
 
 
 def read_requirements():
-    with open('requirements.txt', 'r') as fin:
+    with open('code/api/threatresponse/requirements.txt', 'r') as fin:
         requirements = []
         for line in fin:
             # Discard any comments (i.e. everything after the very first '#').
