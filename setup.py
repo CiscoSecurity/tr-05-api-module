@@ -42,9 +42,9 @@ AUTHOR = 'Cisco Security'
 
 LICENSE = 'MIT'
 
-PACKAGE_DIR = {"": "code/api/threatresponse"}
+PACKAGE_DIR = {"": "code/api/"}
 
-PACKAGES = setuptools.find_packages(where='code/api/threatresponse', exclude=['tests', 'tests.*'])
+PACKAGES = setuptools.find_packages(where='code/api/', exclude=['tests', 'tests.*'])
 
 PYTHON_REQUIRES = '>=2.6'
 
