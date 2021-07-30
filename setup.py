@@ -3,7 +3,7 @@ import setuptools
 
 
 def read_version():
-    with open('version.py', 'r') as fin:
+    with open('code/api/threatresponse/version.py', 'r') as fin:
         return re.search(
             r"^__version__ = '(?P<version>.+)'$",
             fin.read().strip(),
@@ -16,7 +16,7 @@ def read_readme():
 
 
 def read_requirements():
-    with open('requirements.txt', 'r') as fin:
+    with open('code/requirements.txt', 'r') as fin:
         requirements = []
         for line in fin:
             # Discard any comments (i.e. everything after the very first '#').
