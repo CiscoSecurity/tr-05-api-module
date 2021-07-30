@@ -44,7 +44,7 @@ LICENSE = 'MIT'
 
 PACKAGE_DIR = {"": "code/api/threatresponse"}
 
-PACKAGES = setuptools.find_packages(where='threatresponse', exclude=['tests', 'tests.*'])
+PACKAGES = setuptools.find_packages(where='code/api/threatresponse', exclude=['tests', 'tests.*'])
 
 PYTHON_REQUIRES = '>=2.6'
 
