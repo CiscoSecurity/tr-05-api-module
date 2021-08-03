@@ -44,7 +44,9 @@ LICENSE = 'MIT'
 
 PACKAGE_DIR = {"": "code/api/"}
 
-PACKAGES = setuptools.find_packages(where='code/api/', exclude=['tests', 'tests.*'])
+PACKAGES = setuptools.find_packages(
+    where='code/api/', exclude=['tests', 'tests.*']
+    )
 
 PYTHON_REQUIRES = '>=2.6'
 
