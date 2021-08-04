@@ -624,55 +624,55 @@ def test_python_module_positive_user_mgmt_search_users(module_headers):
     assert admins.status_code == 200
 
 
-# def test_python_module_positive_token(module_tool_client_token):
-#     """Perform testing of availability perform request to the Threat response
-#     using token
-#
-#     ID: CCTRI-1579-8f1c20ea-fe40-11ea-adc1-0242ac120002
-#
-#     Steps:
-#
-#         1. Inspect observable using token
-#         2. Sleep and wait until token will expired
-#
-#     Expectedresults: Inspect for provided observable returns expected
-#         values, wait until token will expired and check that exception
-#         raises
-#
-#     Importance: Critical
-#     """
-#     assert module_tool_client_token.inspect.inspect(
-#         {'content': '1.1.1.1'}) == [{'type': 'ip', 'value': '1.1.1.1'}]
-#
-#     # wait till token will expired
-#     time.sleep(601)
-#
-#     with pytest.raises(HTTPError):
-#         assert module_tool_client_token.inspect.inspect(
-#             {'content': '1.1.1.1'}) != [{'type': 'ip', 'value': '1.1.1.1'}]
-#
-#
-# @pytest.mark.parametrize(
-#     'token, error',
-#     ((gen_random_ctr_token(token_length=0), CredentialsError),
-#      (gen_random_ctr_token(), HTTPError))
-# )
-# def test_python_module_negative_token(token, error):
-#     """Perform testing of availability perform request to the Threat response
-#     using invalid token
-#
-#     ID: CCTRI-1579-4ca2a94f-db81-44c9-bf5b-53146cfd127a
-#
-#     Steps:
-#
-#         1. Inspect observable using empty token
-#         2. Inspect observable using invalid token
-#
-#     Expectedresults: Inspect for provided observable doesn't returns expected
-#         values, because token is invalid
-#
-#     Importance: Critical
-#     """
-#     with pytest.raises(error):
-#         assert ThreatResponse(token=token).inspect.inspect(
-#             {'content': '1.1.1.1'}) != [{'type': 'ip', 'value': '1.1.1.1'}]
+def test_python_module_positive_token(module_tool_client_token):
+    """Perform testing of availability perform request to the Threat response
+    using token
+
+    ID: CCTRI-1579-8f1c20ea-fe40-11ea-adc1-0242ac120002
+
+    Steps:
+
+        1. Inspect observable using token
+        2. Sleep and wait until token will expired
+
+    Expectedresults: Inspect for provided observable returns expected
+        values, wait until token will expired and check that exception
+        raises
+
+    Importance: Critical
+    """
+    assert module_tool_client_token.inspect.inspect(
+        {'content': '1.1.1.1'}) == [{'type': 'ip', 'value': '1.1.1.1'}]
+
+    # wait till token will expired
+    time.sleep(601)
+
+    with pytest.raises(HTTPError):
+        assert module_tool_client_token.inspect.inspect(
+            {'content': '1.1.1.1'}) != [{'type': 'ip', 'value': '1.1.1.1'}]
+
+
+@pytest.mark.parametrize(
+    'token, error',
+    ((gen_random_ctr_token(token_length=0), CredentialsError),
+     (gen_random_ctr_token(), HTTPError))
+)
+def test_python_module_negative_token(token, error):
+    """Perform testing of availability perform request to the Threat response
+    using invalid token
+
+    ID: CCTRI-1579-4ca2a94f-db81-44c9-bf5b-53146cfd127a
+
+    Steps:
+
+        1. Inspect observable using empty token
+        2. Inspect observable using invalid token
+
+    Expectedresults: Inspect for provided observable doesn't returns expected
+        values, because token is invalid
+
+    Importance: Critical
+    """
+    with pytest.raises(error):
+        assert ThreatResponse(token=token).inspect.inspect(
+            {'content': '1.1.1.1'}) != [{'type': 'ip', 'value': '1.1.1.1'}]
