@@ -154,10 +154,7 @@ def test_python_module_ctia_positive_attack_pattern(
         'type': 'attack-pattern',
         'short_description': 'desc for test',
         'source': 'new source point',
-
-
         'title': 'for test'
-
     }
     # Create new entity using provided payload
     post_tool_response = attack_pattern.post(payload=payload,
