@@ -5,7 +5,7 @@ from ctrlibrary.core.datafactory import gen_string
 from ctrlibrary.threatresponse import token
 from ctrlibrary.core import settings
 from ctrlibrary.threatresponse.profile import update_org
-from threatresponse.client import ThreatResponse
+from threatresponse import ThreatResponse
 
 
 def pytest_collection_modifyitems():
