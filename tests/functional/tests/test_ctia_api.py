@@ -27,7 +27,7 @@ from ctrlibrary.ctia.endpoints import (
     WEAKNESS,
 )
 
-SERVER_VERSION = '1.0.22'
+SERVER_VERSION = '1.1.3'
 
 
 def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
@@ -58,10 +58,13 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
     actor = module_tool_client.private_intel.actor
     payload = {
         'actor_type': 'Hacker',
+        'description': 'For Test',
         'confidence': 'High',
         'schema_version': SERVER_VERSION,
-        'source': 'a source',
+        'source': 'test source',
         'type': 'actor',
+        'short_description': 'test',
+        'title': 'for test'
     }
     # Create new entity using provided payload
     post_tool_response = actor.post(payload=payload,
@@ -72,7 +75,10 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
             'confidence',
             'schema_version',
             'source',
-            'type'
+            'type',
+            'description',
+            'short_description',
+            'title'
         ]
     }
     assert values == payload
@@ -90,7 +96,15 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
     put_tool_response = delayed_return(
         actor.put(
             id_=entity_id,
-            payload={'source': 'new source point', 'actor_type': 'Hacker'}
+            payload={'source': 'new source point',
+                     'actor_type': 'Hacker',
+                     'description': 'for Test',
+                     'confidence': 'High',
+                     'schema_version': SERVER_VERSION,
+                     'type': 'actor',
+                     'short_description': 'test',
+                     'title': 'for test'
+                     }
         )
     )
     assert put_tool_response['source'] == 'new source point'
@@ -135,9 +149,12 @@ def test_python_module_ctia_positive_attack_pattern(
             'A bootkit is a malware variant that modifies the boot sectors of'
             ' a hard drive'
         ),
-        'name': 'Bootkit',
+
         'schema_version': SERVER_VERSION,
-        'type': 'attack-pattern'
+        'type': 'attack-pattern',
+        'short_description': 'desc for test',
+        'source': 'new source point',
+        'title': 'for test'
     }
     # Create new entity using provided payload
     post_tool_response = attack_pattern.post(payload=payload,
@@ -145,9 +162,11 @@ def test_python_module_ctia_positive_attack_pattern(
     values = {
         key: post_tool_response[key] for key in [
             'description',
-            'name',
             'schema_version',
-            'type'
+            'type',
+            'short_description',
+            'source',
+            'title'
         ]
     }
     assert values == payload
@@ -166,17 +185,18 @@ def test_python_module_ctia_positive_attack_pattern(
         attack_pattern.put(
             id_=entity_id,
             payload={
-                'name': 'Worm',
+                'short_description': 'Updated descr',
                 'description': (
                     'A standalone malware that replicates itself in order to'
                     ' spread to other computers'
-                )
+                ),
+                'title': 'for test'
             }
         )
     )
-    assert put_tool_response['name'] == 'Worm'
+    assert put_tool_response['short_description'] == 'Updated descr'
     get_tool_response = attack_pattern.get(entity_id)
-    assert get_tool_response['name'] == 'Worm'
+    assert get_tool_response['short_description'] == 'Updated descr'
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(attack_pattern.delete(entity_id))
@@ -213,13 +233,18 @@ def test_python_module_ctia_positive_bulk(module_headers, module_tool_client):
         'campaign_type': 'Critical',
         'confidence': 'Medium',
         'type': 'campaign',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'description': 'For test',
+        'short_description': 'Short test description',
+        'title': 'Test'
     }
     coa_payload = {
         'description': 'COA entity we use for bulk testing',
         'coa_type': 'Diplomatic Actions',
         'type': 'coa',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'short_description': 'Short test description',
+        'title': 'Test'
     }
     # Create Campaign and COA entities in bulk
     post_tool_response = delayed_return(
@@ -237,7 +262,10 @@ def test_python_module_ctia_positive_bulk(module_headers, module_tool_client):
             'campaign_type',
             'confidence',
             'type',
-            'schema_version'
+            'schema_version',
+            'description',
+            'short_description',
+            'title'
         ]
     }
     assert values == campaign_payload
@@ -360,7 +388,9 @@ def test_python_module_ctia_positive_campaign(
         'campaign_type': 'Critical',
         'confidence': 'Medium',
         'type': 'campaign',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'description': 'For Test',
+        'short_description': 'Short test description'
     }
     # Create new entity using provided payload
     post_tool_response = campaign.post(payload=payload,
@@ -371,7 +401,9 @@ def test_python_module_ctia_positive_campaign(
             'campaign_type',
             'confidence',
             'type',
-            'schema_version'
+            'schema_version',
+            'description',
+            'short_description'
         ]
     }
     assert values == payload
@@ -389,14 +421,18 @@ def test_python_module_ctia_positive_campaign(
     put_tool_response = delayed_return(
         campaign.put(
             id_=entity_id,
-            payload={'title': 'New demo campaign', 'campaign_type': 'Critical'}
+            payload={'title': 'New demo campaign',
+                     'campaign_type': 'Critical',
+                     'description': 'For Test',
+                     'short_description': 'Short test description'
+                     }
         )
     )
     assert put_tool_response['title'] == 'New demo campaign'
     get_tool_response = campaign.get(entity_id)
     assert get_tool_response['title'] == 'New demo campaign'
     # Search for campaign by entity id
-    search_tool_response = campaign.search(params={
+    search_tool_response = campaign.search.get(params={
         'query': 'id:*{}'.format(entity_id)})
     # We got exactly one entry for provided unique entity id
     assert len(search_tool_response) == 1
@@ -649,7 +685,7 @@ def test_python_module_ctia_positive_event(module_tool_client):
     Importance: Critical
     """
     event = module_tool_client.private_intel.event
-    entities_list = event.search(params={'query': '*'})
+    entities_list = event.search.get(params={'query': '*'})
     assert len(entities_list) > 0
     entity = random.choice(entities_list)
     assert entity['type'] == 'event'
@@ -829,7 +865,10 @@ def test_python_module_ctia_positive_feedback(
         'campaign_type': 'Critical',
         'confidence': 'Medium',
         'type': 'campaign',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'description': "for test",
+        'short_description': 'sort test description',
+        'title': 'Test title'
     }
     # Create new campaign entity to be used for feedback
     post_tool_response = campaign.post(payload=payload,
@@ -1108,8 +1147,8 @@ def test_python_module_ctia_positive_incident(
 
 def test_python_module_ctia_positive_indicator(
         module_headers, module_tool_client):
-    """Perform testing for indicator entity of custom threat intelligence python
-    module
+    """Perform testing for indicator entity of custom threat intelligence
+     python module
 
     ID: CCTRI-163-f73c4512-9faa-462f-929f-c7ae3f79f887
 
@@ -1378,18 +1417,24 @@ def test_python_module_ctia_positive_malware(
     payload = {
         'type': 'malware',
         'schema_version': SERVER_VERSION,
-        'name': 'TinyZBot',
-        'labels': ['malware']
+        'labels': ['malware'],
+        'description': 'Test description',
+        'title': 'Title for test',
+        'short_description': 'Short test description'
+
     }
     # Create new entity using provided payload
     post_tool_response = malware.post(payload=payload,
                                       params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
-            'name',
+            'title',
             'labels',
             'type',
-            'schema_version'
+            'schema_version',
+            'description',
+            'short_description',
+
         ]
     }
     assert values == payload
@@ -1407,12 +1452,16 @@ def test_python_module_ctia_positive_malware(
     put_tool_response = delayed_return(
         malware.put(
             id_=entity_id,
-            payload={'name': 'XBot', 'labels': ['malware']}
+            payload={'labels': ['malware'],
+                     'description': 'Test description',
+                     'title': 'Changed title for test',
+                     'short_description': 'Short test description'
+                     }
         )
     )
-    assert put_tool_response['name'] == 'XBot'
+    assert put_tool_response['title'] == 'Changed title for test'
     get_tool_response = malware.get(entity_id)
-    assert get_tool_response['name'] == 'XBot'
+    assert get_tool_response['title'] == 'Changed title for test'
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(malware.delete(entity_id))
@@ -1456,7 +1505,10 @@ def test_python_module_ctia_positive_relationship(
         'campaign_type': 'Low',
         'confidence': 'Medium',
         'type': 'campaign',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'description': 'Test description',
+        'title': 'Title for test',
+        'short_description': 'Short test description'
     }
     # Create new campaign using provided payload
     campaign_post_response = campaign.post(payload=payload,
@@ -1658,20 +1710,24 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
     """
     tool = module_tool_client.private_intel.tool
     payload = {
-        'name': 'cmd',
         'labels': ['tool'],
         'type': 'tool',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'description': 'Test description',
+        'title': 'Title for test',
+        'short_description': 'Short test description'
     }
     # Create new entity using provided payload
     post_tool_response = tool.post(payload=payload,
                                    params={'wait_for': 'true'})
     values = {
         key: post_tool_response[key] for key in [
-            'name',
             'labels',
             'type',
-            'schema_version'
+            'schema_version',
+            'description',
+            'title',
+            'short_description'
         ]
     }
     assert values == payload
@@ -1689,12 +1745,16 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
     put_tool_response = delayed_return(
         tool.put(
             id_=entity_id,
-            payload={'name': 'gedit', 'labels': ['tool']}
+            payload={'labels': ['tool'],
+                     'description': 'Test description',
+                     'title': 'Changed title for test',
+                     'short_description': 'Short test description'
+                     }
         )
     )
-    assert put_tool_response['name'] == 'gedit'
+    assert put_tool_response['title'] == 'Changed title for test'
     get_tool_response = tool.get(entity_id)
-    assert get_tool_response['name'] == 'gedit'
+    assert get_tool_response['title'] == 'Changed title for test'
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(tool.delete(entity_id))
