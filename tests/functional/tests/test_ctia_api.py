@@ -183,7 +183,7 @@ def test_python_module_ctia_positive_actor_search(module_headers,
     assert get_actor_search[0]['type'] == 'actor'
     assert get_actor_search[0]['description'] == 'for Test'
     # Count entities after entity created
-    get_actor_search_count = actor.search.count()
+    count_actor_before_deleted = actor.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(actor.search.delete(params={'id': entity_id,
@@ -191,9 +191,11 @@ def test_python_module_ctia_positive_actor_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert actor.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_actor_search_count2 = actor.search.count()
-    # Compare results of get_actor_search_count and get_actor_search_count2
-    assert get_actor_search_count != get_actor_search_count2
+    count_actor_after_deleted = actor.search.count()
+    # Compare results of count_actor_before_deleted
+    # and count_actor_after_deleted
+    assert count_actor_before_deleted !=\
+           count_actor_after_deleted
 
 
 def test_python_module_ctia_positive_actor_metric(module_headers,
@@ -440,7 +442,7 @@ def test_python_module_ctia_positive_asset_search(module_headers,
     assert get_asset_search[0]['type'] == 'asset'
     assert get_asset_search[0]['description'] == 'For Test'
     # Count entities after entity created
-    get_asset_search_count = asset.search.count()
+    count_asset_before_deleted = asset.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(asset.search.delete(params={'id': entity_id,
@@ -448,9 +450,10 @@ def test_python_module_ctia_positive_asset_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert asset.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_asset_search_count2 = asset.search.count()
-    # Compare results of get_asset_search_count and get_asset_search_count2
-    assert get_asset_search_count != get_asset_search_count2
+    count_asset_after_deleted = asset.search.count()
+    # Compare results of count_asset_before_deleted and
+    # count_asset_after_deleted
+    assert count_asset_before_deleted != count_asset_after_deleted
 
 
 def test_python_module_ctia_positive_asset_metric(module_headers,
@@ -832,7 +835,7 @@ def test_python_module_ctia_positive_asset_mapping_search(module_headers,
     assert get_asset_mapping_search[0]['type'] == 'asset-mapping'
     assert get_asset_mapping_search[0]['source'] == 'test source'
     # Count entities after entity created
-    get_asset_mapping_search_count = asset_mapping.search.count()
+    count_asset_mapping_before_deleted = asset_mapping.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(asset_mapping.search.delete(
@@ -841,10 +844,11 @@ def test_python_module_ctia_positive_asset_mapping_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert asset.search.get(params={'id': entity_id_asset_mapping}) == []
     # Count entities after entity deleted
-    get_asset_mapping_search_count2 = asset_mapping.search.count()
-    # Compare results of get_asset_mapping_search_count and
-    # get_asset_mapping_search_count2
-    assert get_asset_mapping_search_count != get_asset_mapping_search_count2
+    count_asset_mapping_after_deleted = asset_mapping.search.count()
+    # Compare results of count_asset_mapping_before_deleted and
+    # count_asset_mapping_after_deleted
+    assert count_asset_mapping_before_deleted !=\
+           count_asset_mapping_after_deleted
     # Delete asset entity and make attempt to get it back to
     # validate it is not there anymore
     delayed_return(asset.delete(entity_id_asset))
@@ -1259,7 +1263,7 @@ def test_python_module_ctia_positive_asset_properties_search(module_headers,
     assert get_asset_properties_search[0]['type'] == 'asset-properties'
     assert get_asset_properties_search[0]['source'] == 'test source'
     # Count entities after entity created
-    get_asset_properties_search_count = asset_properties.search.count()
+    count_asset_properties_before_deleted = asset_properties.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(asset_properties.search.delete(
@@ -1268,11 +1272,11 @@ def test_python_module_ctia_positive_asset_properties_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert asset.search.get(params={'id': entity_id_asset_properties}) == []
     # Count entities after entity deleted
-    get_asset_properties_search_count2 = asset_properties.search.count()
-    # Compare results of get_asset_properties_search_count and
-    # get_asset_properties_search_count2
-    assert get_asset_properties_search_count != \
-           get_asset_properties_search_count2
+    count_asset_properties_after_deleted = asset_properties.search.count()
+    # Compare results of count_asset_properties_before_deleted and
+    # count_asset_properties_after_deleted
+    assert count_asset_properties_before_deleted != \
+           count_asset_properties_after_deleted
     # Delete asset entity and make attempt to get it back to
     # validate it is not there anymore
     delayed_return(asset.delete(entity_id_asset))
@@ -1564,7 +1568,7 @@ def test_python_module_ctia_positive_attack_pattern_search(module_headers,
     assert get_attack_pattern_search[0]['type'] == 'attack-pattern'
     assert get_attack_pattern_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_attack_pattern_search_count = attack_pattern.search.count()
+    count_attack_pattern_before_deleted = attack_pattern.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(attack_pattern.search.delete(params={'id': entity_id,
@@ -1572,10 +1576,11 @@ def test_python_module_ctia_positive_attack_pattern_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert attack_pattern.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_attack_pattern_search_count2 = attack_pattern.search.count()
-    # Compare results of get_attack_pattern_search_count
-    # and get_attack_pattern_search_count2
-    assert get_attack_pattern_search_count != get_attack_pattern_search_count2
+    count_attack_pattern_after_deleted = attack_pattern.search.count()
+    # Compare results of count_attack_pattern_before_deleted
+    # and count_attack_pattern_after_deleted
+    assert count_attack_pattern_before_deleted !=\
+           count_attack_pattern_after_deleted
 
 
 def test_python_module_ctia_positive_attack_pattern_metric(module_headers,
@@ -1960,7 +1965,7 @@ def test_python_module_ctia_positive_campaign_search(module_headers,
     assert get_campaign_search[0]['type'] == 'campaign'
     assert get_campaign_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_campaign_search_count = campaign.search.count()
+    count_campaign_before_deleted = campaign.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(campaign.search.delete(params={'id': entity_id,
@@ -1968,10 +1973,10 @@ def test_python_module_ctia_positive_campaign_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert campaign.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_campaign_search_count2 = campaign.search.count()
-    # Compare results of get_campaign_search_count
-    # and get_campaign_search_count2
-    assert get_campaign_search_count != get_campaign_search_count2
+    count_campaign_after_deleted = campaign.search.count()
+    # Compare results of count_campaign_before_deleted
+    # and count_campaign_after_deleted
+    assert count_campaign_before_deleted != count_campaign_after_deleted
 
 
 def test_python_module_ctia_positive_campaign_metric(module_headers,
@@ -2217,7 +2222,7 @@ def test_python_module_ctia_positive_casebook_search(module_headers,
     assert get_casebook_search[0]['type'] == 'casebook'
     assert get_casebook_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_casebook_search_count = casebook.search.count()
+    count_casebook_before_deleted = casebook.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(casebook.search.delete(params={'id': entity_id,
@@ -2225,10 +2230,10 @@ def test_python_module_ctia_positive_casebook_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert casebook.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_casebook_search_count2 = casebook.search.count()
-    # Compare results of get_casebook_search_count
-    # and get_casebook_search_count2
-    assert get_casebook_search_count != get_casebook_search_count2
+    count_casebook_after_deleted = casebook.search.count()
+    # Compare results of count_casebook_before_deleted
+    # and count_casebook_after_deleted
+    assert count_casebook_before_deleted != count_casebook_after_deleted
 
 
 def test_python_module_ctia_positive_casebook_metric(module_headers,
@@ -2437,7 +2442,7 @@ def test_python_module_ctia_positive_coa_search(module_headers,
     assert get_coa_search[0]['type'] == 'coa'
     assert get_coa_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_coa_search_count = coa.search.count()
+    count_coa_before_deleted = coa.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(coa.search.delete(params={'id': entity_id,
@@ -2445,10 +2450,10 @@ def test_python_module_ctia_positive_coa_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert coa.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_coa_search_count2 = coa.search.count()
-    # Compare results of get_coa_search_count
-    # and get_coa_search_count2
-    assert get_coa_search_count != get_coa_search_count2
+    count_coa_after_deleted = coa.search.count()
+    # Compare results of count_coa_before_deleted
+    # and count_coa_after_deleted
+    assert count_coa_before_deleted != count_coa_after_deleted
 
 
 def test_python_module_ctia_positive_coa_metric(module_headers,
@@ -2641,7 +2646,7 @@ def test_python_module_ctia_positive_event_search(module_headers,
     assert event_search[1]['type'] == 'event'
     entity_id = event_search[1]['id'].rpartition('/')[-1]
     # Count entities after entity created
-    get_event_search_count = event.search.count()
+    count_event_before_deleted = event.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     deleting_response = None
@@ -2660,10 +2665,10 @@ def test_python_module_ctia_positive_event_search(module_headers,
     assert parsed_text_response['capabilities'][1] == 'developer'
     assert parsed_text_response['capabilities'][2] == 'delete-event'
     # Count entities after entity deleted
-    get_event_search_count2 = event.search.count()
-    # Compare results of get_event_search_count
-    # and get_event_search_count2
-    assert get_event_search_count == get_event_search_count2
+    count_event_after_deleted = event.search.count()
+    # Compare results of count_event_before_deleted
+    # and count_event_after_deleted
+    assert count_event_before_deleted == count_event_after_deleted
 
 
 def test_python_module_ctia_positive_feed(module_headers, module_tool_client):
@@ -3174,7 +3179,7 @@ def test_python_module_ctia_positive_incident_search(module_headers,
     assert get_incident_search[0]['type'] == 'incident'
     assert get_incident_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_incident_search_count = incident.search.count()
+    count_incident_before_deleted = incident.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(incident.search.delete(params={'id': entity_id,
@@ -3182,10 +3187,10 @@ def test_python_module_ctia_positive_incident_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert incident.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_incident_search_count2 = incident.search.count()
-    # Compare results of get_incident_search_count
-    # and get_incident_search_count2
-    assert get_incident_search_count != get_incident_search_count2
+    count_incident_after_deleted = incident.search.count()
+    # Compare results of count_incident_before_deleted
+    # and count_incident_after_deleted
+    assert count_incident_before_deleted != count_incident_after_deleted
 
 
 def test_python_module_ctia_positive_incident_metric(module_headers,
@@ -3393,7 +3398,7 @@ def test_python_module_ctia_positive_indicator_search(module_headers,
     assert get_indicator_search[0]['type'] == 'indicator'
     assert get_indicator_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_indicator_search_count = indicator.search.count()
+    count_indicator_before_deleted = indicator.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(indicator.search.delete(params={'id': entity_id,
@@ -3401,10 +3406,10 @@ def test_python_module_ctia_positive_indicator_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert indicator.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_indicator_search_count2 = indicator.search.count()
-    # Compare results of get_indicator_search_count
-    # and get_indicator_search_count2
-    assert get_indicator_search_count != get_indicator_search_count2
+    count_indicator_after_deleted = indicator.search.count()
+    # Compare results of count_indicator_before_deleted
+    # and count_indicator_after_deleted
+    assert count_indicator_before_deleted != count_indicator_after_deleted
 
 
 def test_python_module_ctia_positive_indicator_metric(module_headers,
@@ -3609,7 +3614,7 @@ def test_python_module_ctia_positive_investigation_search(module_headers,
     assert get_investigation_search[0]['type'] == 'investigation'
     assert get_investigation_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_investigation_search_count = investigation.search.count()
+    count_investigation_before_deleted = investigation.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(investigation.search.delete(params={'id': entity_id,
@@ -3617,10 +3622,11 @@ def test_python_module_ctia_positive_investigation_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert investigation.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_investigation_search_count2 = investigation.search.count()
-    # Compare results of get_investigation_search_count
+    count_investigation_after_deleted = investigation.search.count()
+    # Compare results of count_investigation_before_deleted
     # and get_investigation_search_count2
-    assert get_investigation_search_count != get_investigation_search_count2
+    assert count_investigation_before_deleted !=\
+           count_investigation_after_deleted
 
 
 def test_python_module_ctia_positive_investigation_metric(module_headers,
@@ -3861,7 +3867,7 @@ def test_python_module_ctia_positive_judgement_search(module_headers,
     get_judgement_search = judgement.search.get(params={'id': entity_id})
     assert get_judgement_search[0]['type'] == 'judgement'
     # Count entities after entity created
-    get_judgement_search_count = judgement.search.count()
+    count_judgement_before_deleted = judgement.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(judgement.search.delete(params={'id': entity_id,
@@ -3869,10 +3875,10 @@ def test_python_module_ctia_positive_judgement_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert judgement.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_judgement_search_count2 = judgement.search.count()
-    # Compare results of get_judgement_search_count
-    # and get_judgement_search_count2
-    assert get_judgement_search_count != get_judgement_search_count2
+    count_judgement_after_deleted = judgement.search.count()
+    # Compare results of count_judgement_before_deleted
+    # and count_judgement_after_deleted
+    assert count_judgement_before_deleted != count_judgement_after_deleted
 
 
 def test_python_module_ctia_positive_judgement_metric(module_headers,
@@ -4103,7 +4109,7 @@ def test_python_module_ctia_positive_malware_search(module_headers,
     assert get_malware_search[0]['type'] == 'malware'
     assert get_malware_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_malware_search_count = malware.search.count()
+    count_malware_before_deleted = malware.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(malware.search.delete(params={'id': entity_id,
@@ -4111,10 +4117,10 @@ def test_python_module_ctia_positive_malware_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert malware.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_malware_search_count2 = malware.search.count()
-    # Compare results of get_malware_search_count
-    # and get_malware_search_count2
-    assert get_malware_search_count != get_malware_search_count2
+    count_malware_after_deleted = malware.search.count()
+    # Compare results of count_malware_before_deleted
+    # and count_malware_after_deleted
+    assert count_malware_before_deleted != count_malware_after_deleted
 
 
 def test_python_module_ctia_positive_malware_metric(module_headers,
@@ -4394,7 +4400,7 @@ def test_python_module_ctia_positive_relationship_search(module_headers,
     assert get_relationship_search[0]['schema_version'] == '1.1.3'
     assert get_relationship_search[0]['description'] == 'Test relation'
     # Count entities after entity created
-    get_relationship_search_count = relationship.search.count()
+    count_relationship_before_deleted = relationship.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(relationship.search.delete(params={'id': entity_id,
@@ -4402,10 +4408,11 @@ def test_python_module_ctia_positive_relationship_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert relationship.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_relationship_search_count2 = relationship.search.count()
-    # Compare results of get_relationship_search_count
-    # and get_relationship_search_count2
-    assert get_relationship_search_count != get_relationship_search_count2
+    count_relationship_after_deleted = relationship.search.count()
+    # Compare results of count_relationship_before_deleted
+    # and count_relationship_after_deleted
+    assert count_relationship_before_deleted !=\
+           count_relationship_after_deleted
 
 
 def test_python_module_ctia_positive_relationship_metric(module_headers,
@@ -4656,7 +4663,7 @@ def test_python_module_ctia_positive_sighting_search(module_headers,
     assert get_sighting_search[0]['type'] == 'sighting'
     assert get_sighting_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_sighting_search_count = sighting.search.count()
+    count_sighting_before_deleted = sighting.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(sighting.search.delete(params={'id': entity_id,
@@ -4664,10 +4671,10 @@ def test_python_module_ctia_positive_sighting_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert sighting.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_sighting_search_count2 = sighting.search.count()
-    # Compare results of get_sighting_search_count
-    # and get_sighting_search_count2
-    assert get_sighting_search_count != get_sighting_search_count2
+    count_sighting_after_deleted = sighting.search.count()
+    # Compare results of count_sighting_before_deleted
+    # and count_sighting_after_deleted
+    assert count_sighting_before_deleted != count_sighting_after_deleted
 
 
 def test_python_module_ctia_positive_sighting_metric(module_headers,
@@ -4925,7 +4932,7 @@ def test_python_module_ctia_positive_target_record_search(module_headers,
     assert get_target_record_search[0]['type'] == 'target-record'
     assert get_target_record_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_target_record_search_count = target_record.search.count()
+    count_target_record_before_deleted = target_record.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(target_record.search.delete(params={'id': entity_id,
@@ -4933,10 +4940,11 @@ def test_python_module_ctia_positive_target_record_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert target_record.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_target_record_search_count2 = target_record.search.count()
-    # Compare results of get_target_record_search_count
-    # and get_target_record_search_count2
-    assert get_target_record_search_count != get_target_record_search_count2
+    count_target_record_after_deleted = target_record.search.count()
+    # Compare results of count_target_record_before_deleted
+    # and count_target_record_after_deleted
+    assert count_target_record_before_deleted !=\
+           count_target_record_after_deleted
 
 
 def test_python_module_ctia_positive_target_record_metric(module_headers,
@@ -5185,7 +5193,7 @@ def test_python_module_ctia_positive_tool_search(module_headers,
     assert get_tool_search[0]['type'] == 'tool'
     assert get_tool_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_tool_search_count = tool.search.count()
+    count_tool_before_deleted = tool.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(tool.search.delete(params={'id': entity_id,
@@ -5193,10 +5201,10 @@ def test_python_module_ctia_positive_tool_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert tool.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_tool_search_count2 = tool.search.count()
-    # Compare results of get_tool_search_count
-    # and get_tool_search_count2
-    assert get_tool_search_count != get_tool_search_count2
+    count_tool_after_deleted = tool.search.count()
+    # Compare results of count_tool_before_deleted
+    # and count_tool_after_deleted
+    assert count_tool_before_deleted != count_tool_after_deleted
 
 
 def test_python_module_ctia_positive_tool_metric(module_headers,
@@ -5469,7 +5477,7 @@ def test_python_module_ctia_positive_vulnerability_search(module_headers,
     assert get_vulnerability_search[0]['type'] == 'vulnerability'
     assert get_vulnerability_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_vulnerability_search_count = vulnerability.search.count()
+    count_vulnerability_before_deleted = vulnerability.search.count()
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(vulnerability.search.delete(params={'id': entity_id,
@@ -5477,10 +5485,11 @@ def test_python_module_ctia_positive_vulnerability_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert vulnerability.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_vulnerability_search_count2 = vulnerability.search.count()
-    # Compare results of get_vulnerability_search_count
-    # and get_vulnerability_search_count2
-    assert get_vulnerability_search_count != get_vulnerability_search_count2
+    count_vulnerability_after_deleted = vulnerability.search.count()
+    # Compare results of count_vulnerability_before_deleted
+    # and count_vulnerability_after_deleted
+    assert count_vulnerability_before_deleted !=\
+           count_vulnerability_after_deleted
 
 
 def test_python_module_ctia_positive_vulnerability_metric(module_headers,
@@ -5689,7 +5698,7 @@ def test_python_module_ctia_positive_weakness_search(module_headers,
     assert get_weakness_search[0]['type'] == 'weakness'
     assert get_weakness_search[0]['schema_version'] == '1.1.3'
     # Count entities after entity created
-    get_weakness_search_count = weakness.search.count()
+    count_weakness_before_deleted = weakness.search.count()
     # Delete the entity and make atcctempt to get it back to validate it is
     # not there anymore
     delayed_return(weakness.search.delete(params={'id': entity_id,
@@ -5697,10 +5706,10 @@ def test_python_module_ctia_positive_weakness_search(module_headers,
     # Repeat GET request and validate that entity was deleted
     assert weakness.search.get(params={'id': entity_id}) == []
     # Count entities after entity deleted
-    get_weakness_search_count2 = weakness.search.count()
-    # Compare results of get_weakness_search_count
-    # and get_weakness_search_count2
-    assert get_weakness_search_count != get_weakness_search_count2
+    count_weakness_after_deleted = weakness.search.count()
+    # Compare results of count_weakness_before_deleted
+    # and count_weakness_after_deleted
+    assert count_weakness_before_deleted != count_weakness_after_deleted
 
 
 def test_python_module_ctia_positive_weakness_metric(module_headers,
