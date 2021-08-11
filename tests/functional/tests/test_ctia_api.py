@@ -1520,8 +1520,8 @@ def test_python_module_ctia_positive_attack_pattern_search(module_tool_client):
         6. Count entities after entity deleted
         7. Compare the amount of entities after creating and deleting entities
 
-    Expected results: Attack_pattern entity can be created, fetched, counted and
-        deleted using custom python module. Data stored in the entity is
+    Expected results: Attack_pattern entity can be created, fetched, counted
+     and deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
     Importance: Critical
@@ -1678,8 +1678,8 @@ def test_python_module_ctia_positive_bulk(module_headers, module_tool_client):
         5. Send same GET request, but with direct access to the server
         6. Compare results
 
-    Expected results: Bulk functionality works properly and some entities can be
-        created in the same time using custom python module
+    Expected results: Bulk functionality works properly and some entities can
+     be created in the same time using custom python module
 
     Importance: Critical
     """
@@ -1832,9 +1832,9 @@ def test_python_module_ctia_positive_campaign(
             validate proper values are returned
         8. Delete entity from the system
 
-    Expected results: Campaign entity can be created, fetched, updated, searched
-        and deleted using custom python module. Data stored in the entity is
-        the same no matter you access it directly or using our tool
+    Expected results: Campaign entity can be created, fetched, updated,
+     searched and deleted using custom python module. Data stored in the
+      entity is the same no matter you access it directly or using our tool
 
     Importance: Critical
     """
