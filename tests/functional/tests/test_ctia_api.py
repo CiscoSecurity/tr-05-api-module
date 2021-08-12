@@ -1,11 +1,15 @@
 import pytest
 import random
+import json
 from requests import HTTPError
 from ctrlibrary.core.datafactory import gen_ip
 from ctrlibrary.core.utils import delayed_return
 from ctrlibrary.ctia.base import ctia_get_data
 from ctrlibrary.ctia.endpoints import (
     ACTOR,
+    ASSET,
+    ASSET_MAPPING,
+    ASSET_PROPERTIES,
     ATTACK_PATTERN,
     CAMPAIGN,
     CASEBOOK,
@@ -21,6 +25,7 @@ from ctrlibrary.ctia.endpoints import (
     MALWARE,
     RELATIONSHIP,
     SIGHTING,
+    TARGET_RECORD,
     TOOL,
     VERDICT,
     VULNERABILITY,
@@ -49,7 +54,7 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
             updated
         7. Delete entity from the system
 
-    Expectedresults: Actor entity can be created, fetched, updated and
+    Expected results: Actor entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -117,6 +122,1299 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
         actor.get(entity_id)
 
 
+def test_python_module_ctia_positive_actor_search(module_headers,
+                                                  module_tool_client):
+    """Perform testing for actor/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 9ba48f7c-19b5-45d9-b5f7-7966795c4abe
+
+    Steps:
+
+        1. Send POST request to create new actor entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Actor entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    actor = module_tool_client.private_intel.actor
+    payload = {
+        'source': 'new source point',
+        'actor_type': 'Hacker',
+        'description': 'for Test',
+        'confidence': 'High',
+        'schema_version': SERVER_VERSION,
+        'type': 'actor',
+        'short_description': 'test',
+        'title': 'for test'
+    }
+    # Create new entity using provided payload
+    post_tool_response = actor.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'actor_type',
+            'confidence',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title'
+        ]
+    }
+    assert values == payload
+    # Create variable for using it in params for endpoints
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_actor_search = actor.search.get(params={'id': entity_id})
+    assert get_actor_search[0]['type'] == 'actor'
+    assert get_actor_search[0]['description'] == 'for Test'
+    # Count entities after entity created
+    count_actor_before_deleted = actor.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(actor.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert actor.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_actor_after_deleted = actor.search.count()
+    # Compare results of count_actor_before_deleted
+    # and count_actor_after_deleted
+    assert count_actor_before_deleted !=\
+           count_actor_after_deleted
+
+
+def test_python_module_ctia_positive_actor_metric(module_tool_client):
+    """Perform testing for actor/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -52c89f1b-9728-41d6-8a1f-07dd0ec8b976
+
+    Steps:
+
+        1. Send POST request to create new actor entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Actor entity can be created, fetched, researched by
+         metric's endpoints and deleted using custom python module.
+         Data stored in the entity is the same no matter you access it
+         directly or using our tool.
+
+    Importance: Critical
+    """
+    actor = module_tool_client.private_intel.actor
+    payload = {
+        'source': 'Test source',
+        'actor_type': 'Hacker',
+        'description': 'for Test',
+        'confidence': 'High',
+        'schema_version': SERVER_VERSION,
+        'type': 'actor',
+        'short_description': 'test',
+        'title': 'for test'
+    }
+    # Create new entity using provided payload
+    post_tool_response = actor.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'actor_type',
+            'confidence',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title'
+        ]
+    }
+    assert values == payload
+    # Create variable for using it in params for endpoints
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_actor = actor.get(entity_id)
+    assert get_created_actor['type'] == 'actor'
+    assert get_created_actor['description'] == 'for Test'
+    assert get_created_actor['source'] == 'Test source'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_actor['timestamp']
+    metric_histogram = actor.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = actor.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = actor.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(actor.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert actor.search.get(params={'id': entity_id}) == []
+
+
+def test_python_module_ctia_positive_asset(module_headers, module_tool_client):
+    """Perform testing for asset entity of custom threat intelligence python
+    module
+
+    ID: CCTRI-2848-85594b4a-d53f-4285-9aa8-c13e21858e4b
+
+    Steps:
+
+        1. Send POST request to create new asset entity using custom python
+            module
+        2. Send GET request using custom python module to read just created
+            entity back.
+        3. Send same GET request, but using direct access to the server
+        4. Compare results
+        5. Validate that GET request of external_id returns number of
+        external_id
+        6. Update asset entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
+            updated
+        8. Delete entity from the system
+
+    Expected results: Asset entity can be created, fetched, updated and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    asset = module_tool_client.private_intel.asset
+    payload = {
+        'asset_type': 'data',
+        'description': 'For Test',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset',
+        'short_description': 'test',
+        'title': 'for test',
+        'external_ids': ['3']
+    }
+    # Create new entity using provided payload
+    post_tool_response = asset.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'asset_type',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = asset.get(entity_id)
+    get_direct_response = ctia_get_data(
+        target_url=ASSET,
+        entity_id=entity_id,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = asset.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
+    # Update entity values
+    put_tool_response = delayed_return(
+        asset.put(
+            id_=entity_id,
+            payload={'source': 'new source point',
+                     'asset_type': 'device',
+                     'description': 'for Test',
+                     'valid_time': {
+                      "start_time": "2021-07-27T07:55:38.193Z",
+                      "end_time": "2021-07-27T07:55:38.193Z"},
+                     'schema_version': SERVER_VERSION,
+                     'type': 'asset',
+                     'short_description': 'test',
+                     'title': 'for test'
+                     }
+        )
+    )
+    assert put_tool_response['asset_type'] == 'device'
+    get_tool_response = asset.get(entity_id)
+    assert get_tool_response['source'] == 'new source point'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(asset.delete(entity_id))
+    with pytest.raises(HTTPError):
+        asset.get(entity_id)
+
+
+def test_python_module_ctia_positive_asset_search(module_headers,
+                                                  module_tool_client):
+    """Perform testing for asset/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 593c7ea1-82f6-4484-beec-9aeecb20b4f3
+
+    Steps:
+
+        1. Send POST request to create new asset entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Asset entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    asset = module_tool_client.private_intel.asset
+    payload = {
+        'asset_type': 'data',
+        'description': 'For Test',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset',
+        'short_description': 'test',
+        'title': 'for test'
+    }
+    # Create new entity using provided payload
+    post_tool_response = asset.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'asset_type',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_asset_search = asset.search.get(params={'id': entity_id})
+    assert get_asset_search[0]['type'] == 'asset'
+    assert get_asset_search[0]['description'] == 'For Test'
+    # Count entities after entity created
+    count_asset_before_deleted = asset.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(asset.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert asset.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_asset_after_deleted = asset.search.count()
+    # Compare results of count_asset_before_deleted and
+    # count_asset_after_deleted
+    assert count_asset_before_deleted != count_asset_after_deleted
+
+
+def test_python_module_ctia_positive_asset_metric(module_tool_client):
+    """Perform testing for asset/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -a1f492e4-5b8f-483f-8e50-40bb040b394a
+
+    Steps:
+
+        1. Send POST request to create new asset entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Asset entity can be created, fetched, researched by
+         metric's endpoints and deleted using custom python module.
+         Data stored in the entity is the same no matter you access it
+         directly or using our tool.
+
+    Importance: Critical
+    """
+    asset = module_tool_client.private_intel.asset
+    payload = {
+        'asset_type': 'data',
+        'description': 'For Test',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset',
+        'short_description': 'test',
+        'title': 'for test'
+    }
+    # Create new entity using provided payload
+    post_tool_response = asset.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'asset_type',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_asset = asset.get(entity_id)
+    assert get_created_asset['type'] == 'asset'
+    assert get_created_asset['description'] == 'For Test'
+    assert get_created_asset['source'] == 'test source'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_asset['timestamp']
+    metric_histogram = asset.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = asset.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'asset_type'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = asset.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'asset_type'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(asset.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert asset.search.get(params={'id': entity_id}) == []
+
+
+def test_python_module_ctia_positive_asset_mapping(
+        module_headers, module_tool_client):
+    """Perform testing for asset mapping entity of custom threat intelligence
+     python module
+
+    ID: CCTRI-2906 - 9f30e585-2b89-46ba-9a2d-5df8c5b91bdc
+
+    Steps:
+
+        1. Send POST request to create new asset entity using custom
+         python module
+        2. Send GET request using custom python module to read just created
+            entity back.
+        3. Send same GET request, but using direct access to the server
+        4. Compare results
+        5. Send POST request to create new asset_mapping entity using custom
+         python module
+        6. Send GET request using custom python module to read just created
+            entity back.
+        7. Send same GET request, but using direct access to the server
+        8. Compare results
+        9. Validate that GET request of external_id returns number of
+        external_id
+        10. Update asset entity using custom python module
+        11. Repeat GET request using python module and validate that entity was
+            updated
+        12. Delete asset entity from the system
+        13. Delete asset_mapping entity from the system
+
+    Expected results: Asset mapping entity can be created, fetched, updated and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    asset = module_tool_client.private_intel.asset
+    payload = {
+        'asset_type': 'data',
+        'description': 'For Test',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset',
+        'short_description': 'test',
+        'title': 'for test',
+        'external_ids': ['3']
+    }
+    # Create new asset entity using provided payload
+    post_tool_response = asset.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'asset_type',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    entity_id_asset = post_tool_response['id'].rpartition('/')[-1]
+    asset_ref = post_tool_response['id']
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = asset.get(entity_id_asset)
+    get_direct_response = ctia_get_data(
+        target_url=ASSET,
+        entity_id=entity_id_asset,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Create new asset_mapping entity using provided payload
+    asset_mapping = module_tool_client.private_intel.asset_mapping
+    payload_values_asset_mapping = {
+        'asset_type': 'data',
+        'asset_ref': asset_ref,
+        'confidence': 'High',
+        'stability': 'Physical',
+        'specificity': 'Medium',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'observable': {
+            'value': '1.1.1.1',
+            'type': 'ip'
+        },
+        'source': 'test source',
+        'type': 'asset-mapping',
+        'external_ids': ['3']
+    }
+    asset_mapping_post_tool_response = asset_mapping.post(
+        payload=payload_values_asset_mapping, params={'wait_for': 'true'})
+    values_asset_mapping = {
+        key: asset_mapping_post_tool_response[key] for key in [
+            'asset_type',
+            'asset_ref',
+            'confidence',
+            'stability',
+            'specificity',
+            'valid_time',
+            'schema_version',
+            'observable',
+            'source',
+            'type',
+            'external_ids'
+        ]
+    }
+    assert values_asset_mapping == payload_values_asset_mapping
+    entity_id_asset_mapping = \
+        asset_mapping_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_asset_mapping_tool_response = \
+        asset_mapping.get(entity_id_asset_mapping)
+    get_direct_response_asset_mapping = ctia_get_data(
+        target_url=ASSET_MAPPING,
+        entity_id=entity_id_asset_mapping,
+        **{'headers': module_headers}
+    ).json()
+    assert get_asset_mapping_tool_response == get_direct_response_asset_mapping
+    # Validate that GET request of external_id returns number of external_ids
+    external_id_result = asset_mapping.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
+    # Create expired asset mapping
+    expired_asset_mapping = asset_mapping.expire(
+        entity_id_asset_mapping, payload={})
+    assert expired_asset_mapping['source'] == 'test source'
+    # Update asset mapping entity values
+    put_tool_response = delayed_return(
+        asset_mapping.put(
+            id_=entity_id_asset_mapping,
+            payload={'asset_type': 'device',
+                     'asset_ref': asset_ref,
+                     'confidence': 'Low',
+                     'stability': 'Temporary',
+                     'specificity': 'Medium',
+                     'valid_time': {
+                         "start_time": "2021-07-27T07:55:38.193Z",
+                         "end_time": "2021-07-27T07:55:38.193Z"},
+                     'schema_version': SERVER_VERSION,
+                     'observable': {
+                        'value': '1.1.1.1',
+                        'type': 'ip'
+                                    },
+                     'source': 'New test source',
+                     'type': 'asset-mapping'
+                     }
+        )
+    )
+    assert put_tool_response['asset_type'] == 'device'
+    get_tool_response = asset_mapping.get(entity_id_asset_mapping)
+    assert get_tool_response['source'] == 'New test source'
+    assert get_tool_response['asset_type'] == 'device'
+    assert get_tool_response['confidence'] == 'Low'
+    assert get_tool_response['stability'] == 'Temporary'
+    # Delete the asset_mapping and make attempt to get it back to
+    # validate it is not there anymore
+    delayed_return(asset_mapping.delete(entity_id_asset_mapping))
+    with pytest.raises(HTTPError):
+        asset.get(entity_id_asset_mapping)
+    # Delete asset entity and make attempt to get it back to
+    # validate it is not there anymore
+    delayed_return(asset.delete(entity_id_asset))
+    with pytest.raises(HTTPError):
+        asset.get(entity_id_asset)
+
+
+def test_python_module_ctia_positive_asset_mapping_search(module_headers,
+                                                          module_tool_client):
+    """Perform testing for asset mapping/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2906 - 4d46be97-2134-43f7-bb09-cf7ccdb07de8
+
+    Steps:
+
+        1. Send POST request to create new asset entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Send POST request to create new asset mapping entity using custom
+         python module
+        4. Send GET request using custom python module to read just created
+                entity back.
+        5. Count entities after entity created
+        6. Delete asset mapping entity from the system
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+        8. Count entities after entity deleted
+        9. Compare the amount of entities after creating and deleting entities
+        10. Delete asset entity from the system
+
+    Expected results: Asset mapping entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    asset = module_tool_client.private_intel.asset
+    payload = {
+        'asset_type': 'data',
+        'description': 'For Test',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset',
+        'short_description': 'test',
+        'title': 'for test',
+        'external_ids': ['3']
+    }
+    # Create new asset entity using provided payload
+    post_tool_response = asset.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'asset_type',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    entity_id_asset = post_tool_response['id'].rpartition('/')[-1]
+    asset_ref = post_tool_response['id']
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = asset.get(entity_id_asset)
+    get_direct_response = ctia_get_data(
+        target_url=ASSET,
+        entity_id=entity_id_asset,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Create new asset_mapping entity using provided payload
+    asset_mapping = module_tool_client.private_intel.asset_mapping
+    payload_values_asset_mapping = {
+        'asset_type': 'data',
+        'asset_ref': asset_ref,
+        'confidence': 'High',
+        'stability': 'Physical',
+        'specificity': 'Medium',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'observable': {
+            'value': '1.1.1.1',
+            'type': 'ip'
+        },
+        'source': 'test source',
+        'type': 'asset-mapping',
+        'external_ids': ['3']
+    }
+    asset_mapping_post_tool_response = asset_mapping.post(
+        payload=payload_values_asset_mapping, params={'wait_for': 'true'})
+    values_asset_mapping = {
+        key: asset_mapping_post_tool_response[key] for key in [
+            'asset_type',
+            'asset_ref',
+            'confidence',
+            'stability',
+            'specificity',
+            'valid_time',
+            'schema_version',
+            'observable',
+            'source',
+            'type',
+            'external_ids'
+        ]
+    }
+    assert values_asset_mapping == payload_values_asset_mapping
+    entity_id_asset_mapping = \
+        asset_mapping_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_asset_mapping_search = asset_mapping.search.get(
+        params={'id': entity_id_asset_mapping})
+    assert get_asset_mapping_search[0]['type'] == 'asset-mapping'
+    assert get_asset_mapping_search[0]['source'] == 'test source'
+    # Count entities after entity created
+    count_asset_mapping_before_deleted = asset_mapping.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(asset_mapping.search.delete(
+        params={'id': entity_id_asset_mapping,
+                'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert asset.search.get(params={'id': entity_id_asset_mapping}) == []
+    # Count entities after entity deleted
+    count_asset_mapping_after_deleted = asset_mapping.search.count()
+    # Compare results of count_asset_mapping_before_deleted and
+    # count_asset_mapping_after_deleted
+    assert count_asset_mapping_before_deleted !=\
+           count_asset_mapping_after_deleted
+    # Delete asset entity and make attempt to get it back to
+    # validate it is not there anymore
+    delayed_return(asset.delete(entity_id_asset))
+    with pytest.raises(HTTPError):
+        asset.get(entity_id_asset)
+
+
+def test_python_module_ctia_positive_asset_mapping_metric(module_headers,
+                                                          module_tool_client):
+    """Perform testing for asset mapping/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2906 -6113d65c-3587-45b9-a111-f00f98719535
+
+    Steps:
+
+        1. Send POST request to create new asset entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send POST request to create new asset mapping entity using custom
+         python module
+        4. Send GET request using custom python module to read just created
+                 entity back.
+        5. Send GET request to get type of metric/histogram endpoint
+        6. Send GET request to get type of metric/topn endpoint
+        7. Send GET request to get type of metric/cardinality endpoint
+        8. Delete created entity
+        9. Repeat GET request using python module and validate that entity was
+            deleted
+        10. Delete asset mapping entity from the system
+
+     Expected results: Asset mapping entity can be created, fetched, researched
+         by metric's endpoints and deleted using custom python module.
+         Data stored in the entity is the same no matter you access it
+         directly or using our tool.
+
+    Importance: Critical
+    """
+    asset = module_tool_client.private_intel.asset
+    payload = {
+        'asset_type': 'data',
+        'description': 'For Test',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset',
+        'short_description': 'test',
+        'title': 'for test',
+        'external_ids': ['3']
+    }
+    # Create new asset entity using provided payload
+    post_tool_response = asset.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'asset_type',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    entity_id_asset = post_tool_response['id'].rpartition('/')[-1]
+    asset_ref = post_tool_response['id']
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = asset.get(entity_id_asset)
+    get_direct_response = ctia_get_data(
+        target_url=ASSET,
+        entity_id=entity_id_asset,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Create new asset_mapping entity using provided payload
+    asset_mapping = module_tool_client.private_intel.asset_mapping
+    payload_values_asset_mapping = {
+        'asset_type': 'data',
+        'asset_ref': asset_ref,
+        'confidence': 'High',
+        'stability': 'Physical',
+        'specificity': 'Medium',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'observable': {
+            'value': '1.1.1.1',
+            'type': 'ip'
+        },
+        'source': 'test source',
+        'type': 'asset-mapping',
+        'external_ids': ['3']
+    }
+    asset_mapping_post_tool_response = asset_mapping.post(
+        payload=payload_values_asset_mapping, params={'wait_for': 'true'})
+    values_asset_mapping = {
+        key: asset_mapping_post_tool_response[key] for key in [
+            'asset_type',
+            'asset_ref',
+            'confidence',
+            'stability',
+            'specificity',
+            'valid_time',
+            'schema_version',
+            'observable',
+            'source',
+            'type',
+            'external_ids'
+        ]
+    }
+    assert values_asset_mapping == payload_values_asset_mapping
+    entity_id_asset_mapping = \
+        asset_mapping_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_asset_mapping = asset_mapping.get(entity_id_asset_mapping)
+    assert get_created_asset_mapping['type'] == 'asset-mapping'
+    assert get_created_asset_mapping['confidence'] == 'High'
+    assert get_created_asset_mapping['source'] == 'test source'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_asset_mapping['timestamp']
+    metric_histogram = asset_mapping.metric.histogram(
+        params={'granularity': 'week', 'from': data_from,
+                'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = asset_mapping.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = asset_mapping.metric.cardinality(
+        params={'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(asset_mapping.search.delete(
+        params={'id': entity_id_asset_mapping,
+                'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert asset.search.get(params={'id': entity_id_asset_mapping}) == []
+    # Delete asset entity and make attempt to get it back to
+    # validate it is not there anymore
+    delayed_return(asset.delete(entity_id_asset))
+    with pytest.raises(HTTPError):
+        asset.get(entity_id_asset)
+
+
+def test_python_module_ctia_positive_asset_properties(
+        module_headers, module_tool_client):
+    """Perform testing for asset properties entity of custom threat
+     intelligence python module
+
+    ID: CCTRI-2906 - 17265fc5-3137-4359-a396-81f214984aec
+
+    Steps:
+
+        1. Send POST request to create new asset entity using custom
+         python module
+        2. Send GET request using custom python module to read just created
+            entity back.
+        3. Send same GET request, but using direct access to the server
+        4. Compare results
+        5. Send POST request to create new asset properties entity using custom
+         python module
+        6. Send GET request using custom python module to read just created
+            entity back.
+        7. Send same GET request, but using direct access to the server
+        8. Compare results
+        9. Validate that GET request of external_id returns number of
+        external_id
+        10. Check expired endpoint
+        11. Update asset entity using custom python module
+        12. Repeat GET request using python module and validate that entity was
+            updated
+        13. Delete asset entity from the system
+        14. Delete asset properties entity from the system
+
+    Expected results: Asset properties entity can be created, fetched, updated
+     and deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    asset = module_tool_client.private_intel.asset
+    payload = {
+        'asset_type': 'data',
+        'description': 'For Test',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset',
+        'short_description': 'test',
+        'title': 'for test',
+        'external_ids': ['3']
+    }
+    # Create new asset entity using provided payload
+    post_tool_response = asset.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'asset_type',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    entity_id_asset = post_tool_response['id'].rpartition('/')[-1]
+    asset_ref = post_tool_response['id']
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = asset.get(entity_id_asset)
+    get_direct_response = ctia_get_data(
+        target_url=ASSET,
+        entity_id=entity_id_asset,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Create new asset properties entity using provided payload
+    asset_properties = module_tool_client.private_intel.asset_properties
+    payload_values_asset_properties = {
+        'asset_ref': asset_ref,
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset-properties',
+        'external_ids': ['3']
+    }
+    asset_properties_post_tool_response = asset_properties.post(
+        payload=payload_values_asset_properties, params={'wait_for': 'true'})
+    values_asset_properties = {
+        key: asset_properties_post_tool_response[key] for key in [
+            'asset_ref',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'external_ids'
+        ]
+    }
+    assert values_asset_properties == payload_values_asset_properties
+    entity_id_asset_properties = \
+        asset_properties_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_asset_properties_tool_response = \
+        asset_properties.get(entity_id_asset_properties)
+    get_direct_response_asset_properties = ctia_get_data(
+        target_url=ASSET_PROPERTIES,
+        entity_id=entity_id_asset_properties,
+        **{'headers': module_headers}
+    ).json()
+    assert get_asset_properties_tool_response ==\
+           get_direct_response_asset_properties
+    # Validate that GET request of external_id returns number of external_ids
+    external_id_result = asset_properties.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
+    # Create expired asset properties
+    expired_asset_properties = asset_properties.expire(
+        entity_id_asset_properties, payload={})
+    assert expired_asset_properties['source'] == 'test source'
+    # Update asset properties entity values
+    put_tool_response = delayed_return(
+        asset_properties.put(
+            id_=entity_id_asset_properties,
+            payload={'asset_ref': asset_ref,
+                     'valid_time': {
+                         "start_time": "2021-07-27T07:55:38.193Z",
+                         "end_time": "2021-07-27T07:55:38.193Z"},
+                     'schema_version': SERVER_VERSION,
+                     'source': 'New test source',
+                     'type': 'asset-properties'
+                     }
+        )
+    )
+    assert put_tool_response['type'] == 'asset-properties'
+    get_tool_response = asset_properties.get(entity_id_asset_properties)
+    assert get_tool_response['source'] == 'New test source'
+    # Delete the asset properties and make attempt to get it back to
+    # validate it is not there anymore
+    delayed_return(asset_properties.delete(entity_id_asset_properties))
+    with pytest.raises(HTTPError):
+        asset.get(entity_id_asset_properties)
+    # Delete asset entity and make attempt to get it back to
+    # validate it is not there anymore
+    delayed_return(asset.delete(entity_id_asset))
+    with pytest.raises(HTTPError):
+        asset.get(entity_id_asset)
+
+
+def test_python_module_ctia_positive_asset_properties_search(
+        module_headers, module_tool_client):
+    """Perform testing for asset properties/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2906 - 3246f737-e33d-4e60-b21f-3a85c28eddcf
+
+    Steps:
+
+        1. Send POST request to create new asset entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Send POST request to create new asset properties entity using custom
+         python module
+        4. Send GET request using custom python module to read just created
+                entity back.
+        5. Count entities after entity created
+        6. Delete asset properties entity from the system
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+        8. Count entities after entity deleted
+        9. Compare the amount of entities after creating and deleting entities
+        10. Delete asset entity from the system
+
+    Expected results: Asset properties entity can be created, fetched, counted
+     and deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    asset = module_tool_client.private_intel.asset
+    payload = {
+        'asset_type': 'data',
+        'description': 'For Test',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset',
+        'short_description': 'test',
+        'title': 'for test',
+        'external_ids': ['3']
+    }
+    # Create new asset entity using provided payload
+    post_tool_response = asset.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'asset_type',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    entity_id_asset = post_tool_response['id'].rpartition('/')[-1]
+    asset_ref = post_tool_response['id']
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = asset.get(entity_id_asset)
+    get_direct_response = ctia_get_data(
+        target_url=ASSET,
+        entity_id=entity_id_asset,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Create new asset properties entity using provided payload
+    asset_properties = module_tool_client.private_intel.asset_properties
+    payload_values_asset_properties = {
+        'asset_ref': asset_ref,
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset-properties',
+        'external_ids': ['3']
+    }
+    asset_properties_post_tool_response = asset_properties.post(
+        payload=payload_values_asset_properties, params={'wait_for': 'true'})
+    values_asset_properties = {
+        key: asset_properties_post_tool_response[key] for key in [
+            'asset_ref',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'external_ids'
+        ]
+    }
+    assert values_asset_properties == payload_values_asset_properties
+    entity_id_asset_properties = \
+        asset_properties_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_asset_properties_search = asset_properties.search.get(
+        params={'id': entity_id_asset_properties})
+    assert get_asset_properties_search[0]['type'] == 'asset-properties'
+    assert get_asset_properties_search[0]['source'] == 'test source'
+    # Count entities after entity created
+    count_asset_properties_before_deleted = asset_properties.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(asset_properties.search.delete(
+        params={'id': entity_id_asset_properties,
+                'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert asset.search.get(params={'id': entity_id_asset_properties}) == []
+    # Count entities after entity deleted
+    count_asset_properties_after_deleted = asset_properties.search.count()
+    # Compare results of count_asset_properties_before_deleted and
+    # count_asset_properties_after_deleted
+    assert count_asset_properties_before_deleted != \
+           count_asset_properties_after_deleted
+    # Delete asset entity and make attempt to get it back to
+    # validate it is not there anymore
+    delayed_return(asset.delete(entity_id_asset))
+    with pytest.raises(HTTPError):
+        asset.get(entity_id_asset)
+
+
+def test_python_module_ctia_positive_asset_properties_metric(
+        module_headers, module_tool_client):
+    """Perform testing for asset properties/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2906 -b3c835e4-4c5d-4d5d-95f6-45d3d7e350c3
+
+    Steps:
+
+        1. Send POST request to create new asset entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send POST request to create new asset properties entity using custom
+         python module
+        4. Send GET request using custom python module to read just created
+                 entity back.
+        5. Send GET request to get type of metric/histogram endpoint
+        6. Send GET request to get type of metric/topn endpoint
+        7. Send GET request to get type of metric/cardinality endpoint
+        8. Delete created entity
+        9. Repeat GET request using python module and validate that entity was
+            deleted
+        10. Delete asset properties entity from the system
+
+     Expected results: Asset properties entity can be created, fetched,
+      researched by metric's endpoints and deleted using custom python module.
+         Data stored in the entity is the same no matter you access it
+         directly or using our tool.
+
+    Importance: Critical
+    """
+    asset = module_tool_client.private_intel.asset
+    payload = {
+        'asset_type': 'data',
+        'description': 'For Test',
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset',
+        'short_description': 'test',
+        'title': 'for test',
+        'external_ids': ['3']
+    }
+    # Create new asset entity using provided payload
+    post_tool_response = asset.post(payload=payload,
+                                    params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'asset_type',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'description',
+            'short_description',
+            'title',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    entity_id_asset = post_tool_response['id'].rpartition('/')[-1]
+    asset_ref = post_tool_response['id']
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = asset.get(entity_id_asset)
+    get_direct_response = ctia_get_data(
+        target_url=ASSET,
+        entity_id=entity_id_asset,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Create new asset properties entity using provided payload
+    asset_properties = module_tool_client.private_intel.asset_properties
+    payload_values_asset_properties = {
+        'asset_ref': asset_ref,
+        'valid_time': {
+            "start_time": "2021-07-27T07:55:38.193Z",
+            "end_time": "2021-07-27T07:55:38.193Z"},
+        'schema_version': SERVER_VERSION,
+        'source': 'test source',
+        'type': 'asset-properties',
+        'external_ids': ['3']
+    }
+    asset_properties_post_tool_response = asset_properties.post(
+        payload=payload_values_asset_properties, params={'wait_for': 'true'})
+    values_asset_properties = {
+        key: asset_properties_post_tool_response[key] for key in [
+            'asset_ref',
+            'valid_time',
+            'schema_version',
+            'source',
+            'type',
+            'external_ids'
+        ]
+    }
+    assert values_asset_properties == payload_values_asset_properties
+    entity_id_asset_properties = \
+        asset_properties_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_asset_properties = \
+        asset_properties.get(entity_id_asset_properties)
+    assert get_created_asset_properties['type'] == 'asset-properties'
+    assert get_created_asset_properties['source'] == 'test source'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_asset_properties['timestamp']
+    metric_histogram = asset_properties.metric.histogram(
+        params={'granularity': 'week', 'from': data_from,
+                'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = asset_properties.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = asset_properties.metric.cardinality(
+        params={'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(asset_properties.search.delete(
+        params={'id': entity_id_asset_properties,
+                'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert asset.search.get(params={'id': entity_id_asset_properties}) == []
+    # Delete asset entity and make attempt to get it back to
+    # validate it is not there anymore
+    delayed_return(asset.delete(entity_id_asset))
+    with pytest.raises(HTTPError):
+        asset.get(entity_id_asset)
+
+
 def test_python_module_ctia_positive_attack_pattern(
         module_headers, module_tool_client):
     """Perform testing for attack pattern entity of custom threat intelligence
@@ -137,8 +1435,8 @@ def test_python_module_ctia_positive_attack_pattern(
             updated
         7. Delete entity from the system
 
-    Expectedresults: Attack pattern entity can be created, fetched, updated and
-        deleted using custom python module. Data stored in the entity is
+    Expected results: Attack pattern entity can be created, fetched, updated
+     and deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
     Importance: Critical
@@ -146,10 +1444,9 @@ def test_python_module_ctia_positive_attack_pattern(
     attack_pattern = module_tool_client.private_intel.attack_pattern
     payload = {
         'description': (
-            'A bootkit is a malware variant that modifies the boot sectors of'
+            'A boot kit is a malware variant that modifies the boot sectors of'
             ' a hard drive'
         ),
-
         'schema_version': SERVER_VERSION,
         'type': 'attack-pattern',
         'short_description': 'desc for test',
@@ -204,6 +1501,165 @@ def test_python_module_ctia_positive_attack_pattern(
         attack_pattern.get(entity_id)
 
 
+def test_python_module_ctia_positive_attack_pattern_search(module_tool_client):
+    """Perform testing for attack_pattern/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 642bcca5-3eec-4955-b395-e4c365b65bf5
+
+    Steps:
+
+        1. Send POST request to create new attack_pattern entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Attack_pattern entity can be created, fetched, counted
+     and deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    attack_pattern = module_tool_client.private_intel.attack_pattern
+    payload = {
+        'description': (
+            'A boot kit is a malware variant that modifies the boot sectors of'
+            ' a hard drive'
+        ),
+
+        'schema_version': SERVER_VERSION,
+        'type': 'attack-pattern',
+        'short_description': 'desc for test',
+        'source': 'new source point',
+
+        'title': 'for test'
+
+    }
+    # Create new entity using provided payload
+    post_tool_response = attack_pattern.post(payload=payload,
+                                             params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'schema_version',
+            'type',
+            'short_description',
+            'source',
+            'title'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_attack_pattern_search = attack_pattern.search.get(
+        params={'id': entity_id})
+    assert get_attack_pattern_search[0]['type'] == 'attack-pattern'
+    assert get_attack_pattern_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_attack_pattern_before_deleted = attack_pattern.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(attack_pattern.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert attack_pattern.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_attack_pattern_after_deleted = attack_pattern.search.count()
+    # Compare results of count_attack_pattern_before_deleted
+    # and count_attack_pattern_after_deleted
+    assert count_attack_pattern_before_deleted !=\
+           count_attack_pattern_after_deleted
+
+
+def test_python_module_ctia_positive_attack_pattern_metric(module_tool_client):
+    """Perform testing for attack_pattern/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -1b6c327c-cf55-4e22-a72c-93f9ad4b2763
+
+    Steps:
+
+        1. Send POST request to create new attack_pattern entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Attack_pattern entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    attack_pattern = module_tool_client.private_intel.attack_pattern
+    payload = {
+        'description': (
+            'A boot kit is a malware variant that modifies the boot sectors of'
+            ' a hard drive'
+        ),
+
+        'schema_version': SERVER_VERSION,
+        'type': 'attack-pattern',
+        'short_description': 'desc for test',
+        'source': 'new source point',
+
+        'title': 'for test'
+
+    }
+    # Create new entity using provided payload
+    post_tool_response = attack_pattern.post(payload=payload,
+                                             params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'schema_version',
+            'type',
+            'short_description',
+            'source',
+            'title'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_attack_pattern = attack_pattern.get(entity_id)
+    assert get_created_attack_pattern['type'] == 'attack-pattern'
+    assert get_created_attack_pattern['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_attack_pattern['timestamp']
+    metric_histogram = attack_pattern.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = attack_pattern.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = attack_pattern.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(attack_pattern.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert attack_pattern.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_bulk(module_headers, module_tool_client):
     """Perform testing for bulk functionality of custom threat intelligence
     python module
@@ -222,8 +1678,8 @@ def test_python_module_ctia_positive_bulk(module_headers, module_tool_client):
         5. Send same GET request, but with direct access to the server
         6. Compare results
 
-    Expectedresults: Bulk functionality works properly and some entities can be
-        created in the same time using custom python module
+    Expected results: Bulk functionality works properly and some entities can
+     be created in the same time using custom python module
 
     Importance: Critical
     """
@@ -296,7 +1752,7 @@ def test_python_module_ctia_positive_bundle(module_tool_client):
         3. Send POST request to export data using bundle functionality
         4. Send POST request to import data using bundle functionality
 
-    Expectedresults: Bundle functionality works properly and some entities can
+    Expected results: Bundle functionality works properly and some entities can
         be imported or exported using custom python module
 
     Importance: Critical
@@ -376,9 +1832,9 @@ def test_python_module_ctia_positive_campaign(
             validate proper values are returned
         8. Delete entity from the system
 
-    Expectedresults: Campaign entity can be created, fetched, updated, searched
-        and deleted using custom python module. Data stored in the entity is
-        the same no matter you access it directly or using our tool
+    Expected results: Campaign entity can be created, fetched, updated,
+     searched and deleted using custom python module. Data stored in the
+      entity is the same no matter you access it directly or using our tool
 
     Importance: Critical
     """
@@ -444,6 +1900,156 @@ def test_python_module_ctia_positive_campaign(
         campaign.get(entity_id)
 
 
+def test_python_module_ctia_positive_campaign_search(module_tool_client):
+    """Perform testing for campaign/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - b65fb933-d81b-4189-abbb-849fc2deef06
+
+    Steps:
+
+        1. Send POST request to create new campaign entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Campaign entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    campaign = module_tool_client.private_intel.campaign
+    payload = {
+        'title': 'Demo campaign',
+        'campaign_type': 'Critical',
+        'confidence': 'Medium',
+        'type': 'campaign',
+        'schema_version': SERVER_VERSION,
+        'description': 'For Test',
+        'short_description': 'Short test description'
+    }
+    # Create new entity using provided payload
+    post_tool_response = campaign.post(payload=payload,
+                                       params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'title',
+            'campaign_type',
+            'confidence',
+            'type',
+            'schema_version',
+            'description',
+            'short_description'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_campaign_search = campaign.search.get(
+        params={'id': entity_id})
+    assert get_campaign_search[0]['type'] == 'campaign'
+    assert get_campaign_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_campaign_before_deleted = campaign.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(campaign.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert campaign.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_campaign_after_deleted = campaign.search.count()
+    # Compare results of count_campaign_before_deleted
+    # and count_campaign_after_deleted
+    assert count_campaign_before_deleted != count_campaign_after_deleted
+
+
+def test_python_module_ctia_positive_campaign_metric(module_tool_client):
+    """Perform testing for campaign/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -b11cbee0-a3e5-4a19-8b4a-d3d16e7bfb5c
+
+    Steps:
+
+        1. Send POST request to create new campaign entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Campaign entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    campaign = module_tool_client.private_intel.campaign
+    payload = {
+        'title': 'Demo campaign',
+        'campaign_type': 'Critical',
+        'confidence': 'Medium',
+        'type': 'campaign',
+        'schema_version': SERVER_VERSION,
+        'description': 'For Test',
+        'short_description': 'Short test description'
+    }
+    # Create new entity using provided payload
+    post_tool_response = campaign.post(payload=payload,
+                                       params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'title',
+            'campaign_type',
+            'confidence',
+            'type',
+            'schema_version',
+            'description',
+            'short_description'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_campaign = campaign.get(entity_id)
+    assert get_created_campaign['type'] == 'campaign'
+    assert get_created_campaign['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_campaign['timestamp']
+    metric_histogram = campaign.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = campaign.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = campaign.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(campaign.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert campaign.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_casebook(
         module_headers, module_tool_client):
     """Perform testing for casebook entity of custom threat intelligence python
@@ -464,9 +2070,10 @@ def test_python_module_ctia_positive_casebook(
         7. Update casebook entity using custom python module
         8. Repeat GET request using python module and validate that entity was
             updated
-        9. Delete entity from the system
+        9. Use Patch endpoint for updating updated entity
+        10. Delete entity from the system
 
-    Expectedresults: Casebook entity can be created, fetched, updated and
+    Expected results: Casebook entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -528,11 +2135,173 @@ def test_python_module_ctia_positive_casebook(
     assert put_tool_response['short_description'] == 'Updated description'
     get_tool_response = casebook.get(entity_id)
     assert get_tool_response['short_description'] == 'Updated description'
+    # Use Patch endpoint for updating updated entity
+    payload_for_patch = {
+        'type': 'casebook',
+        'title': 'Case November, 2021 0:00 PM',
+        'short_description': 'Patched Casebook',
+        'description': 'Patched entity',
+        'observables': [],
+        'timestamp': '2019-09-24T11:34:18.000Z'
+    }
+    patch_tool_response = casebook.patch(entity_id, payload=payload_for_patch,
+                                         params={'wait_for': 'true'})
+    assert patch_tool_response['short_description'] == 'Patched Casebook'
+    assert patch_tool_response['description'] == 'Patched entity'
+    assert patch_tool_response['title'] == 'Case November, 2021 0:00 PM'
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(casebook.delete(entity_id))
     with pytest.raises(HTTPError):
         casebook.get(entity_id)
+
+
+def test_python_module_ctia_positive_casebook_search(module_tool_client):
+    """Perform testing for casebook/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 90719039-6d18-49cf-87fb-739e695be1fd
+
+    Steps:
+
+        1. Send POST request to create new casebook entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Casebook entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    casebook = module_tool_client.private_intel.casebook
+    observable = [{'value': 'instanbul.com', 'type': 'domain'}]
+    payload = {
+        'type': 'casebook',
+        'title': 'Case September 24, 2019 2:34 PM',
+        'short_description': 'New Casebook',
+        'description': 'New Casebook for malicious tickets',
+        'observables': observable,
+        'timestamp': '2019-09-24T11:34:18.000Z'
+    }
+    # Create new entity using provided payload
+    post_tool_response = casebook.post(payload=payload,
+                                       params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'type',
+            'title',
+            'short_description',
+            'description',
+            'observables',
+            'timestamp'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_casebook_search = casebook.search.get(
+        params={'id': entity_id})
+    assert get_casebook_search[0]['type'] == 'casebook'
+    assert get_casebook_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_casebook_before_deleted = casebook.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(casebook.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert casebook.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_casebook_after_deleted = casebook.search.count()
+    # Compare results of count_casebook_before_deleted
+    # and count_casebook_after_deleted
+    assert count_casebook_before_deleted != count_casebook_after_deleted
+
+
+def test_python_module_ctia_positive_casebook_metric(module_tool_client):
+    """Perform testing for casebook/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -e5f86888-5cab-4048-ae5a-92220db88497
+
+    Steps:
+
+        1. Send POST request to create new casebook entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Casebook entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    casebook = module_tool_client.private_intel.casebook
+    observable = [{'value': 'instanbul.com', 'type': 'domain'}]
+    payload = {
+        'type': 'casebook',
+        'title': 'Case September 24, 2019 2:34 PM',
+        'short_description': 'New Casebook',
+        'description': 'New Casebook for malicious tickets',
+        'observables': observable,
+        'timestamp': '2019-09-24T11:34:18.000Z'
+    }
+    # Create new entity using provided payload
+    post_tool_response = casebook.post(payload=payload,
+                                       params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'type',
+            'title',
+            'short_description',
+            'description',
+            'observables',
+            'timestamp'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_casebook = casebook.get(entity_id)
+    assert get_created_casebook['type'] == 'casebook'
+    assert get_created_casebook['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_casebook['timestamp']
+    metric_histogram = casebook.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = casebook.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = casebook.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(casebook.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert casebook.search.get(params={'id': entity_id}) == []
 
 
 def test_python_module_ctia_positive_coa(module_headers, module_tool_client):
@@ -554,7 +2323,7 @@ def test_python_module_ctia_positive_coa(module_headers, module_tool_client):
             updated
         7. Delete entity from the system
 
-    Expectedresults: COA entity can be created, fetched, updated and
+    Expected results: COA entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -608,6 +2377,148 @@ def test_python_module_ctia_positive_coa(module_headers, module_tool_client):
         coa.get(entity_id)
 
 
+def test_python_module_ctia_positive_coa_search(module_tool_client):
+    """Perform testing for coa/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 5bd4220c-f91f-407d-9b3b-c436d8dc5c3f
+
+    Steps:
+
+        1. Send POST request to create new coa entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: COA entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    coa = module_tool_client.private_intel.coa
+    payload = {
+        'description': 'COA entity we use for testing',
+        'structured_coa_type': 'openc2',
+        'coa_type': 'Diplomatic Actions',
+        'type': 'coa',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_tool_response = coa.post(payload=payload,
+                                  params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'structured_coa_type',
+            'coa_type',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_coa_search = coa.search.get(
+        params={'id': entity_id})
+    assert get_coa_search[0]['type'] == 'coa'
+    assert get_coa_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_coa_before_deleted = coa.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(coa.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert coa.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_coa_after_deleted = coa.search.count()
+    # Compare results of count_coa_before_deleted
+    # and count_coa_after_deleted
+    assert count_coa_before_deleted != count_coa_after_deleted
+
+
+def test_python_module_ctia_positive_coa_metric(module_tool_client):
+    """Perform testing for coa/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -73e26197-527f-437b-9ad8-eb5cd34761ed
+
+    Steps:
+
+        1. Send POST request to create new coa entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: COA entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    coa = module_tool_client.private_intel.coa
+    payload = {
+        'description': 'COA entity we use for testing',
+        'structured_coa_type': 'openc2',
+        'coa_type': 'Diplomatic Actions',
+        'type': 'coa',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_tool_response = coa.post(payload=payload,
+                                  params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'structured_coa_type',
+            'coa_type',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_coa = coa.get(entity_id)
+    assert get_created_coa['type'] == 'coa'
+    assert get_created_coa['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_coa['timestamp']
+    metric_histogram = coa.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = coa.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = coa.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(coa.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert coa.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_data_table(
         module_headers, module_tool_client):
     """Perform testing for data table entity of custom threat intelligence
@@ -625,7 +2536,7 @@ def test_python_module_ctia_positive_data_table(
         4. Compare results
         5. Delete entity from the system
 
-    Expectedresults: Data table entity can be created, fetched and deleted
+    Expected results: Data table entity can be created, fetched and deleted
         using custom python module. Data stored in the entity is the same no
         matter you access it directly or using our tool
 
@@ -679,7 +2590,7 @@ def test_python_module_ctia_positive_event(module_tool_client):
         2. Send GET request to server using that id
         3. Validate returned data contains information about event
 
-    Expectedresults: Requests sent successfully and got valid response
+    Expected results: Requests sent successfully and got valid response
         from server
 
     Importance: Critical
@@ -692,6 +2603,59 @@ def test_python_module_ctia_positive_event(module_tool_client):
     get_tool_response = event.get(entity['id'].rpartition('/')[-1])
     assert get_tool_response['type'] == 'event'
     assert get_tool_response['timestamp']
+
+
+def test_python_module_ctia_positive_event_search(module_tool_client):
+    """Perform testing for event/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2906 - 363a43d4-1862-4eed-aecb-3d011804642d
+
+    Steps:
+
+        1. Send GET request using custom python module to read just created
+                entity back.
+        2. Count entities after entity created
+        3. Delete entity from the system
+        4. Count entities after entity deleted
+        5. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Event entity can be fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    event = module_tool_client.private_intel.event
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    event_search = event.search.get()
+    assert event_search[1]['type'] == 'event'
+    entity_id = event_search[1]['id'].rpartition('/')[-1]
+    # Count entities after entity created
+    count_event_before_deleted = event.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    deleting_response = None
+    try:
+        event.search.delete(params={
+            'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true',
+            'wait_for': 'true'})
+    except HTTPError as error:
+        deleting_response = error
+    assert deleting_response.response.status_code == 403
+    json_string = deleting_response.response.text
+    parsed_text_response = json.loads(json_string)
+    assert parsed_text_response['message'] == 'Missing capability'
+    assert parsed_text_response['error'] == 'missing_capability'
+    assert parsed_text_response['capabilities'][0] == 'search-event'
+    assert parsed_text_response['capabilities'][1] == 'developer'
+    assert parsed_text_response['capabilities'][2] == 'delete-event'
+    # Count entities after entity deleted
+    count_event_after_deleted = event.search.count()
+    # Compare results of count_event_before_deleted
+    # and count_event_after_deleted
+    assert count_event_before_deleted == count_event_after_deleted
 
 
 def test_python_module_ctia_positive_feed(module_headers, module_tool_client):
@@ -721,7 +2685,7 @@ def test_python_module_ctia_positive_feed(module_headers, module_tool_client):
             endpoint
         11. Delete entity from the system
 
-    Expectedresults: Feed entity can be created, fetched, updated and
+    Expected results: Feed entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -854,7 +2818,7 @@ def test_python_module_ctia_positive_feedback(
         4. Compare results
         5. Delete entity from the system
 
-    Expectedresults: Feedback entity can be created, fetched and deleted using
+    Expected results: Feedback entity can be created, fetched and deleted using
         custom python module. Data stored in the entity is the same no matter
         you access it directly or using our tool
 
@@ -924,7 +2888,7 @@ def test_python_module_ctia_positive_graphql(module_tool_client):
         1. Send POST request to server to execute GraphQL query using custom
             python module
 
-    Expectedresults: POST request sent successfully and got valid response
+    Expected results: POST request sent successfully and got valid response
         from server
 
     Importance: Critical
@@ -967,7 +2931,7 @@ def test_python_module_ctia_positive_identity_assertion(
             updated
         7. Delete entity from the system
 
-    Expectedresults: Identity assertion entity can be created, fetched,
+    Expected results: Identity assertion entity can be created, fetched,
         updated and deleted using custom python module. Data stored in the
         entity is the same no matter you access it directly or using our tool
 
@@ -1072,7 +3036,7 @@ def test_python_module_ctia_positive_incident(
         10. Repeat GET request to validate that status was updated
         11. Delete entity from the system
 
-    Expectedresults: Incident entity can be created, fetched, updated and
+    Expected results: Incident entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -1145,6 +3109,152 @@ def test_python_module_ctia_positive_incident(
         incident.get(entity_id)
 
 
+def test_python_module_ctia_positive_incident_search(module_tool_client):
+    """Perform testing for incident/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 8fc6ba46-a610-4432-a72b-af92836fa560
+
+    Steps:
+
+        1. Send POST request to create new incident entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Incident entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    incident = module_tool_client.private_intel.incident
+    payload = {
+        'confidence': 'High',
+        'incident_time': {
+            'opened': "2016-02-11T00:40:48.212Z"
+        },
+        'status': 'Open',
+        'type': 'incident',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_tool_response = incident.post(payload=payload,
+                                       params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'confidence',
+            'incident_time',
+            'status',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_incident_search = incident.search.get(
+        params={'id': entity_id})
+    assert get_incident_search[0]['type'] == 'incident'
+    assert get_incident_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_incident_before_deleted = incident.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(incident.search.delete(
+        params={'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert incident.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_incident_after_deleted = incident.search.count()
+    # Compare results of count_incident_before_deleted
+    # and count_incident_after_deleted
+    assert count_incident_before_deleted != count_incident_after_deleted
+
+
+def test_python_module_ctia_positive_incident_metric(module_tool_client):
+    """Perform testing for incident/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -1828964e-ebee-4ed5-939f-f44e8010e0eb
+
+    Steps:
+
+        1. Send POST request to create new incident entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Incident entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    incident = module_tool_client.private_intel.incident
+    payload = {
+        'confidence': 'High',
+        'incident_time': {
+            'opened': "2016-02-11T00:40:48.212Z"
+        },
+        'status': 'Open',
+        'type': 'incident',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_tool_response = incident.post(payload=payload,
+                                       params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'confidence',
+            'incident_time',
+            'status',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_incident = incident.get(entity_id)
+    assert get_created_incident['type'] == 'incident'
+    assert get_created_incident['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_incident['timestamp']
+    metric_histogram = incident.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = incident.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = incident.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(incident.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert incident.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_indicator(
         module_headers, module_tool_client):
     """Perform testing for indicator entity of custom threat intelligence
@@ -1165,7 +3275,7 @@ def test_python_module_ctia_positive_indicator(
             updated
         7. Delete entity from the system
 
-    Expectedresults: Indicator entity can be created, fetched, updated and
+    Expected results: Indicator entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -1220,6 +3330,144 @@ def test_python_module_ctia_positive_indicator(
         indicator.get(entity_id)
 
 
+def test_python_module_ctia_positive_indicator_search(module_tool_client):
+    """Perform testing for indicator/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 6137f999-74e9-456e-bea8-42f26341de43
+
+    Steps:
+
+        1. Send POST request to create new indicator entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Indicator entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    indicator = module_tool_client.private_intel.indicator
+    payload = {
+        'producer': 'producer',
+        'schema_version': SERVER_VERSION,
+        'type': 'indicator',
+        'revision': 0
+    }
+    # Create new entity using provided payload
+    post_tool_response = indicator.post(payload=payload,
+                                        params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'producer',
+            'revision',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_indicator_search = indicator.search.get(
+        params={'id': entity_id})
+    assert get_indicator_search[0]['type'] == 'indicator'
+    assert get_indicator_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_indicator_before_deleted = indicator.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(indicator.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert indicator.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_indicator_after_deleted = indicator.search.count()
+    # Compare results of count_indicator_before_deleted
+    # and count_indicator_after_deleted
+    assert count_indicator_before_deleted != count_indicator_after_deleted
+
+
+def test_python_module_ctia_positive_indicator_metric(module_tool_client):
+    """Perform testing for indicator/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -36009d09-8efc-412d-8003-33fb148ba8bf
+
+    Steps:
+
+        1. Send POST request to create new indicator entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Indicator entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    indicator = module_tool_client.private_intel.indicator
+    payload = {
+        'producer': 'producer',
+        'schema_version': SERVER_VERSION,
+        'type': 'indicator',
+        'revision': 0
+    }
+    # Create new entity using provided payload
+    post_tool_response = indicator.post(payload=payload,
+                                        params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'producer',
+            'revision',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_indicator = indicator.get(entity_id)
+    assert get_created_indicator['type'] == 'indicator'
+    assert get_created_indicator['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_indicator['timestamp']
+    metric_histogram = indicator.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = indicator.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = indicator.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(indicator.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert indicator.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_investigation(
         module_headers, module_tool_client):
     """Perform testing for investigation entity of custom threat intelligence
@@ -1240,7 +3488,7 @@ def test_python_module_ctia_positive_investigation(
             updated
         7. Delete entity from the system
 
-    Expectedresults: Investigation entity can be created, fetched, updated and
+    Expected results: Investigation entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -1294,6 +3542,149 @@ def test_python_module_ctia_positive_investigation(
         investigation.get(entity_id)
 
 
+def test_python_module_ctia_positive_investigation_search(module_tool_client):
+    """Perform testing for investigation/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 7dae9799-2ae0-4a8c-81ae-99477bb4833a
+
+    Steps:
+
+        1. Send POST request to create new investigation entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Investigation entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    investigation = module_tool_client.private_intel.investigation
+    payload = {
+        'title': 'Demo investigation',
+        'description': 'Request investigation for yesterday malware',
+        'type': 'investigation',
+        'source': 'a source',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_tool_response = investigation.post(payload=payload,
+                                            params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'title',
+            'description',
+            'source',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_investigation_search = investigation.search.get(
+        params={'id': entity_id})
+    assert get_investigation_search[0]['type'] == 'investigation'
+    assert get_investigation_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_investigation_before_deleted = investigation.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(investigation.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert investigation.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_investigation_after_deleted = investigation.search.count()
+    # Compare results of count_investigation_before_deleted
+    # and get_investigation_search_count2
+    assert count_investigation_before_deleted !=\
+           count_investigation_after_deleted
+
+
+def test_python_module_ctia_positive_investigation_metric(module_tool_client):
+    """Perform testing for investigation/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -b1148fab-b57e-409c-a6b4-2ce0bd229bf1
+
+    Steps:
+
+        1. Send POST request to create new investigation entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Investigation entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    investigation = module_tool_client.private_intel.investigation
+    payload = {
+        'title': 'Demo investigation',
+        'description': 'Request investigation for yesterday malware',
+        'type': 'investigation',
+        'source': 'a source',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_tool_response = investigation.post(payload=payload,
+                                            params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'title',
+            'description',
+            'source',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_investigation = investigation.get(entity_id)
+    assert get_created_investigation['type'] == 'investigation'
+    assert get_created_investigation['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_investigation['timestamp']
+    metric_histogram = investigation.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = investigation.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = investigation.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(investigation.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert investigation.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_judgement(
         module_headers, module_tool_client):
     """Perform testing for judgement entity of custom threat intelligence
@@ -1312,9 +3703,10 @@ def test_python_module_ctia_positive_judgement(
         5. Make an attempt to update judgement entity using custom python
             module
         6. Check that error is returned
-        7. Delete entity from the system
+        7. Create expired judgement via /ctia/judgement/{id}/expire endpoint
+        8. Delete entity from the system
 
-    Expectedresults: Judgement entity can be created, fetched and deleted
+    Expected results: Judgement entity can be created, fetched and deleted
         using custom python module. Data stored in the entity is the same
         no matter you access it directly or using our tool
 
@@ -1380,11 +3772,179 @@ def test_python_module_ctia_positive_judgement(
             }
         )
     assert '"error": "missing_capability"' in str(context.value)
+    # Create expired judgement
+    expired_judgement = judgement.expire(entity_id, payload={},
+                                         params={'reason': 'For test'})
+    assert expired_judgement['reason'] == ' For test'
     # Delete the entity and make attempt to get it back to validate it is
     # not there anymore
     delayed_return(judgement.delete(entity_id))
     with pytest.raises(HTTPError):
         judgement.get(entity_id)
+
+
+def test_python_module_ctia_positive_judgement_search(module_tool_client):
+    """Perform testing for judgement/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 5f5b8907-9e76-4bbb-aa11-330721f569eb
+
+    Steps:
+
+        1. Send POST request to create new judgement entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Actor entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    judgement = module_tool_client.private_intel.judgement
+    payload = {
+        'confidence': 'High',
+        'disposition': 1,
+        'disposition_name': 'Clean',
+        'observable': {
+            'type': 'ip',
+            'value': '10.0.0.1'
+        },
+        'priority': 99,
+        'schema_version': SERVER_VERSION,
+        'severity': 'Medium',
+        'source': 'source',
+        'type': 'judgement',
+    }
+    # Create new entity using provided payload
+    post_tool_response = judgement.post(payload=payload,
+                                        params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'confidence',
+            'disposition',
+            'disposition_name',
+            'observable',
+            'priority',
+            'schema_version',
+            'observable',
+            'severity',
+            'source',
+            'type'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_judgement_search = judgement.search.get(params={'id': entity_id})
+    assert get_judgement_search[0]['type'] == 'judgement'
+    # Count entities after entity created
+    count_judgement_before_deleted = judgement.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(judgement.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert judgement.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_judgement_after_deleted = judgement.search.count()
+    # Compare results of count_judgement_before_deleted
+    # and count_judgement_after_deleted
+    assert count_judgement_before_deleted != count_judgement_after_deleted
+
+
+def test_python_module_ctia_positive_judgement_metric(module_tool_client):
+    """Perform testing for judgement/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -7bddcca2-0188-4885-9289-fa0797bf1448
+
+    Steps:
+
+        1. Send POST request to create new judgement entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Actor entity can be created, fetched, researched by
+         metric's endpoints and deleted using custom python module.
+         Data stored in the entity is the same no matter you access it
+         directly or using our tool.
+
+    Importance: Critical
+    """
+    judgement = module_tool_client.private_intel.judgement
+    payload = {
+        'confidence': 'High',
+        'disposition': 1,
+        'disposition_name': 'Clean',
+        'observable': {
+            'type': 'ip',
+            'value': '10.0.0.1'
+        },
+        'priority': 99,
+        'schema_version': SERVER_VERSION,
+        'severity': 'Medium',
+        'source': 'source',
+        'type': 'judgement',
+    }
+    # Create new entity using provided payload
+    post_tool_response = judgement.post(payload=payload,
+                                        params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'confidence',
+            'disposition',
+            'disposition_name',
+            'observable',
+            'priority',
+            'schema_version',
+            'observable',
+            'severity',
+            'source',
+            'type',
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_judgement = judgement.get(entity_id)
+    assert get_created_judgement['type'] == 'judgement'
+    assert get_created_judgement['source'] == 'source'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_judgement['timestamp']
+    metric_histogram = judgement.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = judgement.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'confidence'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = judgement.metric.cardinality(
+        params={'from': data_from, 'aggregate-on': 'confidence'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(judgement.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert judgement.search.get(params={'id': entity_id}) == []
 
 
 def test_python_module_ctia_positive_malware(
@@ -1407,7 +3967,7 @@ def test_python_module_ctia_positive_malware(
             updated
         7. Delete entity from the system
 
-    Expectedresults: Malware entity can be created, fetched, updated and
+    Expected results: Malware entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -1469,6 +4029,156 @@ def test_python_module_ctia_positive_malware(
         malware.get(entity_id)
 
 
+def test_python_module_ctia_positive_malware_search(module_tool_client):
+    """Perform testing for malware/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 9f54a221-0e7b-4410-9737-84c61ab32dfe
+
+    Steps:
+
+        1. Send POST request to create new malware entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Malware entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    malware = module_tool_client.private_intel.malware
+    payload = {
+        'type': 'malware',
+        'schema_version': SERVER_VERSION,
+        'labels': ['malware'],
+        'description': 'Test description',
+        'title': 'Title for test',
+        'short_description': 'Short test description'
+
+    }
+    # Create new entity using provided payload
+    post_tool_response = malware.post(payload=payload,
+                                      params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'title',
+            'labels',
+            'type',
+            'schema_version',
+            'description',
+            'short_description',
+
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_malware_search = malware.search.get(
+        params={'id': entity_id})
+    assert get_malware_search[0]['type'] == 'malware'
+    assert get_malware_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_malware_before_deleted = malware.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(malware.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert malware.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_malware_after_deleted = malware.search.count()
+    # Compare results of count_malware_before_deleted
+    # and count_malware_after_deleted
+    assert count_malware_before_deleted != count_malware_after_deleted
+
+
+def test_python_module_ctia_positive_malware_metric(module_tool_client):
+    """Perform testing for malware/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -33b01f79-0d65-4aef-a1b0-c8f497400508
+
+    Steps:
+
+        1. Send POST request to create new malware entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Malware entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    malware = module_tool_client.private_intel.malware
+    payload = {
+        'type': 'malware',
+        'schema_version': SERVER_VERSION,
+        'labels': ['malware'],
+        'description': 'Test description',
+        'title': 'Title for test',
+        'short_description': 'Short test description'
+
+    }
+    # Create new entity using provided payload
+    post_tool_response = malware.post(payload=payload,
+                                      params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'title',
+            'labels',
+            'type',
+            'schema_version',
+            'description',
+            'short_description',
+
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_malware = malware.get(entity_id)
+    assert get_created_malware['type'] == 'malware'
+    assert get_created_malware['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_malware['timestamp']
+    metric_histogram = malware.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = malware.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = malware.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(malware.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert malware.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_relationship(
         module_headers, module_tool_client):
     """Perform testing for relationship entity of custom threat intelligence
@@ -1493,7 +4203,7 @@ def test_python_module_ctia_positive_relationship(
             updated
         9. Delete entity from the system
 
-    Expectedresults: Relationship entity can be created, fetched, updated and
+    Expected results: Relationship entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is the
         same no matter you access it directly or using our tool
 
@@ -1580,6 +4290,213 @@ def test_python_module_ctia_positive_relationship(
         relationship.get(entity_id)
 
 
+def test_python_module_ctia_positive_relationship_search(module_tool_client):
+    """Perform testing for relationship/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 55dedd52-678a-4513-9b43-0bb88599d3f5
+
+    Steps:
+
+        1. Send POST request to create one campaign entity to be used for
+            relationship functionality
+        2. Send POST request to create one indicator entity to be used for
+            relationship functionality
+        3. Send POST request to create new relationship entity using custom
+            python module
+        4. Send GET request using custom python module to read just created
+                entity back.
+        5. Count entities after entity created
+        6. Delete entity from the system
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+        8. Count entities after entity deleted
+        9. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Relationship entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    campaign = module_tool_client.private_intel.campaign
+    payload = {
+        'campaign_type': 'Low',
+        'confidence': 'Medium',
+        'type': 'campaign',
+        'schema_version': SERVER_VERSION,
+        'description': 'Test description',
+        'title': 'Title for test',
+        'short_description': 'Short test description'
+    }
+    # Create new campaign using provided payload
+    campaign_post_response = campaign.post(payload=payload,
+                                           params={'wait_for': 'true'})
+    # Prepare data for indicator
+    indicator = module_tool_client.private_intel.indicator
+    payload = {
+        'producer': 'producer',
+        'schema_version': SERVER_VERSION,
+        'type': 'indicator',
+        'revision': 0
+    }
+    # Create new indicator using provided payload
+    indicator_post_response = indicator.post(payload=payload,
+                                             params={'wait_for': 'true'})
+    # Use created entities for relationship
+    relationship = module_tool_client.private_intel.relationship
+    payload = {
+        'description': 'Test relation',
+        'schema_version': SERVER_VERSION,
+        'type': 'relationship',
+        'source_ref': campaign_post_response['id'],
+        'target_ref': indicator_post_response['id'],
+        'relationship_type': 'indicates',
+    }
+    # Create new entity using provided payload
+    post_tool_response = relationship.post(payload=payload,
+                                           params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'source_ref',
+            'target_ref',
+            'relationship_type',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_relationship_search = relationship.search.get(
+        params={'id': entity_id})
+    assert get_relationship_search[0]['type'] == 'relationship'
+    assert get_relationship_search[0]['schema_version'] == '1.1.3'
+    assert get_relationship_search[0]['description'] == 'Test relation'
+    # Count entities after entity created
+    count_relationship_before_deleted = relationship.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(relationship.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert relationship.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_relationship_after_deleted = relationship.search.count()
+    # Compare results of count_relationship_before_deleted
+    # and count_relationship_after_deleted
+    assert count_relationship_before_deleted !=\
+           count_relationship_after_deleted
+
+
+def test_python_module_ctia_positive_relationship_metric(module_tool_client):
+    """Perform testing for relationship/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -4d34bfc9-eec7-4c28-b53c-f6c83e46a9d1
+
+    Steps:
+
+        1. Send POST request to create one campaign entity to be used for
+            relationship functionality
+        2. Send POST request to create one indicator entity to be used for
+            relationship functionality
+        3. Send POST request to create new relationship entity using custom
+            python module
+        4. Send GET request using custom python module to read just created
+                 entity back.
+        5. Send GET request to get type of metric/histogram endpoint
+        6. Send GET request to get type of metric/topn endpoint
+        7. Send GET request to get type of metric/cardinality endpoint
+        8. Delete created entity
+        9. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Relationship entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    campaign = module_tool_client.private_intel.campaign
+    payload = {
+        'campaign_type': 'Low',
+        'confidence': 'Medium',
+        'type': 'campaign',
+        'schema_version': SERVER_VERSION,
+        'description': 'Test description',
+        'title': 'Title for test',
+        'short_description': 'Short test description'
+    }
+    # Create new campaign using provided payload
+    campaign_post_response = campaign.post(payload=payload,
+                                           params={'wait_for': 'true'})
+    # Prepare data for indicator
+    indicator = module_tool_client.private_intel.indicator
+    payload = {
+        'producer': 'producer',
+        'schema_version': SERVER_VERSION,
+        'type': 'indicator',
+        'revision': 0
+    }
+    # Create new indicator using provided payload
+    indicator_post_response = indicator.post(payload=payload,
+                                             params={'wait_for': 'true'})
+    # Use created entities for relationship
+    relationship = module_tool_client.private_intel.relationship
+    payload = {
+        'description': 'Test relation',
+        'schema_version': SERVER_VERSION,
+        'type': 'relationship',
+        'source_ref': campaign_post_response['id'],
+        'target_ref': indicator_post_response['id'],
+        'relationship_type': 'indicates',
+    }
+    # Create new entity using provided payload
+    post_tool_response = relationship.post(payload=payload,
+                                           params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'source_ref',
+            'target_ref',
+            'relationship_type',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_relationship = relationship.get(entity_id)
+    assert get_created_relationship['type'] == 'relationship'
+    assert get_created_relationship['schema_version'] == '1.1.3'
+    assert get_created_relationship['description'] == 'Test relation'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_relationship['timestamp']
+    metric_histogram = relationship.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = relationship.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = relationship.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(relationship.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert relationship.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_sighting(
         module_headers, module_tool_client):
     """Perform testing for sighting entity of custom threat intelligence python
@@ -1600,7 +4517,7 @@ def test_python_module_ctia_positive_sighting(
             updated
         7. Delete entity from the system
 
-    Expectedresults: Sighting entity can be created, fetched, updated and
+    Expected results: Sighting entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -1663,6 +4580,431 @@ def test_python_module_ctia_positive_sighting(
         sighting.get(entity_id)
 
 
+def test_python_module_ctia_positive_sighting_search(module_tool_client):
+    """Perform testing for sighting/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - cbe1ae9b-8889-45d0-ac14-a4ec71c7208a
+
+    Steps:
+
+        1. Send POST request to create new sighting entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Sighting entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    sighting = module_tool_client.private_intel.sighting
+    payload = {
+        'count': 1,
+        'observed_time': {
+            'start_time': '2019-09-25T00:40:48.212Z',
+            'end_time': '2019-09-25T00:40:48.212Z'
+        },
+        'confidence': 'High',
+        'type': 'sighting',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_sighting_response = sighting.post(
+        payload=payload, params={'wait_for': 'true'})
+    values = {
+        key: post_sighting_response[key] for key in [
+            'count',
+            'observed_time',
+            'confidence',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_sighting_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_sighting_search = sighting.search.get(
+        params={'id': entity_id})
+    assert get_sighting_search[0]['type'] == 'sighting'
+    assert get_sighting_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_sighting_before_deleted = sighting.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(sighting.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert sighting.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_sighting_after_deleted = sighting.search.count()
+    # Compare results of count_sighting_before_deleted
+    # and count_sighting_after_deleted
+    assert count_sighting_before_deleted != count_sighting_after_deleted
+
+
+def test_python_module_ctia_positive_sighting_metric(module_tool_client):
+    """Perform testing for sighting/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -edbab647-5ba8-4756-be13-4ebe96d4c899
+
+    Steps:
+
+        1. Send POST request to create new sighting entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Sighting entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    sighting = module_tool_client.private_intel.sighting
+    payload = {
+        'count': 1,
+        'observed_time': {
+            'start_time': '2019-09-25T00:40:48.212Z',
+            'end_time': '2019-09-25T00:40:48.212Z'
+        },
+        'confidence': 'High',
+        'type': 'sighting',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_sighting_response = sighting.post(payload=payload,
+                                           params={'wait_for': 'true'})
+    values = {
+        key: post_sighting_response[key] for key in [
+            'count',
+            'observed_time',
+            'confidence',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_sighting_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_sighting = sighting.get(entity_id)
+    assert get_created_sighting['type'] == 'sighting'
+    assert get_created_sighting['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_sighting['timestamp']
+    metric_histogram = sighting.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = sighting.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = sighting.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(sighting.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert sighting.search.get(params={'id': entity_id}) == []
+
+
+def test_python_module_ctia_positive_target_record(
+        module_headers, module_tool_client):
+    """Perform testing for target_record entity of custom threat intelligence
+     python module
+
+    ID: CCTRI-2906 - 3392e79b-b8c7-4ff8-b261-a1032bc78cbd
+
+    Steps:
+
+        1. Send POST request to create new target_record entity using custom
+         python module
+        2. Send GET request using custom python module to read just created
+            entity back.
+        3. Send same GET request, but using direct access to the server
+        4. Compare results
+        5. Validate that GET request of external_id returns number of
+        external_id
+        6. Update target_record entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
+            updated
+        8. Delete entity from the system
+
+    Expected results: Sighting entity can be created, fetched, updated and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    target_record = module_tool_client.private_intel.target_record
+    payload = {
+        "targets": [
+            {
+                "type": "string",
+                "observables": [
+                    {
+                        "value": "asdf.com",
+                        "type": "domain"
+                    }
+                ],
+                "observed_time": {
+                    "start_time": "2021-08-05T14:17:54.726Z",
+                    "end_time": "2021-08-05T14:17:54.726Z"
+                }
+            }
+            ],
+        'source': 'For test',
+        'type': 'target-record',
+        'schema_version': SERVER_VERSION,
+        'external_ids': ['3']
+    }
+    # Create new entity using provided payload
+    post_tool_response = target_record.post(
+        payload=payload, params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'source',
+            'targets',
+            'type',
+            'schema_version',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = target_record.get(entity_id)
+    get_direct_response = ctia_get_data(
+        target_url=TARGET_RECORD,
+        entity_id=entity_id,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns appropriate value
+    external_id_result = target_record.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
+    # Update entity values
+    put_tool_response = delayed_return(
+        target_record.put(
+            id_=entity_id,
+            payload={
+                'source': 'Updated source',
+                'targets': [
+                    {
+                        "type": "string",
+                        "observables": [
+                            {
+                                "value": "asdf.com",
+                                "type": "domain"
+                            }
+                            ],
+                        "observed_time": {
+                            "start_time": "2021-08-05T14:17:54.726Z",
+                            "end_time": "2021-08-05T14:17:54.726Z"
+                        }
+                    }
+                ]
+                }
+        )
+    )
+    assert put_tool_response['source'] == 'Updated source'
+    get_tool_response = target_record.get(entity_id)
+    assert get_tool_response['source'] == 'Updated source'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(target_record.delete(entity_id))
+    with pytest.raises(HTTPError):
+        target_record.get(entity_id)
+
+
+def test_python_module_ctia_positive_target_record_search(module_tool_client):
+    """Perform testing for target_record/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2906 - b1fd55c7-cbae-43c7-a246-725948563e96
+
+    Steps:
+
+        1. Send POST request to create new target_record entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Target_record entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    target_record = module_tool_client.private_intel.target_record
+    payload = {
+        "targets": [
+            {
+                "type": "string",
+                "observables": [
+                    {
+                        "value": "asdf.com",
+                        "type": "domain"
+                    }
+                ],
+                "observed_time": {
+                    "start_time": "2021-08-05T14:17:54.726Z",
+                    "end_time": "2021-08-05T14:17:54.726Z"
+                }
+            }
+        ],
+        'source': 'For test',
+        'type': 'target-record',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_tool_response = target_record.post(payload=payload,
+                                            params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'source',
+            'targets',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_target_record_search = target_record.search.get(
+        params={'id': entity_id})
+    assert get_target_record_search[0]['type'] == 'target-record'
+    assert get_target_record_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_target_record_before_deleted = target_record.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(target_record.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert target_record.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_target_record_after_deleted = target_record.search.count()
+    # Compare results of count_target_record_before_deleted
+    # and count_target_record_after_deleted
+    assert count_target_record_before_deleted !=\
+           count_target_record_after_deleted
+
+
+def test_python_module_ctia_positive_target_record_metric(module_tool_client):
+    """Perform testing for target_record/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2906 -e3426742-294f-406a-9fb0-06958c369c3d
+
+    Steps:
+
+        1. Send POST request to create new target_record entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Target_record entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    target_record = module_tool_client.private_intel.target_record
+    payload = {
+        "targets": [
+            {
+                "type": "string",
+                "observables": [
+                    {
+                        "value": "asdf.com",
+                        "type": "domain"
+                    }
+                ],
+                "observed_time": {
+                    "start_time": "2021-08-05T14:17:54.726Z",
+                    "end_time": "2021-08-05T14:17:54.726Z"
+                }
+            }
+        ],
+        'source': 'For test',
+        'type': 'target-record',
+        'schema_version': SERVER_VERSION
+    }
+    # Create new entity using provided payload
+    post_tool_response = target_record.post(payload=payload,
+                                            params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'source',
+            'targets',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_target_record = target_record.get(entity_id)
+    assert get_created_target_record['type'] == 'target-record'
+    assert get_created_target_record['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_target_record['timestamp']
+    metric_histogram = target_record.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = target_record.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = target_record.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(target_record.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert target_record.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_status(module_tool_client):
     """Perform testing for status endpoint using custom threat intelligence
     python module
@@ -1674,7 +5016,7 @@ def test_python_module_ctia_positive_status(module_tool_client):
         1. Send GET request to server using custom python module
         2. Validate returned data
 
-    Expectedresults: Response contains information about server health status
+    Expected results: Response contains information about server health status
 
     Importance: Critical
     """
@@ -1702,7 +5044,7 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
             updated
         7. Delete entity from the system
 
-    Expectedresults: Tool entity can be created, fetched, updated and
+    Expected results: Tool entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -1765,6 +5107,152 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
         tool.delete(entity_id)
 
 
+def test_python_module_ctia_positive_tool_search(module_tool_client):
+    """Perform testing for tool/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - cbe1ae9b-8889-45d0-ac14-a4ec71c7208a
+
+    Steps:
+
+        1. Send POST request to create new tool entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Tool entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    tool = module_tool_client.private_intel.tool
+    payload = {
+        'labels': ['tool'],
+        'type': 'tool',
+        'schema_version': SERVER_VERSION,
+        'description': 'Test description',
+        'title': 'Title for test',
+        'short_description': 'Short test description'
+    }
+    # Create new entity using provided payload
+    post_tool_response = tool.post(payload=payload,
+                                   params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'labels',
+            'type',
+            'schema_version',
+            'description',
+            'title',
+            'short_description'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_search = tool.search.get(
+        params={'id': entity_id})
+    assert get_tool_search[0]['type'] == 'tool'
+    assert get_tool_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_tool_before_deleted = tool.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(tool.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert tool.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_tool_after_deleted = tool.search.count()
+    # Compare results of count_tool_before_deleted
+    # and count_tool_after_deleted
+    assert count_tool_before_deleted != count_tool_after_deleted
+
+
+def test_python_module_ctia_positive_tool_metric(module_tool_client):
+    """Perform testing for tool/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -edbab647-5ba8-4756-be13-4ebe96d4c899
+
+    Steps:
+
+        1. Send POST request to create new tool entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Tool entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    tool = module_tool_client.private_intel.tool
+    payload = {
+        'labels': ['tool'],
+        'type': 'tool',
+        'schema_version': SERVER_VERSION,
+        'description': 'Test description',
+        'title': 'Title for test',
+        'short_description': 'Short test description'
+    }
+    # Create new entity using provided payload
+    post_tool_response = tool.post(payload=payload,
+                                   params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'labels',
+            'type',
+            'schema_version',
+            'description',
+            'title',
+            'short_description'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_tool = tool.get(entity_id)
+    assert get_created_tool['type'] == 'tool'
+    assert get_created_tool['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_tool['timestamp']
+    metric_histogram = tool.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = tool.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = tool.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(tool.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert tool.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_verdict(
         module_headers, module_tool_client):
     """Perform testing for verdict entity of custom threat intelligence python
@@ -1781,7 +5269,7 @@ def test_python_module_ctia_positive_verdict(
         3. Send same GET request, but using direct access to the server
         4. Compare results
 
-    Expectedresults: Verdict entity can be fetched using custom python module.
+    Expected results: Verdict entity can be fetched using custom python module.
         Data stored in the entity is the same no matter you access it directly
         or using our tool
 
@@ -1827,7 +5315,7 @@ def test_python_module_ctia_positive_version(module_tool_client):
         1. Send GET request to server using custom python module
         2. Validate returned data
 
-    Expectedresults: Response contains information about server version
+    Expected results: Response contains information about server version
 
     Importance: Critical
     """
@@ -1857,7 +5345,7 @@ def test_python_module_ctia_positive_vulnerability(
             updated
         7. Delete entity from the system
 
-    Expectedresults: Vulnerability entity can be created, fetched, updated and
+    Expected results: Vulnerability entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -1907,6 +5395,141 @@ def test_python_module_ctia_positive_vulnerability(
         vulnerability.get(entity_id)
 
 
+def test_python_module_ctia_positive_vulnerability_search(module_tool_client):
+    """Perform testing for vulnerability/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - 642bcca5-3eec-4955-b395-e4c365b65bf5
+
+    Steps:
+
+        1. Send POST request to create new vulnerability entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Vulnerability entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    vulnerability = module_tool_client.private_intel.vulnerability
+    payload = {
+        'description': 'Browser vulnerability',
+        'type': 'vulnerability',
+        'schema_version': SERVER_VERSION,
+    }
+    # Create new entity using provided payload
+    post_tool_response = vulnerability.post(payload=payload,
+                                            params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_vulnerability_search = vulnerability.search.get(
+        params={'id': entity_id})
+    assert get_vulnerability_search[0]['type'] == 'vulnerability'
+    assert get_vulnerability_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_vulnerability_before_deleted = vulnerability.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(vulnerability.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert vulnerability.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_vulnerability_after_deleted = vulnerability.search.count()
+    # Compare results of count_vulnerability_before_deleted
+    # and count_vulnerability_after_deleted
+    assert count_vulnerability_before_deleted !=\
+           count_vulnerability_after_deleted
+
+
+def test_python_module_ctia_positive_vulnerability_metric(module_tool_client):
+    """Perform testing for vulnerability/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -1b6c327c-cf55-4e22-a72c-93f9ad4b2763
+
+    Steps:
+
+        1. Send POST request to create new vulnerability entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Vulnerability entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    vulnerability = module_tool_client.private_intel.vulnerability
+    payload = {
+        'description': 'Browser vulnerability',
+        'type': 'vulnerability',
+        'schema_version': SERVER_VERSION,
+    }
+    # Create new entity using provided payload
+    post_tool_response = vulnerability.post(payload=payload,
+                                            params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_vulnerability = vulnerability.get(entity_id)
+    assert get_created_vulnerability['type'] == 'vulnerability'
+    assert get_created_vulnerability['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_vulnerability['timestamp']
+    metric_histogram = vulnerability.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = vulnerability.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = vulnerability.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(vulnerability.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert vulnerability.search.get(params={'id': entity_id}) == []
+
+
 def test_python_module_ctia_positive_weakness(
         module_headers, module_tool_client):
     """Perform testing for weakness entity of custom threat intelligence python
@@ -1927,7 +5550,7 @@ def test_python_module_ctia_positive_weakness(
             updated
         7. Delete entity from the system
 
-    Expectedresults: Weakness entity can be created, fetched, updated and
+    Expected results: Weakness entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
@@ -1983,3 +5606,151 @@ def test_python_module_ctia_positive_weakness(
     delayed_return(weakness.delete(entity_id))
     with pytest.raises(HTTPError):
         weakness.get(entity_id)
+
+
+def test_python_module_ctia_positive_weakness_search(module_tool_client):
+    """Perform testing for weakness/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 - a01b4f84-9661-4b67-ac94-cc5ce4ec3cb9
+
+    Steps:
+
+        1. Send POST request to create new weakness entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: Weakness entity can be created, fetched, counted and
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    weakness = module_tool_client.private_intel.weakness
+    payload = {
+        'description': (
+            'The software receives input from an upstream component, but it'
+            ' does not neutralize or incorrectly neutralizes code syntax'
+            ' before using the input in a dynamic evaluation call'
+            ' (e.g. \"eval\").'),
+        'schema_version': SERVER_VERSION,
+        'likelihood': 'Medium',
+        'type': 'weakness'
+    }
+    # Create new entity using provided payload
+    post_tool_response = weakness.post(
+        payload=payload, params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'likelihood',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    # Create variable for using it in params for endpoints
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_weakness_search = weakness.search.get(params={'id': entity_id})
+    assert get_weakness_search[0]['type'] == 'weakness'
+    assert get_weakness_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_weakness_before_deleted = weakness.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(weakness.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert weakness.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_weakness_after_deleted = weakness.search.count()
+    # Compare results of count_weakness_before_deleted
+    # and count_weakness_after_deleted
+    assert count_weakness_before_deleted != count_weakness_after_deleted
+
+
+def test_python_module_ctia_positive_weakness_metric(module_tool_client):
+    """Perform testing for weakness/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2848 -52c89f1b-9728-41d6-8a1f-07dd0ec8b976
+
+    Steps:
+
+        1. Send POST request to create new weakness entity using custom python
+                module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: Weakness entity can be created, fetched, researched by
+         metric's endpoints and deleted using custom python module.
+         Data stored in the entity is the same no matter you access it
+         directly or using our tool.
+
+    Importance: Critical
+    """
+    weakness = module_tool_client.private_intel.weakness
+    payload = {
+        'description': (
+            'The software receives input from an upstream component, but it'
+            ' does not neutralize or incorrectly neutralizes code syntax'
+            ' before using the input in a dynamic evaluation call'
+            ' (e.g. \"eval\").'),
+        'schema_version': SERVER_VERSION,
+        'likelihood': 'Medium',
+        'type': 'weakness'
+    }
+    # Create new entity using provided payload
+    post_tool_response = weakness.post(payload=payload,
+                                       params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'description',
+            'likelihood',
+            'type',
+            'schema_version'
+        ]
+    }
+    assert values == payload
+    # Create variable for using it in params for endpoints
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_weakness = weakness.get(entity_id)
+    assert get_created_weakness['type'] == 'weakness'
+    assert get_created_weakness['likelihood'] == 'Medium'
+    assert get_created_weakness['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_weakness['timestamp']
+    metric_histogram = weakness.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = weakness.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = weakness.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'source'})
+    assert metric_cardinality['type'] == 'cardinality'
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(weakness.search.delete(params={
+        'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert weakness.search.get(params={'id': entity_id}) == []
