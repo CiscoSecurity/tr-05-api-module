@@ -49,10 +49,12 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update actor entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+           external_id
+        6. Update actor entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        8. Delete entity from the system
 
     Expected results: Actor entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -69,7 +71,8 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
         'source': 'test source',
         'type': 'actor',
         'short_description': 'test',
-        'title': 'for test'
+        'title': 'for test',
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = actor.post(payload=payload,
@@ -83,7 +86,8 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
             'type',
             'description',
             'short_description',
-            'title'
+            'title',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -97,6 +101,9 @@ def test_python_module_ctia_positive_actor(module_headers, module_tool_client):
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = actor.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         actor.put(
@@ -1430,10 +1437,12 @@ def test_python_module_ctia_positive_attack_pattern(
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update attack pattern entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+           external_id
+        6. Update attack pattern entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        8. Delete entity from the system
 
     Expected results: Attack pattern entity can be created, fetched, updated
      and deleted using custom python module. Data stored in the entity is
@@ -1451,7 +1460,8 @@ def test_python_module_ctia_positive_attack_pattern(
         'type': 'attack-pattern',
         'short_description': 'desc for test',
         'source': 'new source point',
-        'title': 'for test'
+        'title': 'for test',
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = attack_pattern.post(payload=payload,
@@ -1463,7 +1473,8 @@ def test_python_module_ctia_positive_attack_pattern(
             'type',
             'short_description',
             'source',
-            'title'
+            'title',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -1477,6 +1488,9 @@ def test_python_module_ctia_positive_attack_pattern(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = attack_pattern.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         attack_pattern.put(
@@ -2064,14 +2078,18 @@ def test_python_module_ctia_positive_casebook(
         2. Send GET request using custom python module to read just created
             entity back.
         3. Send same GET request, but using direct access to the server
-        4. Compare results
-        5. Add new observable entity to the casebook
-        6. Send GET request to validate that observable was actually added
-        7. Update casebook entity using custom python module
-        8. Repeat GET request using python module and validate that entity was
+        4. Validate that GET request of external_id returns number of
+           external_id
+        5. Compare results
+        6. Add new observable entity to the casebook
+        7. Send GET request to validate that observable was actually added
+        8. Validate that POST request of casebook.texts returns created
+           text and type
+        9. Update casebook entity using custom python module
+        10. Repeat GET request using python module and validate that entity was
             updated
-        9. Use Patch endpoint for updating updated entity
-        10. Delete entity from the system
+        11. Use Patch endpoint for updating updated entity
+        12. Delete entity from the system
 
     Expected results: Casebook entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -2087,7 +2105,8 @@ def test_python_module_ctia_positive_casebook(
         'short_description': 'New Casebook',
         'description': 'New Casebook for malicious tickets',
         'observables': [],
-        'timestamp': '2019-09-24T11:34:18.000Z'
+        'timestamp': '2019-09-24T11:34:18.000Z',
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = casebook.post(payload=payload,
@@ -2099,7 +2118,8 @@ def test_python_module_ctia_positive_casebook(
             'short_description',
             'description',
             'observables',
-            'timestamp'
+            'timestamp',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -2125,6 +2145,23 @@ def test_python_module_ctia_positive_casebook(
     )
     get_tool_response = casebook.get(entity_id)
     assert get_tool_response['observables'] == observable
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = casebook.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
+    # Validate that POST request of casebook.texts returns created
+    # text and type
+    payload_for_texts = {
+        "operation": "remove",
+        "texts": [
+            {
+                "type": "test type",
+                "text": "test text"
+            }
+        ]
+    }
+    added_texts_data = casebook.texts(entity_id, payload=payload_for_texts)
+    assert added_texts_data['texts'][0]['type'] == 'test type'
+    assert added_texts_data['texts'][0]['text'] == 'test text'
     # Update entity values
     put_tool_response = delayed_return(
         casebook.put(
@@ -2154,6 +2191,133 @@ def test_python_module_ctia_positive_casebook(
     delayed_return(casebook.delete(entity_id))
     with pytest.raises(HTTPError):
         casebook.get(entity_id)
+
+
+# def test_python_module_ctia_positive_casebook_bundle(
+#         module_headers, module_tool_client):
+#     """Perform testing for casebook entity of custom threat intelligence python
+#     module
+#
+#     ID: CCTRI-2968 -11e8a791-5496-4831-af75-1823fb572e02
+#
+#     Steps:
+#
+#         1. Send POST request to create new casebook entity using custom python
+#             module
+#         2. Send GET request using custom python module to read just created
+#             entity back.
+#         3. Send same GET request, but using direct access to the server
+#         4. Validate that GET request of external_id returns number of
+#            external_id
+#         5. Compare results
+#         6. Add new observable entity to the casebook
+#         7. Send GET request to validate that observable was actually added
+#         8. Validate that POST request of casebook.texts returns created
+#            text and type
+#         9. Update casebook entity using custom python module
+#         10. Repeat GET request using python module and validate that entity was
+#             updated
+#         11. Use Patch endpoint for updating updated entity
+#         12. Delete entity from the system
+#
+#     Expected results: Casebook entity can be created, fetched, updated and
+#         deleted using custom python module. Data stored in the entity is
+#         the same no matter you access it directly or using our tool
+#
+#     Importance: Critical
+#     """
+#     casebook = module_tool_client.private_intel.casebook
+#     payload = {
+#         'type': 'casebook',
+#         'title': 'Case September 24, 2019 2:34 PM',
+#         'short_description': 'New Casebook',
+#         'description': 'New Casebook for malicious tickets',
+#         'observables': [],
+#         'timestamp': '2019-09-24T11:34:18.000Z',
+#         'external_ids': ['3']
+#     }
+#     # Create new entity using provided payload
+#     post_tool_response = casebook.post(payload=payload,
+#                                        params={'wait_for': 'true'})
+#     values = {
+#         key: post_tool_response[key] for key in [
+#             'type',
+#             'title',
+#             'short_description',
+#             'description',
+#             'observables',
+#             'timestamp',
+#             'external_ids'
+#         ]
+#     }
+#     assert values == payload
+#     entity_id = post_tool_response['id'].rpartition('/')[-1]
+#     # Validate that GET request return same data for direct access and access
+#     # through custom python module
+#     get_tool_response = casebook.get(entity_id)
+#     get_direct_response = ctia_get_data(
+#         target_url=CASEBOOK,
+#         entity_id=entity_id,
+#         **{'headers': module_headers}
+#     ).json()
+#     assert get_tool_response == get_direct_response
+#     payload_for_bundle = {
+#         'bundle': {
+#                    "description": "Bundle For test",
+#                    'assets': [
+#                     {
+#                         'asset_type': 'data',
+#                         'schema_version': '1.1.3',
+#                         'type': 'asset',
+#                         'source': 'test source',
+#                         'id': 'https://private.intel.amp.cisco.com:443/'
+#                               'ctia/asset/'
+#                               'asset-05d6ed79-7b70-4af9-add0-4ba310a57127',
+#                         'valid_time': {
+#                             'start_time': '2021-07-27T07:55:38.193Z',
+#                             'end_time': '2021-07-27T07:55:38.193Z'
+#                         }
+#                     }
+#                    ],
+#                    'tools': [
+#                        {
+#                         'description': 'cmd',
+#                         'labels': ['tool'],
+#                         'schema_version': '1.1.0',
+#                         'type': 'tool',
+#                         'id': 'https://private.intel.amp.cisco.com:443/ctia/'
+#                               'tool/tool-5c13a5ad-a618-44dc-ba86-79698b5e9839',
+#                         'short_description': 'cmd',
+#                         'title': 'cmd'
+#                        }
+#                    ],
+#                    'indicators': [
+#                        {
+#                          'valid_time': {
+#                               "start_time": "2020-03-31T06:30:10.138Z",
+#                               "end_time": "2525-01-01T00:00:00.000Z"
+#                               },
+#                          'schema_version': '1.0.16',
+#                          'producer': 'producer',
+#                          'type': 'indicator',
+#                          'id': 'https://private.intel.amp.cisco.com:443/ctia/'
+#                                'indicator/'
+#                                'indicator-ae98d9e1-dfec-42ac-bcb9-a367c72d0a9c'
+#                        }
+#                    ]
+#                   },
+#         'operation': 'add',
+#
+#     }
+#     patch_tool_response = casebook.bundle(entity_id, payload=payload_for_bundle)
+#     assert patch_tool_response['short_description'] == 'Patched Casebook'
+#     assert patch_tool_response['description'] == 'Patched entity'
+#     assert patch_tool_response['title'] == 'Case November, 2021 0:00 PM'
+#     # Delete the entity and make attempt to get it back to validate it is
+#     # not there anymore
+#     delayed_return(casebook.delete(entity_id))
+#     with pytest.raises(HTTPError):
+#         casebook.get(entity_id)
 
 
 def test_python_module_ctia_positive_casebook_search(module_tool_client):
@@ -2318,10 +2482,12 @@ def test_python_module_ctia_positive_coa(module_headers, module_tool_client):
           entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update coa entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+           external_id
+        6. Update coa entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        8. Delete entity from the system
 
     Expected results: COA entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -2335,7 +2501,8 @@ def test_python_module_ctia_positive_coa(module_headers, module_tool_client):
         'structured_coa_type': 'openc2',
         'coa_type': 'Diplomatic Actions',
         'type': 'coa',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = coa.post(payload=payload,
@@ -2346,7 +2513,8 @@ def test_python_module_ctia_positive_coa(module_headers, module_tool_client):
             'structured_coa_type',
             'coa_type',
             'type',
-            'schema_version'
+            'schema_version',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -2360,6 +2528,9 @@ def test_python_module_ctia_positive_coa(module_headers, module_tool_client):
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = coa.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         coa.put(
@@ -2613,15 +2784,16 @@ def test_python_module_ctia_positive_event_search(module_tool_client):
 
     Steps:
 
-        1. Send GET request using custom python module to read just created
-                entity back.
+        1. Send GET request using custom python module to read entities.
         2. Count entities after entity created
         3. Delete entity from the system
         4. Count entities after entity deleted
         5. Compare the amount of entities after creating and deleting entities
+        6. Send GET request using custom python module to read entities by id.
+        7. Delete entity from the system using id of event
 
-    Expected results: Event entity can be fetched, counted and
-        deleted using custom python module. Data stored in the entity is
+    Expected results: Event entity can be fetched, counted using custom python
+        module. Event can not be deleted. Data stored in the entity is
         the same no matter you access it directly or using our tool
 
     Importance: Critical
@@ -2631,7 +2803,7 @@ def test_python_module_ctia_positive_event_search(module_tool_client):
     # through custom python module
     event_search = event.search.get()
     assert event_search[1]['type'] == 'event'
-    entity_id = event_search[1]['id'].rpartition('/')[-1]
+    entity_id = event_search[1]['id']
     # Count entities after entity created
     count_event_before_deleted = event.search.count()
     # Delete the entity and make attempt to get it back to validate it is
@@ -2656,6 +2828,24 @@ def test_python_module_ctia_positive_event_search(module_tool_client):
     # Compare results of count_event_before_deleted
     # and count_event_after_deleted
     assert count_event_before_deleted == count_event_after_deleted
+    # Validate that GET request return data of event by id.
+    event_search_by_id = event.get(entity_id)
+    assert event_search_by_id['type'] == 'event'
+    assert event_search_by_id['id'] == entity_id
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    by_id_deleting_response = None
+    try:
+        event.delete(entity_id)
+    except HTTPError as error:
+        by_id_deleting_response = error
+    assert by_id_deleting_response.response.status_code == 403
+    json_string = by_id_deleting_response.response.text
+    parsed_text_response = json.loads(json_string)
+    assert parsed_text_response['message'] == 'Missing capability'
+    assert parsed_text_response['error'] == 'missing_capability'
+    assert parsed_text_response['capabilities'][0] == 'developer'
+    assert parsed_text_response['capabilities'][1] == 'delete-event'
 
 
 def test_python_module_ctia_positive_feed(module_headers, module_tool_client):
@@ -3026,15 +3216,17 @@ def test_python_module_ctia_positive_incident(
         2. Send GET request using custom python module to read just created
             entity back.
         3. Send same GET request, but using direct access to the server
-        4. Compare results
-        5. Update incident entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        4. Compare
+        5. Validate that GET request of external_id returns number of
+           external_id
+        6. Update incident entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Send PATCH request to update entity partially
-        8. Repeat GET request to validate that entity was updated
-        9. Update incident status using special endpoint for that purpose
-        10. Repeat GET request to validate that status was updated
-        11. Delete entity from the system
+        8. Send PATCH request to update entity partially
+        9. Repeat GET request to validate that entity was updated
+        10. Update incident status using special endpoint for that purpose
+        11. Repeat GET request to validate that status was updated
+        12. Delete entity from the system
 
     Expected results: Incident entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -3050,7 +3242,8 @@ def test_python_module_ctia_positive_incident(
         },
         'status': 'Open',
         'type': 'incident',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = incident.post(payload=payload,
@@ -3061,7 +3254,8 @@ def test_python_module_ctia_positive_incident(
             'incident_time',
             'status',
             'type',
-            'schema_version'
+            'schema_version',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -3075,6 +3269,9 @@ def test_python_module_ctia_positive_incident(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = incident.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         incident.put(
@@ -3255,6 +3452,246 @@ def test_python_module_ctia_positive_incident_metric(module_tool_client):
     assert incident.search.get(params={'id': entity_id}) == []
 
 
+def test_python_module_ctia_positive_sightings_incident(
+        module_headers, module_tool_client):
+    """Perform testing for indicator entity of custom threat intelligence
+     python module
+
+    ID: CCTRI-2968-aa6ada6a-3fea-4743-bb46-85ebb38b1c6c
+
+    Steps:
+
+        1. Send POST request to create new sighting entity using custom python
+            module
+        2. Send POST request to create new incident entity using custom python
+            module
+        3. Send POST request to create new relationship entity using custom
+         python module
+        4. Delete sighting entity from the system
+        5. Delete incident entity from the system
+        6. Delete relationship entity from the system
+
+    Expected results: Incident and sighting entities can be created, added
+     into relationship and deleted using custom python module.
+      Data stored in the entity is the same no matter you access it directly
+       or using our tool
+
+    Importance: Critical
+    """
+    observable = {'type': 'ip', 'value': gen_ip()}
+    sighting = module_tool_client.private_intel.sighting
+    payload = {
+        'count': 1,
+        'observed_time': {
+            'start_time': '2019-09-25T00:40:48.212Z',
+            'end_time': '2019-09-25T00:40:48.212Z'
+        },
+        'confidence': 'High',
+        'type': 'sighting',
+        'schema_version': SERVER_VERSION,
+        'external_ids': ['3'],
+        'observables': [observable]
+    }
+    # Create new entity using provided payload
+    sighting_post_tool_response = sighting.post(
+        payload=payload, params={'wait_for': 'true'})
+    values = {
+        key: sighting_post_tool_response[key] for key in [
+            'count',
+            'observed_time',
+            'confidence',
+            'type',
+            'schema_version',
+            'external_ids',
+            'observables'
+        ]
+    }
+    assert values == payload
+    sighting_entity_id = sighting_post_tool_response['id'].rpartition('/')[-1]
+    # Prepare data for indicator
+    incident = module_tool_client.private_intel.incident
+    payload = {
+        'confidence': 'High',
+        'incident_time': {
+            'opened': "2016-02-11T00:40:48.212Z"
+        },
+        'status': 'Open',
+        'type': 'incident',
+        'schema_version': SERVER_VERSION,
+        'external_ids': ['3']
+    }
+    # Create new entity using provided payload
+    incident_post_tool_response = incident.post(
+        payload=payload, params={'wait_for': 'true'})
+    values = {
+        key: incident_post_tool_response[key] for key in [
+            'confidence',
+            'incident_time',
+            'status',
+            'type',
+            'schema_version',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    incident_entity_id = incident_post_tool_response['id'].rpartition('/')[-1]
+    # Use created entities for relationship
+    relationship = module_tool_client.private_intel.relationship
+    payload = {
+        'description': 'Test relation',
+        'schema_version': SERVER_VERSION,
+        'type': 'relationship',
+        'source_ref': sighting_post_tool_response['id'],
+        'target_ref': incident_post_tool_response['id'],
+        'relationship_type': 'indicates',
+    }
+    # Create new entity using provided payload
+    relationship_post_tool_response = relationship.post(
+        payload=payload, params={'wait_for': 'true'})
+    relationship_entity_id =\
+        relationship_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET judgement indicator request return data
+    observable_type = sighting_post_tool_response['observables'][0]['type']
+    observable_value = sighting_post_tool_response['observables'][0]['value']
+    sightings_indicator_response = incident.sightings.incidents(
+        observable_type=observable_type, observable_value=observable_value)
+    assert sightings_indicator_response
+    # Delete the judgement entity and make attempt to get it back
+    # to validate it is not there anymore
+    delayed_return(sighting.delete(sighting_entity_id))
+    with pytest.raises(HTTPError):
+        sighting.get(sighting_entity_id)
+    # Delete the incident entity and make attempt to get it back
+    # to validate it is not there anymore
+    delayed_return(incident.delete(incident_entity_id))
+    with pytest.raises(HTTPError):
+        incident.get(incident_entity_id)
+    # Delete the relationship entity and make attempt to get it back
+    # to validate it is not there anymore
+    delayed_return(relationship.delete(relationship_entity_id))
+    with pytest.raises(HTTPError):
+        relationship.get(relationship_entity_id)
+
+
+def test_python_module_ctia_positive_incident_link(
+        module_headers, module_tool_client):
+    """Perform testing for investigation entity of custom threat intelligence
+    python module
+
+    ID: CCTRI-2968-24862487-a750-487f-8d58-c86737aa0d75
+
+    Steps:
+
+        1. Send POST request to create new casebook entity using custom python
+           module
+        2. Send POST request to create new incident entity using custom python
+           module
+        3. Delete the relationship entity and make attempt to get it back
+           to validate it is not there anymore
+        4. Delete the incident entity and make attempt to get it back to
+           validate it is not there anymore
+        5. Delete casebook entity and make attempt to get it back to validate
+           it is not there anymore
+
+
+    Expected results: Incident entity can be created,
+        deleted using custom python module. Data stored in the entity is
+        the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    casebook = module_tool_client.private_intel.casebook
+    observable = [{'value': 'instanbul.com', 'type': 'domain'}]
+    casebook_payload = {
+        'type': 'casebook',
+        'title': 'Case September 24, 2019 2:34 PM',
+        'short_description': 'New Casebook',
+        'description': 'New Casebook for malicious tickets',
+        'observables': [],
+        'timestamp': '2019-09-24T11:34:18.000Z',
+        'external_ids': ['3']
+    }
+    # Create casebook entity using provided payload
+    post_tool_response_casebook = casebook.post(
+        payload=casebook_payload, params={'wait_for': 'true'})
+    casebook_values = {
+        key: post_tool_response_casebook[key] for key in [
+            'type',
+            'title',
+            'short_description',
+            'description',
+            'observables',
+            'timestamp',
+            'external_ids'
+        ]
+    }
+    assert casebook_values == casebook_payload
+    casebook_id = post_tool_response_casebook['id']
+    # Add one observable to casebook using special endpoint for this purpose
+    delayed_return(
+        casebook.observables(
+            casebook_id,
+            {
+                'operation': 'add',
+                'observables': observable
+            }
+        )
+    )
+    get_tool_response_casebook = casebook.get(casebook_id)
+    assert get_tool_response_casebook['observables'] == observable
+    # Create incident entity using provided payload
+    incident = module_tool_client.private_intel.incident
+    incident_payload = {
+        'confidence': 'High',
+        'incident_time': {
+            'opened': "2016-02-11T00:40:48.212Z"
+        },
+        'status': 'Open',
+        'type': 'incident',
+        'schema_version': SERVER_VERSION,
+        'external_ids': ['3']
+    }
+    post_tool_response_incident = incident.post(
+        payload=incident_payload, params={'wait_for': 'true'})
+    incident_values = {
+        key: post_tool_response_incident[key] for key in [
+            'confidence',
+            'incident_time',
+            'status',
+            'type',
+            'schema_version',
+            'external_ids'
+        ]
+    }
+    assert incident_values == incident_payload
+    incident_id = post_tool_response_incident['id'].rpartition('/')[-1]
+    # Sent POST request
+    link_payload = {
+                    "casebook_id": casebook_id,
+                    "tlp": "white"
+                   }
+    link_request = incident.link(incident_id, payload=link_payload)
+    assert link_request['type'] == 'relationship'
+    assert link_request['schema_version'] == '1.1.3'
+    relationships_id = link_request['id'].rpartition('/')[-1]
+    # Delete the relationship entity and make attempt to get it back to
+    # validate it is not there anymore
+    relationship = module_tool_client.private_intel.relationship
+    delayed_return(relationship.delete(relationships_id))
+    with pytest.raises(HTTPError):
+        relationship.get(relationships_id)
+    # Delete the incident entity and make attempt to get it back to validate
+    # it is not there anymore
+    delayed_return(incident.delete(incident_id))
+    with pytest.raises(HTTPError):
+        incident.get(incident_id)
+    # Delete casebook entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(casebook.delete(casebook_id))
+    with pytest.raises(HTTPError):
+        casebook.get(casebook_id)
+
+
 def test_python_module_ctia_positive_indicator(
         module_headers, module_tool_client):
     """Perform testing for indicator entity of custom threat intelligence
@@ -3270,10 +3707,12 @@ def test_python_module_ctia_positive_indicator(
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update indicator entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+         external_id
+        6. Update indicator entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        8. Delete entity from the system
 
     Expected results: Indicator entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -3286,7 +3725,8 @@ def test_python_module_ctia_positive_indicator(
         'producer': 'producer',
         'schema_version': SERVER_VERSION,
         'type': 'indicator',
-        'revision': 0
+        'revision': 0,
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = indicator.post(payload=payload,
@@ -3296,7 +3736,8 @@ def test_python_module_ctia_positive_indicator(
             'producer',
             'revision',
             'type',
-            'schema_version'
+            'schema_version',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -3310,6 +3751,9 @@ def test_python_module_ctia_positive_indicator(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = indicator.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         indicator.put(
@@ -3468,6 +3912,217 @@ def test_python_module_ctia_positive_indicator_metric(module_tool_client):
     assert indicator.search.get(params={'id': entity_id}) == []
 
 
+def test_python_module_ctia_positive_judgements_indicator(
+        module_headers, module_tool_client):
+    """Perform testing for indicator entity of custom threat intelligence
+     python module
+
+    ID: CCTRI-2968-2ff5e78f-d8f5-4405-a418-32ea166cc907
+
+    Steps:
+
+        1. Send POST request to create new judgement entity using custom python
+            module
+        2. Send POST request to create new indicator entity using custom python
+            module
+        3. Send POST request to create new relationship entity using custom
+         python module
+        4. Delete judgement entity from the system
+        5. Delete indicator entity from the system
+        6. Delete relationship entity from the system
+
+    Expected results: Indicator and judgement entities can be created, added
+     into relationship and deleted using custom python module.
+      Data stored in the entity is the same no matter you access it directly
+       or using our tool
+
+    Importance: Critical
+    """
+    observable = {'type': 'ip', 'value': gen_ip()}
+    judgement = module_tool_client.private_intel.judgement
+    payload = {
+        'confidence': 'High',
+        'disposition': 2,
+        'disposition_name': 'Malicious',
+        'observable': observable,
+        'priority': 98,
+        'schema_version': SERVER_VERSION,
+        'severity': 'Medium',
+        'source': 'source',
+        'type': 'judgement',
+    }
+    # Create new entity using provided payload
+    judgement_post_response = judgement.post(
+        payload=payload, params={'wait_for': 'true'})
+    judgement_entity_id = judgement_post_response['id'].rpartition('/')[-1]
+    # Prepare data for indicator
+    indicator = module_tool_client.private_intel.indicator
+    payload = {
+        "description": "The IP Blacklist",
+        "producer": "ATQC team",
+        "source": "ATQC generated test data",
+        "source_uri": "https://atqc.com/bad",
+        "title": "ATQC Bad IP",
+        "type": "indicator",
+        "valid_time": {
+            "end_time": "2525-01-01T00:00:00.000Z",
+            "start_time": "2019-03-01T22:26:29.229Z"
+        }
+    }
+    # Create new indicator using provided payload
+    indicator_post_response = indicator.post(
+        payload=payload, params={'wait_for': 'true'})
+    indicator_entity_id = indicator_post_response['id'].rpartition('/')[-1]
+    # Use created entities for relationship
+    relationship = module_tool_client.private_intel.relationship
+    payload = {
+        'description': 'Test relation',
+        'schema_version': SERVER_VERSION,
+        'type': 'relationship',
+        'source_ref': judgement_post_response['id'],
+        'target_ref': indicator_post_response['id'],
+        'relationship_type': 'indicates',
+    }
+    # Create new entity using provided payload
+    relationship_post_tool_response = relationship.post(
+        payload=payload, params={'wait_for': 'true'})
+    relationship_entity_id =\
+        relationship_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET judgement indicator request return data
+    observable_type = judgement_post_response['observable']['value']
+    observable_value = judgement_post_response['observable']['type']
+    judgement_indicator_response = indicator.judgements.indicators(
+        observable_type=observable_type, observable_value=observable_value)
+    assert judgement_indicator_response
+    # Delete the judgement entity and make attempt to get it back
+    # to validate it is not there anymore
+    delayed_return(judgement.delete(judgement_entity_id))
+    with pytest.raises(HTTPError):
+        judgement.get(judgement_entity_id)
+    # Delete the indicator entity and make attempt to get it back
+    # to validate it is not there anymore
+    delayed_return(indicator.delete(indicator_entity_id))
+    with pytest.raises(HTTPError):
+        indicator.get(indicator_entity_id)
+    # Delete the relationship entity and make attempt to get it back
+    # to validate it is not there anymore
+    delayed_return(relationship.delete(relationship_entity_id))
+    with pytest.raises(HTTPError):
+        relationship.get(relationship_entity_id)
+
+
+def test_python_module_ctia_positive_sightings_indicator(
+        module_headers, module_tool_client):
+    """Perform testing for indicator entity of custom threat intelligence
+     python module
+
+    ID: CCTRI-2968-070cfd62-f15f-4bfe-8d36-2b7c0aa5654a
+
+    Steps:
+
+        1. Send POST request to create new sighting entity using custom python
+            module
+        2. Send POST request to create new indicator entity using custom python
+            module
+        3. Send POST request to create new relationship entity using custom
+         python module
+        4. Delete sighting entity from the system
+        5. Delete indicator entity from the system
+        6. Delete relationship entity from the system
+
+    Expected results: Indicator and sighting entities can be created, added
+     into relationship and deleted using custom python module.
+      Data stored in the entity is the same no matter you access it directly
+       or using our tool
+
+    Importance: Critical
+    """
+    observable = {'type': 'ip', 'value': gen_ip()}
+    sighting = module_tool_client.private_intel.sighting
+    payload = {
+        'count': 1,
+        'observed_time': {
+            'start_time': '2019-09-25T00:40:48.212Z',
+            'end_time': '2019-09-25T00:40:48.212Z'
+        },
+        'confidence': 'High',
+        'type': 'sighting',
+        'schema_version': SERVER_VERSION,
+        'external_ids': ['3'],
+        'observables': [observable]
+    }
+    # Create new entity using provided payload
+    sighting_post_tool_response = sighting.post(
+        payload=payload, params={'wait_for': 'true'})
+    values = {
+        key: sighting_post_tool_response[key] for key in [
+            'count',
+            'observed_time',
+            'confidence',
+            'type',
+            'schema_version',
+            'external_ids',
+            'observables'
+        ]
+    }
+    assert values == payload
+    sighting_entity_id = sighting_post_tool_response['id'].rpartition('/')[-1]
+    # Prepare data for indicator
+    indicator = module_tool_client.private_intel.indicator
+    payload = {
+        "description": "The IP Blacklist",
+        "producer": "ATQC team",
+        "source": "ATQC generated test data",
+        "source_uri": "https://atqc.com/bad",
+        "title": "ATQC Bad IP",
+        "type": "indicator",
+        "valid_time": {
+            "end_time": "2525-01-01T00:00:00.000Z",
+            "start_time": "2019-03-01T22:26:29.229Z"
+        }
+    }
+    # Create new indicator using provided payload
+    indicator_post_response = indicator.post(
+        payload=payload, params={'wait_for': 'true'})
+    indicator_entity_id = indicator_post_response['id'].rpartition('/')[-1]
+    # Use created entities for relationship
+    relationship = module_tool_client.private_intel.relationship
+    payload = {
+        'description': 'Test relation',
+        'schema_version': SERVER_VERSION,
+        'type': 'relationship',
+        'source_ref': sighting_post_tool_response['id'],
+        'target_ref': indicator_post_response['id'],
+        'relationship_type': 'indicates',
+    }
+    # Create new entity using provided payload
+    relationship_post_tool_response = relationship.post(
+        payload=payload, params={'wait_for': 'true'})
+    relationship_entity_id =\
+        relationship_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET judgement indicator request return data
+    observable_type = sighting_post_tool_response['observables'][0]['type']
+    observable_value = sighting_post_tool_response['observables'][0]['value']
+    sightings_indicator_response = indicator.sightings.indicators(
+        observable_type=observable_type, observable_value=observable_value)
+    assert sightings_indicator_response
+    # Delete the judgement entity and make attempt to get it back
+    # to validate it is not there anymore
+    delayed_return(sighting.delete(sighting_entity_id))
+    with pytest.raises(HTTPError):
+        sighting.get(sighting_entity_id)
+    # Delete the indicator entity and make attempt to get it back
+    # to validate it is not there anymore
+    delayed_return(indicator.delete(indicator_entity_id))
+    with pytest.raises(HTTPError):
+        indicator.get(indicator_entity_id)
+    # Delete the relationship entity and make attempt to get it back
+    # to validate it is not there anymore
+    delayed_return(relationship.delete(relationship_entity_id))
+    with pytest.raises(HTTPError):
+        relationship.get(relationship_entity_id)
+
+
 def test_python_module_ctia_positive_investigation(
         module_headers, module_tool_client):
     """Perform testing for investigation entity of custom threat intelligence
@@ -3483,10 +4138,12 @@ def test_python_module_ctia_positive_investigation(
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update investigation entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+           external_id
+        6. Update investigation entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        8. Delete entity from the system
 
     Expected results: Investigation entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -3500,7 +4157,8 @@ def test_python_module_ctia_positive_investigation(
         'description': 'Request investigation for yesterday malware',
         'type': 'investigation',
         'source': 'a source',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = investigation.post(payload=payload,
@@ -3511,7 +4169,8 @@ def test_python_module_ctia_positive_investigation(
             'description',
             'source',
             'type',
-            'schema_version'
+            'schema_version',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -3525,6 +4184,9 @@ def test_python_module_ctia_positive_investigation(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = investigation.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         investigation.put(
@@ -3700,11 +4362,15 @@ def test_python_module_ctia_positive_judgement(
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Make an attempt to update judgement entity using custom python
+        5. Validate that GET request of external_id returns number of
+            external_id
+        6. Validate that GET sighting request returns observeble and type of
+           created entity
+        7. Make an attempt to update judgement entity using custom python
             module
-        6. Check that error is returned
-        7. Create expired judgement via /ctia/judgement/{id}/expire endpoint
-        8. Delete entity from the system
+        8. Check that error is returned
+        9. Create expired judgement via /ctia/judgement/{id}/expire endpoint
+        10. Delete entity from the system
 
     Expected results: Judgement entity can be created, fetched and deleted
         using custom python module. Data stored in the entity is the same
@@ -3726,6 +4392,7 @@ def test_python_module_ctia_positive_judgement(
         'severity': 'Medium',
         'source': 'source',
         'type': 'judgement',
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = judgement.post(payload=payload,
@@ -3742,6 +4409,7 @@ def test_python_module_ctia_positive_judgement(
             'severity',
             'source',
             'type',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -3755,6 +4423,20 @@ def test_python_module_ctia_positive_judgement(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = judgement.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
+    # Validate that GET sighting request returns observeble and type of
+    # created entity
+    observable_value = get_tool_response['observable']['value']
+    observable_type = get_tool_response['observable']['type']
+    get_observable_of_judgement = judgement.judgements(
+        observable_type=observable_type, observable_value=observable_value)
+    assert get_observable_of_judgement
+    assert get_observable_of_judgement[0]['observable']['value'] ==\
+           observable_value
+    assert get_observable_of_judgement[0]['observable']['type'] ==\
+           observable_type
     # Make an attempt to update Judgement using endpoint which is not
     # implemented in application
     with pytest.raises(HTTPError) as context:
@@ -3962,10 +4644,13 @@ def test_python_module_ctia_positive_malware(
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update malware entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+         external_id
+
+        6. Update malware entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        8. Delete entity from the system
 
     Expected results: Malware entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -3980,7 +4665,8 @@ def test_python_module_ctia_positive_malware(
         'labels': ['malware'],
         'description': 'Test description',
         'title': 'Title for test',
-        'short_description': 'Short test description'
+        'short_description': 'Short test description',
+        'external_ids': ['3']
 
     }
     # Create new entity using provided payload
@@ -3994,6 +4680,7 @@ def test_python_module_ctia_positive_malware(
             'schema_version',
             'description',
             'short_description',
+            'external_ids'
 
         ]
     }
@@ -4008,6 +4695,9 @@ def test_python_module_ctia_positive_malware(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = malware.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         malware.put(
@@ -4197,11 +4887,13 @@ def test_python_module_ctia_positive_relationship(
         4. Send GET request using custom python module to read just created
             entity back.
         5. Send same GET request, but using direct access to the server
-        6. Compare results
-        7. Update relationship entity using custom python module
-        8. Repeat GET request using python module and validate that entity was
+        6. Validate that GET request of external_id returns number of
+         external_id
+        7. Compare results
+        8. Update relationship entity using custom python module
+        9. Repeat GET request using python module and validate that entity was
             updated
-        9. Delete entity from the system
+        10. Delete entity from the system
 
     Expected results: Relationship entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is the
@@ -4243,6 +4935,7 @@ def test_python_module_ctia_positive_relationship(
         'source_ref': campaign_post_response['id'],
         'target_ref': indicator_post_response['id'],
         'relationship_type': 'indicates',
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = relationship.post(payload=payload,
@@ -4254,7 +4947,8 @@ def test_python_module_ctia_positive_relationship(
             'target_ref',
             'relationship_type',
             'type',
-            'schema_version'
+            'schema_version',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -4268,6 +4962,9 @@ def test_python_module_ctia_positive_relationship(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = relationship.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         relationship.put(
@@ -4512,10 +5209,14 @@ def test_python_module_ctia_positive_sighting(
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update sighting entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+         external_id
+        6. Validate that GET sighting request returns observeble and type of
+         created entity
+        7. Update sighting entity using custom python module
+        8. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        9. Delete entity from the system
 
     Expected results: Sighting entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -4532,7 +5233,14 @@ def test_python_module_ctia_positive_sighting(
         },
         'confidence': 'High',
         'type': 'sighting',
-        'schema_version': SERVER_VERSION
+        'schema_version': SERVER_VERSION,
+        'external_ids': ['3'],
+        'observables': [
+            {
+                'value': '123.421.123.1',
+                'type': 'ip'
+            }
+        ]
     }
     # Create new entity using provided payload
     post_tool_response = sighting.post(payload=payload,
@@ -4543,7 +5251,9 @@ def test_python_module_ctia_positive_sighting(
             'observed_time',
             'confidence',
             'type',
-            'schema_version'
+            'schema_version',
+            'external_ids',
+            'observables'
         ]
     }
     assert values == payload
@@ -4557,6 +5267,16 @@ def test_python_module_ctia_positive_sighting(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = sighting.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
+    # Validate that GET sighting request returns observeble and type of
+    # created entity
+    get_observeble_of_sighting = sighting.sightings(
+        observable_type='ip', observable_value='123.421.123.1')
+    assert get_observeble_of_sighting[0]['observables'][0]['value'] == \
+           '123.421.123.1'
+    assert get_observeble_of_sighting[0]['observables'][0]['type'] == 'ip'
     # Update entity values
     put_tool_response = delayed_return(
         sighting.put(
@@ -5039,10 +5759,12 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update tool entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+         external_id
+        6. Update tool entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        8. Delete entity from the system
 
     Expected results: Tool entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -5057,7 +5779,8 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
         'schema_version': SERVER_VERSION,
         'description': 'Test description',
         'title': 'Title for test',
-        'short_description': 'Short test description'
+        'short_description': 'Short test description',
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = tool.post(payload=payload,
@@ -5069,7 +5792,8 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
             'schema_version',
             'description',
             'title',
-            'short_description'
+            'short_description',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -5083,6 +5807,9 @@ def test_python_module_ctia_positive_tool(module_headers, module_tool_client):
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = tool.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         tool.put(
@@ -5340,10 +6067,12 @@ def test_python_module_ctia_positive_vulnerability(
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update vulnerability entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+        external_id
+        6. Update vulnerability entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        8. Delete entity from the system
 
     Expected results: Vulnerability entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -5356,6 +6085,7 @@ def test_python_module_ctia_positive_vulnerability(
         'description': 'Browser vulnerability',
         'type': 'vulnerability',
         'schema_version': SERVER_VERSION,
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = vulnerability.post(payload=payload,
@@ -5364,7 +6094,8 @@ def test_python_module_ctia_positive_vulnerability(
         key: post_tool_response[key] for key in [
             'description',
             'type',
-            'schema_version'
+            'schema_version',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -5378,6 +6109,9 @@ def test_python_module_ctia_positive_vulnerability(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = vulnerability.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         vulnerability.put(
@@ -5545,10 +6279,12 @@ def test_python_module_ctia_positive_weakness(
             entity back.
         3. Send same GET request, but using direct access to the server
         4. Compare results
-        5. Update weakness entity using custom python module
-        6. Repeat GET request using python module and validate that entity was
+        5. Validate that GET request of external_id returns number of
+        external_id
+        6. Update weakness entity using custom python module
+        7. Repeat GET request using python module and validate that entity was
             updated
-        7. Delete entity from the system
+        8. Delete entity from the system
 
     Expected results: Weakness entity can be created, fetched, updated and
         deleted using custom python module. Data stored in the entity is
@@ -5565,7 +6301,8 @@ def test_python_module_ctia_positive_weakness(
             ' (e.g. \"eval\").'),
         'schema_version': SERVER_VERSION,
         'likelihood': 'Medium',
-        'type': 'weakness'
+        'type': 'weakness',
+        'external_ids': ['3']
     }
     # Create new entity using provided payload
     post_tool_response = weakness.post(payload=payload,
@@ -5575,7 +6312,8 @@ def test_python_module_ctia_positive_weakness(
             'description',
             'likelihood',
             'type',
-            'schema_version'
+            'schema_version',
+            'external_ids'
         ]
     }
     assert values == payload
@@ -5589,6 +6327,9 @@ def test_python_module_ctia_positive_weakness(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = weakness.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         weakness.put(
