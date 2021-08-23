@@ -18,7 +18,8 @@ class IndicatorAPI(IntelEntityAPI):
                 '/ctia',
                 observable_type,
                 observable_value,
-                'judgements/indicators'
+                'judgements',
+                'indicators'
             ),
             **kwargs
         )
@@ -30,7 +31,8 @@ class IndicatorAPI(IntelEntityAPI):
                 '/ctia',
                 observable_type,
                 observable_value,
-                'sightings/indicators'
+                'sightings',
+                'indicators'
             ),
             **kwargs
         )

@@ -7,9 +7,6 @@ from ctrlibrary.core.utils import delayed_return
 from ctrlibrary.ctia.base import ctia_get_data
 from ctrlibrary.ctia.endpoints import (
     ACTOR,
-    ASSET,
-    ASSET_MAPPING,
-    ASSET_PROPERTIES,
     ATTACK_PATTERN,
     CAMPAIGN,
     CASEBOOK,
@@ -25,7 +22,6 @@ from ctrlibrary.ctia.endpoints import (
     MALWARE,
     RELATIONSHIP,
     SIGHTING,
-    TARGET_RECORD,
     TOOL,
     VERDICT,
     VULNERABILITY,
