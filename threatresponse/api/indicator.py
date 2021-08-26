@@ -16,8 +16,8 @@ class IndicatorAPI(IntelEntityAPI):
         return self._get(
             urls.join(
                 '/ctia',
-                observable_type,
                 observable_value,
+                observable_type,
                 'judgements',
                 'indicators'
             ),

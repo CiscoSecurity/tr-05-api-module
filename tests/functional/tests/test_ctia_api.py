@@ -8,6 +8,9 @@ from ctrlibrary.ctia.base import ctia_get_data
 from ctrlibrary.ctia.endpoints import (
     ACTOR,
     ATTACK_PATTERN,
+    ASSET,
+    ASSET_MAPPING,
+    ASSET_PROPERTIES,
     CAMPAIGN,
     CASEBOOK,
     COA,
@@ -22,6 +25,7 @@ from ctrlibrary.ctia.endpoints import (
     MALWARE,
     RELATIONSHIP,
     SIGHTING,
+    TARGET_RECORD,
     TOOL,
     VERDICT,
     VULNERABILITY,
@@ -2189,131 +2193,95 @@ def test_python_module_ctia_positive_casebook(
         casebook.get(entity_id)
 
 
-# def test_python_module_ctia_positive_casebook_bundle(
-#         module_headers, module_tool_client):
-#     """Perform testing for casebook entity of custom threat intelligence python
-#     module
-#
-#     ID: CCTRI-2968 -11e8a791-5496-4831-af75-1823fb572e02
-#
-#     Steps:
-#
-#         1. Send POST request to create new casebook entity using custom python
-#             module
-#         2. Send GET request using custom python module to read just created
-#             entity back.
-#         3. Send same GET request, but using direct access to the server
-#         4. Validate that GET request of external_id returns number of
-#            external_id
-#         5. Compare results
-#         6. Add new observable entity to the casebook
-#         7. Send GET request to validate that observable was actually added
-#         8. Validate that POST request of casebook.texts returns created
-#            text and type
-#         9. Update casebook entity using custom python module
-#         10. Repeat GET request using python module and validate that entity was
-#             updated
-#         11. Use Patch endpoint for updating updated entity
-#         12. Delete entity from the system
-#
-#     Expected results: Casebook entity can be created, fetched, updated and
-#         deleted using custom python module. Data stored in the entity is
-#         the same no matter you access it directly or using our tool
-#
-#     Importance: Critical
-#     """
-#     casebook = module_tool_client.private_intel.casebook
-#     payload = {
-#         'type': 'casebook',
-#         'title': 'Case September 24, 2019 2:34 PM',
-#         'short_description': 'New Casebook',
-#         'description': 'New Casebook for malicious tickets',
-#         'observables': [],
-#         'timestamp': '2019-09-24T11:34:18.000Z',
-#         'external_ids': ['3']
-#     }
-#     # Create new entity using provided payload
-#     post_tool_response = casebook.post(payload=payload,
-#                                        params={'wait_for': 'true'})
-#     values = {
-#         key: post_tool_response[key] for key in [
-#             'type',
-#             'title',
-#             'short_description',
-#             'description',
-#             'observables',
-#             'timestamp',
-#             'external_ids'
-#         ]
-#     }
-#     assert values == payload
-#     entity_id = post_tool_response['id'].rpartition('/')[-1]
-#     # Validate that GET request return same data for direct access and access
-#     # through custom python module
-#     get_tool_response = casebook.get(entity_id)
-#     get_direct_response = ctia_get_data(
-#         target_url=CASEBOOK,
-#         entity_id=entity_id,
-#         **{'headers': module_headers}
-#     ).json()
-#     assert get_tool_response == get_direct_response
-#     payload_for_bundle = {
-#         'bundle': {
-#                    "description": "Bundle For test",
-#                    'assets': [
-#                     {
-#                         'asset_type': 'data',
-#                         'schema_version': '1.1.3',
-#                         'type': 'asset',
-#                         'source': 'test source',
-#                         'id': 'https://private.intel.amp.cisco.com:443/'
-#                               'ctia/asset/'
-#                               'asset-05d6ed79-7b70-4af9-add0-4ba310a57127',
-#                         'valid_time': {
-#                             'start_time': '2021-07-27T07:55:38.193Z',
-#                             'end_time': '2021-07-27T07:55:38.193Z'
-#                         }
-#                     }
-#                    ],
-#                    'tools': [
-#                        {
-#                         'description': 'cmd',
-#                         'labels': ['tool'],
-#                         'schema_version': '1.1.0',
-#                         'type': 'tool',
-#                         'id': 'https://private.intel.amp.cisco.com:443/ctia/'
-#                               'tool/tool-5c13a5ad-a618-44dc-ba86-79698b5e9839',
-#                         'short_description': 'cmd',
-#                         'title': 'cmd'
-#                        }
-#                    ],
-#                    'indicators': [
-#                        {
-#                          'valid_time': {
-#                               "start_time": "2020-03-31T06:30:10.138Z",
-#                               "end_time": "2525-01-01T00:00:00.000Z"
-#                               },
-#                          'schema_version': '1.0.16',
-#                          'producer': 'producer',
-#                          'type': 'indicator',
-#                          'id': 'https://private.intel.amp.cisco.com:443/ctia/'
-#                                'indicator/'
-#                                'indicator-ae98d9e1-dfec-42ac-bcb9-a367c72d0a9c'
-#                        }
-#                    ]
-#                   },
-#         'operation': 'add',
-#
-#     }
-#     patch_tool_response = casebook.bundle(entity_id, payload=payload_for_bundle)
-#     assert patch_tool_response['short_description'] == 'Patched Casebook'
-#     assert patch_tool_response['description'] == 'Patched entity'
-#     assert patch_tool_response['title'] == 'Case November, 2021 0:00 PM'
-#     # Delete the entity and make attempt to get it back to validate it is
-#     # not there anymore
-#     delayed_return(casebook.delete(entity_id))
-#     with pytest.raises(HTTPError):
-#         casebook.get(entity_id)
+def test_python_module_ctia_positive_casebook_bundle(
+        module_headers, module_tool_client):
+    """Perform testing for casebook entity of custom threat intelligence python
+    module
+
+    ID: CCTRI-2968 -11e8a791-5496-4831-af75-1823fb572e02
+
+    Steps:
+
+        1. Send POST request to create new casebook entity using custom python
+            module
+        2. Send GET request using custom python module to read just created
+            entity back.
+        3. Send same GET request, but using direct access to the server
+        4. Validate that GET request of external_id returns number of
+           external_id
+        5. Send POST request to create casebook bundle entity using custom
+           python module
+        6. Delete casebook entity from the system
+
+    Expected results: Casebook bundle entity can be created and deleted using
+     custom python module. Data stored in the entity is the same no matter
+      you access it directly or using our tool
+
+    Importance: Critical
+    """
+    casebook = module_tool_client.private_intel.casebook
+    payload = {
+        'type': 'casebook',
+        'title': 'Case September 24, 2019 2:34 PM',
+        'short_description': 'New Casebook',
+        'description': 'New Casebook for malicious tickets',
+        'observables': [],
+        'timestamp': '2019-09-24T11:34:18.000Z',
+        'external_ids': ['3']
+    }
+    # Create new casebook entity using provided payload
+    post_tool_response = casebook.post(payload=payload,
+                                       params={'wait_for': 'true'})
+    values = {
+        key: post_tool_response[key] for key in [
+            'type',
+            'title',
+            'short_description',
+            'description',
+            'observables',
+            'timestamp',
+            'external_ids'
+        ]
+    }
+    assert values == payload
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_tool_response = casebook.get(entity_id)
+    get_direct_response = ctia_get_data(
+        target_url=CASEBOOK,
+        entity_id=entity_id,
+        **{'headers': module_headers}
+    ).json()
+    assert get_tool_response == get_direct_response
+    payload_for_bundle = {
+          "operation": "add",
+          "bundle": {
+            "description": "string",
+            "valid_time": {
+               "start_time": "2021-08-26T11:48:51.490Z",
+               "end_time": "2021-08-26T11:48:51.490Z"
+             },
+            "schema_version": "1.1.3",
+            "type": "bundle",
+            "source": "Source For bundle",
+            "short_description": "Bundle description",
+            "title": "Title for test",
+            "id": post_tool_response['id']
+            }
+        }
+    bundle_tool_response = casebook.bundle(entity_id,
+                                           payload=payload_for_bundle)
+    assert bundle_tool_response['description'] ==\
+           'New Casebook for malicious tickets'
+    assert bundle_tool_response['schema_version'] == '1.1.3'
+    assert bundle_tool_response['type'] == 'casebook'
+    bundle_id = bundle_tool_response['id']
+    # Delete the bundle entity and make attempt to get it back to validate
+    # it is not there anymore
+    delayed_return(casebook.delete(bundle_id, params={'wait_for': 'true'}))
+    with pytest.raises(HTTPError):
+        casebook.get(bundle_id)
 
 
 def test_python_module_ctia_positive_casebook_search(module_tool_client):
@@ -3453,7 +3421,7 @@ def test_python_module_ctia_positive_sightings_incident(
     """Perform testing for indicator entity of custom threat intelligence
      python module
 
-    ID: CCTRI-2968-aa6ada6a-3fea-4743-bb46-85ebb38b1c6c
+    ID: CCTRI-2968 -aa6ada6a-3fea-4743-bb46-85ebb38b1c6c
 
     Steps:
 
@@ -3503,7 +3471,7 @@ def test_python_module_ctia_positive_sightings_incident(
         ]
     }
     assert values == payload
-    sighting_entity_id = sighting_post_tool_response['id'].rpartition('/')[-1]
+    sighting_entity_id = sighting_post_tool_response['id']
     # Prepare data for indicator
     incident = module_tool_client.private_intel.incident
     payload = {
@@ -3530,7 +3498,7 @@ def test_python_module_ctia_positive_sightings_incident(
         ]
     }
     assert values == payload
-    incident_entity_id = incident_post_tool_response['id'].rpartition('/')[-1]
+    incident_entity_id = incident_post_tool_response['id']
     # Use created entities for relationship
     relationship = module_tool_client.private_intel.relationship
     payload = {
@@ -3551,7 +3519,7 @@ def test_python_module_ctia_positive_sightings_incident(
     observable_value = sighting_post_tool_response['observables'][0]['value']
     sightings_indicator_response = incident.sightings.incidents(
         observable_type=observable_type, observable_value=observable_value)
-    assert sightings_indicator_response
+    assert sightings_indicator_response[0] == incident_entity_id
     # Delete the judgement entity and make attempt to get it back
     # to validate it is not there anymore
     delayed_return(sighting.delete(sighting_entity_id))
@@ -3669,13 +3637,7 @@ def test_python_module_ctia_positive_incident_link(
     link_request = incident.link(incident_id, payload=link_payload)
     assert link_request['type'] == 'relationship'
     assert link_request['schema_version'] == '1.1.3'
-    relationships_id = link_request['id'].rpartition('/')[-1]
-    # Delete the relationship entity and make attempt to get it back to
-    # validate it is not there anymore
-    relationship = module_tool_client.private_intel.relationship
-    delayed_return(relationship.delete(relationships_id))
-    with pytest.raises(HTTPError):
-        relationship.get(relationships_id)
+    relationships_id = link_request['id']
     # Delete the incident entity and make attempt to get it back to validate
     # it is not there anymore
     delayed_return(incident.delete(incident_id))
@@ -3686,6 +3648,13 @@ def test_python_module_ctia_positive_incident_link(
     delayed_return(casebook.delete(casebook_id))
     with pytest.raises(HTTPError):
         casebook.get(casebook_id)
+    # Delete the relationship entity and make attempt to get it back to
+    # validate it is not there anymore
+    relationship = module_tool_client.private_intel.relationship
+    delayed_return(relationship.delete(relationships_id,
+                                       params={'wait_for': 'true'}))
+    with pytest.raises(HTTPError):
+        relationship.get(relationships_id)
 
 
 def test_python_module_ctia_positive_indicator(
@@ -3913,7 +3882,7 @@ def test_python_module_ctia_positive_judgements_indicator(
     """Perform testing for indicator entity of custom threat intelligence
      python module
 
-    ID: CCTRI-2968-2ff5e78f-d8f5-4405-a418-32ea166cc907
+    ID: CCTRI-2968 -2ff5e78f-d8f5-4405-a418-32ea166cc907
 
     Steps:
 
@@ -3950,7 +3919,7 @@ def test_python_module_ctia_positive_judgements_indicator(
     # Create new entity using provided payload
     judgement_post_response = judgement.post(
         payload=payload, params={'wait_for': 'true'})
-    judgement_entity_id = judgement_post_response['id'].rpartition('/')[-1]
+    judgement_entity_id = judgement_post_response['id']
     # Prepare data for indicator
     indicator = module_tool_client.private_intel.indicator
     payload = {
@@ -3968,7 +3937,7 @@ def test_python_module_ctia_positive_judgements_indicator(
     # Create new indicator using provided payload
     indicator_post_response = indicator.post(
         payload=payload, params={'wait_for': 'true'})
-    indicator_entity_id = indicator_post_response['id'].rpartition('/')[-1]
+    indicator_entity_id = indicator_post_response['id']
     # Use created entities for relationship
     relationship = module_tool_client.private_intel.relationship
     payload = {
@@ -3989,7 +3958,7 @@ def test_python_module_ctia_positive_judgements_indicator(
     observable_value = judgement_post_response['observable']['type']
     judgement_indicator_response = indicator.judgements.indicators(
         observable_type=observable_type, observable_value=observable_value)
-    assert judgement_indicator_response
+    assert judgement_indicator_response[0] == indicator_entity_id
     # Delete the judgement entity and make attempt to get it back
     # to validate it is not there anymore
     delayed_return(judgement.delete(judgement_entity_id))
@@ -4062,7 +4031,7 @@ def test_python_module_ctia_positive_sightings_indicator(
         ]
     }
     assert values == payload
-    sighting_entity_id = sighting_post_tool_response['id'].rpartition('/')[-1]
+    sighting_entity_id = sighting_post_tool_response['id']
     # Prepare data for indicator
     indicator = module_tool_client.private_intel.indicator
     payload = {
@@ -4080,7 +4049,7 @@ def test_python_module_ctia_positive_sightings_indicator(
     # Create new indicator using provided payload
     indicator_post_response = indicator.post(
         payload=payload, params={'wait_for': 'true'})
-    indicator_entity_id = indicator_post_response['id'].rpartition('/')[-1]
+    indicator_entity_id = indicator_post_response['id']
     # Use created entities for relationship
     relationship = module_tool_client.private_intel.relationship
     payload = {
@@ -4095,13 +4064,13 @@ def test_python_module_ctia_positive_sightings_indicator(
     relationship_post_tool_response = relationship.post(
         payload=payload, params={'wait_for': 'true'})
     relationship_entity_id =\
-        relationship_post_tool_response['id'].rpartition('/')[-1]
+        relationship_post_tool_response['id']
     # Validate that GET judgement indicator request return data
     observable_type = sighting_post_tool_response['observables'][0]['type']
     observable_value = sighting_post_tool_response['observables'][0]['value']
     sightings_indicator_response = indicator.sightings.indicators(
         observable_type=observable_type, observable_value=observable_value)
-    assert sightings_indicator_response
+    assert sightings_indicator_response[0] == indicator_entity_id
     # Delete the judgement entity and make attempt to get it back
     # to validate it is not there anymore
     delayed_return(sighting.delete(sighting_entity_id))
