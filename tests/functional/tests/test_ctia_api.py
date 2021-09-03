@@ -1983,7 +1983,8 @@ def test_python_module_ctia_positive_feed(
             'revision',
             'output',
             'type',
-            'feed_type'
+            'feed_type',
+            'indicator_id'
         ]
     }
     assert values == FEED_PAYLOAD

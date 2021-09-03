@@ -256,12 +256,13 @@ def get_incident_response(incident, get_response):
 
 @pytest.fixture(scope='function')
 def get_relationship_response(module_tool_client, get_response, relationship):
+    global relationship_id
     relationship_id = 0
 
     def _get_relationship_response(refs):
-        nonlocal relationship_id
         RELATIONSHIP_PAYLOAD.update(refs)
         response = get_response(relationship, RELATIONSHIP_PAYLOAD)
+        global relationship_id
         relationship_id = response['id'].rpartition('/')[-1]
         return response
     yield _get_relationship_response
@@ -307,14 +308,15 @@ def get_asset_response(asset, get_response):
 
 
 @pytest.fixture(scope='function')
-def get_asset_mapping_response(module_tool_client, get_response,
-                               asset_mapping):
+def get_asset_mapping_response(
+        module_tool_client, get_response, asset_mapping):
+    global asset_mapping_id
     asset_mapping_id = 0
 
     def _get_asset_mapping_response(refs):
-        nonlocal asset_mapping_id
         ASSET_MAPPING_PAYLOAD.update(refs)
         response = get_response(asset_mapping, ASSET_MAPPING_PAYLOAD)
+        global asset_mapping_id
         asset_mapping_id = response['id'].rpartition('/')[-1]
         return response
     yield _get_asset_mapping_response
@@ -326,12 +328,13 @@ def get_asset_mapping_response(module_tool_client, get_response,
 @pytest.fixture(scope='function')
 def get_asset_properties_response(
         module_tool_client, get_response, asset_properties):
+    global asset_properties_id
     asset_properties_id = 0
 
     def _get_asset_properties_response(refs):
-        nonlocal asset_properties_id
         ASSET_PROPERTIES_PAYLOAD.update(refs)
         response = get_response(asset_properties, ASSET_PROPERTIES_PAYLOAD)
+        global asset_properties_id
         asset_properties_id = response['id'].rpartition('/')[-1]
         return response
     yield _get_asset_properties_response
@@ -386,13 +389,15 @@ def get_data_table_response(data_table, get_response):
 
 
 @pytest.fixture(scope='function')
-def get_feed_response(module_tool_client, get_response, feed):
+def get_feed_response(
+        module_tool_client, get_response, feed):
+    global feed_id
     feed_id = 0
 
     def _get_feed_response(refs):
-        nonlocal feed_id
-        ASSET_MAPPING_PAYLOAD.update(refs)
+        FEED_PAYLOAD.update(refs)
         response = get_response(feed, FEED_PAYLOAD)
+        global feed_id
         feed_id = response['id'].rpartition('/')[-1]
         return response
     yield _get_feed_response
@@ -404,15 +409,16 @@ def get_feed_response(module_tool_client, get_response, feed):
 @pytest.fixture(scope='function')
 def get_feedback_response(
         module_tool_client, get_response, feedback):
+    global feedback_id
     feedback_id = 0
 
-    def _get_asset_properties_response(refs):
-        nonlocal feedback_id
+    def _get_feedback_response(refs):
         FEEDBACK_PAYLOAD.update(refs)
         response = get_response(feedback, FEEDBACK_PAYLOAD)
+        global feedback_id
         feedback_id = response['id'].rpartition('/')[-1]
         return response
-    yield _get_asset_properties_response
+    yield _get_feedback_response
     delayed_return(feedback.delete(feedback_id))
     with pytest.raises(HTTPError):
         feedback.get(feedback_id)
