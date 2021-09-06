@@ -70,8 +70,8 @@ from tests.functional.tests.payloads import (
 )
 
 
-def test_python_module_ctia_positive_actor(module_headers, get_actor_response,
-                                           actor):
+def test_python_module_ctia_positive_actor(
+        module_headers, get_entity, get_entity_response):
     """Perform testing for actor entity of custom threat intelligence python
     module
 
@@ -98,7 +98,10 @@ def test_python_module_ctia_positive_actor(module_headers, get_actor_response,
 
     Importance: Critical
     """
-    actor_post_tool_response = get_actor_response
+    actor = get_entity('actor')
+    # Create new entity using provided payload
+    actor_post_tool_response = get_entity_response(
+        'actor', ACTOR_PAYLOAD)
     values = {
         key: actor_post_tool_response[key] for key in [
             'actor_type',
@@ -138,7 +141,7 @@ def test_python_module_ctia_positive_actor(module_headers, get_actor_response,
     assert get_tool_response['source'] == 'new source point'
 
 
-def test_python_module_ctia_positive_actor_search(module_tool_client, actor):
+def test_python_module_ctia_positive_actor_search(get_entity):
     """Perform testing for actor/search entity of custom threat
     intelligence python module
 
@@ -163,6 +166,7 @@ def test_python_module_ctia_positive_actor_search(module_tool_client, actor):
 
     Importance: Critical
     """
+    actor = get_entity('actor')
     # Create new entity using provided payload
     post_tool_response = actor.post(payload=ACTOR_PAYLOAD,
                                     params={'wait_for': 'true'})
@@ -189,7 +193,8 @@ def test_python_module_ctia_positive_actor_search(module_tool_client, actor):
            count_actor_after_deleted
 
 
-def test_python_module_ctia_positive_actor_metric(get_actor_response, actor):
+def test_python_module_ctia_positive_actor_metric(
+        get_entity_response, get_entity):
     """Perform testing for actor/metric endpoints of custom threat
     intelligence python module
 
@@ -212,7 +217,10 @@ def test_python_module_ctia_positive_actor_metric(get_actor_response, actor):
 
     Importance: Critical
     """
-    actor_post_tool_response = get_actor_response
+    actor = get_entity('actor')
+    # Create new entity using provided payload
+    actor_post_tool_response = get_entity_response(
+        'actor', ACTOR_PAYLOAD)
     # Validate that GET request return same data for direct access and access
     # through custom python module
     get_created_actor = actor.get(actor_post_tool_response['id'])
@@ -234,8 +242,8 @@ def test_python_module_ctia_positive_actor_metric(get_actor_response, actor):
     assert metric_cardinality['type'] == 'cardinality'
 
 
-def test_python_module_ctia_positive_asset(module_headers,
-                                           get_asset_response, asset):
+def test_python_module_ctia_positive_asset(
+        module_headers, get_entity, get_entity_response):
     """Perform testing for asset entity of custom threat intelligence python
     module
 
@@ -261,8 +269,10 @@ def test_python_module_ctia_positive_asset(module_headers,
 
     Importance: Critical
     """
+    asset = get_entity('asset')
     # Create new entity using provided payload
-    asset_post_tool_response = get_asset_response
+    asset_post_tool_response = get_entity_response(
+        'asset', ASSET_PAYLOAD)
     values = {
         key: asset_post_tool_response[key] for key in [
             'asset_type',
@@ -302,7 +312,7 @@ def test_python_module_ctia_positive_asset(module_headers,
     assert get_tool_response['source'] == 'new source point'
 
 
-def test_python_module_ctia_positive_asset_search(module_tool_client, asset):
+def test_python_module_ctia_positive_asset_search(get_entity):
     """Perform testing for asset/search entity of custom threat
     intelligence python module
 
@@ -327,6 +337,7 @@ def test_python_module_ctia_positive_asset_search(module_tool_client, asset):
 
     Importance: Critical
     """
+    asset = get_entity('asset')
     # Create new entity using provided payload
     post_tool_response = asset.post(payload=ASSET_PAYLOAD,
                                     params={'wait_for': 'true'})
@@ -365,7 +376,8 @@ def test_python_module_ctia_positive_asset_search(module_tool_client, asset):
     assert count_asset_before_deleted != count_asset_after_deleted
 
 
-def test_python_module_ctia_positive_asset_metric(get_asset_response, asset):
+def test_python_module_ctia_positive_asset_metric(
+        get_entity, get_entity_response):
     """Perform testing for asset/metric endpoints of custom threat
     intelligence python module
 
@@ -388,7 +400,9 @@ def test_python_module_ctia_positive_asset_metric(get_asset_response, asset):
 
     Importance: Critical
     """
-    asset_post_tool_response = get_asset_response
+    asset = get_entity('asset')
+    asset_post_tool_response = get_entity_response(
+        'asset', ASSET_PAYLOAD)
     # Validate that GET request return same data for direct access and access
     # through custom python module
     get_created_asset = asset.get(asset_post_tool_response['id'])
@@ -411,8 +425,7 @@ def test_python_module_ctia_positive_asset_metric(get_asset_response, asset):
 
 
 def test_python_module_ctia_positive_asset_mapping(
-        module_headers, get_asset_response, asset, get_asset_mapping_response,
-        asset_mapping):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for asset mapping entity of custom threat intelligence
      python module
 
@@ -444,10 +457,14 @@ def test_python_module_ctia_positive_asset_mapping(
 
     Importance: Critical
     """
-    asset_post_tool_response = get_asset_response
+    # Create new entity using provided payload
+    asset_post_tool_response = get_entity_response(
+        'asset', ASSET_PAYLOAD)
     entity_id_asset = asset_post_tool_response['id']
+    asset_mapping = get_entity('asset_mapping')
     # Create new asset_mapping entity using provided payload
-    asset_mapping_post_tool_response = get_asset_mapping_response(
+    asset_mapping_post_tool_response = get_entity_response(
+        'asset_mapping', ASSET_MAPPING_PAYLOAD,
         dict(asset_ref=entity_id_asset))
     values_asset_mapping = {
         key: asset_mapping_post_tool_response[key] for key in [
@@ -517,7 +534,7 @@ def test_python_module_ctia_positive_asset_mapping(
 
 
 def test_python_module_ctia_positive_asset_mapping_search(
-        get_asset_response, asset, module_tool_client, asset_mapping):
+        get_entity_response, get_entity):
     """Perform testing for asset mapping/search entity of custom threat
     intelligence python module
 
@@ -546,8 +563,10 @@ def test_python_module_ctia_positive_asset_mapping_search(
 
     Importance: Critical
     """
-    asset_post_tool_response = get_asset_response
+    asset_post_tool_response = get_entity_response(
+        'asset', ASSET_PAYLOAD)
     asset_ref = asset_post_tool_response['id']
+    asset_mapping = get_entity('asset_mapping')
     # Create new asset_mapping entity using provided payload
     payload_values_asset_mapping = {
         'asset_type': 'data',
@@ -596,7 +615,7 @@ def test_python_module_ctia_positive_asset_mapping_search(
 
 
 def test_python_module_ctia_positive_asset_mapping_metric(
-        asset, get_asset_response, get_asset_mapping_response, asset_mapping):
+        get_entity, get_entity_response):
     """Perform testing for asset mapping/metric endpoints of custom threat
     intelligence python module
 
@@ -623,11 +642,14 @@ def test_python_module_ctia_positive_asset_mapping_metric(
 
     Importance: Critical
     """
-    asset_post_tool_response = get_asset_response
-    asset_ref = asset_post_tool_response['id']
+    asset_post_tool_response = get_entity_response(
+        'asset', ASSET_PAYLOAD)
+    entity_id_asset = asset_post_tool_response['id']
+    asset_mapping = get_entity('asset_mapping')
     # Create new asset_mapping entity using provided payload
-    asset_mapping_post_tool_response = get_asset_mapping_response(
-        dict(asset_ref=asset_ref))
+    asset_mapping_post_tool_response = get_entity_response(
+        'asset_mapping', ASSET_MAPPING_PAYLOAD,
+        dict(asset_ref=entity_id_asset))
     entity_id_asset_mapping = \
         asset_mapping_post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
@@ -653,8 +675,7 @@ def test_python_module_ctia_positive_asset_mapping_metric(
 
 
 def test_python_module_ctia_positive_asset_properties(
-        module_headers, get_asset_response, asset_properties,
-        get_asset_properties_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for asset properties entity of custom threat
      intelligence python module
 
@@ -687,10 +708,14 @@ def test_python_module_ctia_positive_asset_properties(
 
     Importance: Critical
     """
-    asset_post_tool_response = get_asset_response
+    # Create new entity using provided payload
+    asset_post_tool_response = get_entity_response(
+        'asset', ASSET_PAYLOAD)
     entity_id_asset = asset_post_tool_response['id']
-    # Create new asset properties entity using provided payload
-    asset_properties_post_tool_response = get_asset_properties_response(
+    asset_properties = get_entity('asset_properties')
+    # Create new asset_mapping entity using provided payload
+    asset_properties_post_tool_response = get_entity_response(
+        'asset_properties', ASSET_PROPERTIES_PAYLOAD,
         dict(asset_ref=entity_id_asset))
     values_asset_properties = {
         key: asset_properties_post_tool_response[key] for key in [
@@ -744,7 +769,7 @@ def test_python_module_ctia_positive_asset_properties(
 
 
 def test_python_module_ctia_positive_asset_properties_search(
-        asset_properties, get_asset_response, asset):
+        get_entity_response, get_entity):
     """Perform testing for asset properties/search entity of custom threat
     intelligence python module
 
@@ -773,8 +798,10 @@ def test_python_module_ctia_positive_asset_properties_search(
 
     Importance: Critical
     """
-    asset_post_tool_response = get_asset_response
+    asset_post_tool_response = get_entity_response(
+        'asset', ASSET_PAYLOAD)
     asset_ref = asset_post_tool_response['id']
+    asset_properties = get_entity('asset_properties')
     # Create new asset properties entity using provided payload
     payload_values_asset_properties = {
         'asset_ref': asset_ref,
@@ -804,7 +831,8 @@ def test_python_module_ctia_positive_asset_properties_search(
         params={'id': entity_id_asset_properties,
                 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
     # Repeat GET request and validate that entity was deleted
-    assert asset.search.get(params={'id': entity_id_asset_properties}) == []
+    assert asset_properties.search.get(
+        params={'id': entity_id_asset_properties}) == []
     # Count entities after entity deleted
     count_asset_properties_after_deleted = asset_properties.search.count()
     # Compare results of count_asset_properties_before_deleted and
@@ -814,8 +842,7 @@ def test_python_module_ctia_positive_asset_properties_search(
 
 
 def test_python_module_ctia_positive_asset_properties_metric(
-        get_asset_response, get_asset_properties_response, asset_properties,
-        asset):
+        get_entity, get_entity_response):
     """Perform testing for asset properties/metric endpoints of custom threat
     intelligence python module
 
@@ -845,10 +872,13 @@ def test_python_module_ctia_positive_asset_properties_metric(
 
     Importance: Critical
     """
-    asset_post_tool_response = get_asset_response
+    asset_post_tool_response = get_entity_response(
+        'asset', ASSET_PAYLOAD)
     asset_ref = asset_post_tool_response['id']
+    asset_properties = get_entity('asset_properties')
     # Create new asset properties entity using provided payload
-    asset_properties_post_tool_response = get_asset_properties_response(
+    asset_properties_post_tool_response = get_entity_response(
+        'asset_properties', ASSET_PROPERTIES_PAYLOAD,
         dict(asset_ref=asset_ref))
     entity_id_asset_properties = \
         asset_properties_post_tool_response['id'].rpartition('/')[-1]
@@ -875,7 +905,7 @@ def test_python_module_ctia_positive_asset_properties_metric(
 
 
 def test_python_module_ctia_positive_attack_pattern(
-        module_headers, get_attack_pattern_response, attack_pattern):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for attack pattern entity of custom threat intelligence
     python module
 
@@ -901,7 +931,9 @@ def test_python_module_ctia_positive_attack_pattern(
 
     Importance: Critical
     """
-    attack_pattern_post_tool_response = get_attack_pattern_response
+    attack_pattern = get_entity('attack_pattern')
+    attack_pattern_post_tool_response = get_entity_response(
+        'attack_pattern', ATTACK_PATTERN_PAYLOAD)
     values = {
         key: attack_pattern_post_tool_response[key] for key in [
             'description',
@@ -939,8 +971,7 @@ def test_python_module_ctia_positive_attack_pattern(
     assert get_tool_response['short_description'] == 'Updated descr'
 
 
-def test_python_module_ctia_positive_attack_pattern_search(
-        module_tool_client, attack_pattern):
+def test_python_module_ctia_positive_attack_pattern_search(get_entity):
     """Perform testing for attack_pattern/search entity of custom threat
     intelligence python module
 
@@ -965,6 +996,7 @@ def test_python_module_ctia_positive_attack_pattern_search(
 
     Importance: Critical
     """
+    attack_pattern = get_entity('attack_pattern')
     payload = {
         'description': (
             'A boot kit is a malware variant that modifies the boot sectors of'
@@ -1006,7 +1038,7 @@ def test_python_module_ctia_positive_attack_pattern_search(
 
 
 def test_python_module_ctia_positive_attack_pattern_metric(
-        attack_pattern, get_attack_pattern_response):
+        get_entity, get_entity_response):
     """Perform testing for attack_pattern/metric endpoints of custom threat
     intelligence python module
 
@@ -1029,6 +1061,9 @@ def test_python_module_ctia_positive_attack_pattern_metric(
 
     Importance: Critical
     """
+    attack_pattern = get_entity('attack_pattern')
+    get_attack_pattern_response = get_entity_response(
+        'attack_pattern', ATTACK_PATTERN_PAYLOAD)
     attack_pattern_post_tool_response = get_attack_pattern_response
     entity_id = attack_pattern_post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
@@ -1051,8 +1086,7 @@ def test_python_module_ctia_positive_attack_pattern_metric(
     assert metric_cardinality['type'] == 'cardinality'
 
 
-def test_python_module_ctia_positive_bulk(module_headers, module_tool_client,
-                                          campaign, bulk):
+def test_python_module_ctia_positive_bulk(module_headers, get_entity):
     """Perform testing for bulk functionality of custom threat intelligence
     python module
 
@@ -1075,6 +1109,8 @@ def test_python_module_ctia_positive_bulk(module_headers, module_tool_client,
 
     Importance: Critical
     """
+    bulk = get_entity('bulk')
+    campaign = get_entity('campaign')
     # Create Campaign and COA entities in bulk
     post_tool_response = delayed_return(
         bulk.post({
@@ -1111,8 +1147,7 @@ def test_python_module_ctia_positive_bulk(module_headers, module_tool_client,
 
 
 def test_python_module_ctia_positive_bundle(
-        module_tool_client, get_incident_response, incident,
-        get_indicator_response, bundle):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for bundle functionality of custom threat intelligence
     python module
 
@@ -1133,10 +1168,13 @@ def test_python_module_ctia_positive_bundle(
     Importance: Critical
     """
     # Prepare data for incident
-    incident_post_tool_response = get_incident_response
+    incident_post_tool_response =\
+        get_entity_response('incident', INCIDENT_PAYLOAD)
     # Create new indicator using provided payload
-    indicator_post_tool_response = get_indicator_response
+    indicator_post_tool_response =\
+        get_entity_response('indicator', INDICATOR_PAYLOAD)
     # Use created entities for bundle
+    bundle = get_entity('bundle')
     payload = {
         'ids': [
             incident_post_tool_response['id'],
@@ -1164,7 +1202,7 @@ def test_python_module_ctia_positive_bundle(
 
 
 def test_python_module_ctia_positive_campaign(
-        module_headers, campaign, get_campaign_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for campaign entity of custom threat intelligence python
     module
 
@@ -1190,7 +1228,9 @@ def test_python_module_ctia_positive_campaign(
 
     Importance: Critical
     """
-    campaign_post_tool_response = get_campaign_response
+    campaign = get_entity('campaign')
+    campaign_post_tool_response = get_entity_response(
+        'campaign', CAMPAIGN_PAYLOAD)
     values = {
         key: campaign_post_tool_response[key] for key in [
             'title',
@@ -1231,7 +1271,7 @@ def test_python_module_ctia_positive_campaign(
     assert search_tool_response[0]['title'] == 'New demo campaign'
 
 
-def test_python_module_ctia_positive_campaign_search(campaign):
+def test_python_module_ctia_positive_campaign_search(get_entity):
     """Perform testing for campaign/search entity of custom threat
     intelligence python module
 
@@ -1256,6 +1296,7 @@ def test_python_module_ctia_positive_campaign_search(campaign):
 
     Importance: Critical
     """
+    campaign = get_entity('campaign')
     # Create new entity using provided payload
     post_tool_response = campaign.post(payload=CAMPAIGN_PAYLOAD,
                                        params={'wait_for': 'true'})
@@ -1282,7 +1323,7 @@ def test_python_module_ctia_positive_campaign_search(campaign):
 
 
 def test_python_module_ctia_positive_campaign_metric(
-        campaign, get_campaign_response):
+        get_entity, get_entity_response):
     """Perform testing for campaign/metric endpoints of custom threat
     intelligence python module
 
@@ -1308,7 +1349,8 @@ def test_python_module_ctia_positive_campaign_metric(
 
     Importance: Critical
     """
-    post_tool_tool_response = get_campaign_response
+    campaign = get_entity('campaign')
+    post_tool_tool_response = get_entity_response('campaign', CAMPAIGN_PAYLOAD)
     entity_id = post_tool_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -1331,7 +1373,7 @@ def test_python_module_ctia_positive_campaign_metric(
 
 
 def test_python_module_ctia_positive_casebook(
-        module_headers, casebook, get_casebook_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for casebook entity of custom threat intelligence python
     module
 
@@ -1363,7 +1405,9 @@ def test_python_module_ctia_positive_casebook(
     Importance: Critical
     """
     # Create new entity using provided payload
-    casebook_post_tool_response = get_casebook_response
+    casebook = get_entity('casebook')
+    casebook_post_tool_response = get_entity_response(
+        'casebook', CASEBOOK_PAYLOAD)
     values = {
         key: casebook_post_tool_response[key] for key in [
             'type',
@@ -1392,13 +1436,13 @@ def test_python_module_ctia_positive_casebook(
             entity_id,
             {
                 'operation': 'add',
-                'observables': get_casebook_response['observables']
+                'observables': casebook_post_tool_response['observables']
             }
         )
     )
     get_tool_response = casebook.get(entity_id)
     assert get_tool_response['observables'][0] ==\
-           get_casebook_response['observables'][0]
+           casebook_post_tool_response['observables'][0]
     # Validate that GET request of external_id returns number of external_id
     external_id_result = casebook.external_id(3)
     assert external_id_result[0]['external_ids'] == ['3']
@@ -1436,7 +1480,7 @@ def test_python_module_ctia_positive_casebook(
 
 
 def test_python_module_ctia_positive_casebook_bundle(
-        module_headers, casebook, get_casebook_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for casebook entity of custom threat intelligence python
     module
 
@@ -1461,8 +1505,10 @@ def test_python_module_ctia_positive_casebook_bundle(
 
     Importance: Critical
     """
+    casebook = get_entity('casebook')
     # Create new casebook entity using provided payload
-    casebook_post_tool_response = get_casebook_response
+    casebook_post_tool_response = get_entity_response(
+        'casebook', CASEBOOK_PAYLOAD)
     values = {
         key: casebook_post_tool_response[key] for key in [
             'type',
@@ -1509,8 +1555,7 @@ def test_python_module_ctia_positive_casebook_bundle(
     assert bundle_tool_response['type'] == 'casebook'
 
 
-def test_python_module_ctia_positive_casebook_search(
-        module_tool_client, casebook):
+def test_python_module_ctia_positive_casebook_search(get_entity):
     """Perform testing for casebook/search entity of custom threat
     intelligence python module
 
@@ -1535,6 +1580,7 @@ def test_python_module_ctia_positive_casebook_search(
 
     Importance: Critical
     """
+    casebook = get_entity('casebook')
     observable = [{'value': 'instanbul.com', 'type': 'domain'}]
     payload = {
         'type': 'casebook',
@@ -1581,7 +1627,7 @@ def test_python_module_ctia_positive_casebook_search(
 
 
 def test_python_module_ctia_positive_casebook_metric(
-        get_casebook_response, casebook):
+        get_entity, get_entity_response):
     """Perform testing for casebook/metric endpoints of custom threat
     intelligence python module
 
@@ -1604,7 +1650,9 @@ def test_python_module_ctia_positive_casebook_metric(
 
     Importance: Critical
     """
-    casebook_post_tool_response = get_casebook_response
+    casebook = get_entity('casebook')
+    casebook_post_tool_response = get_entity_response(
+        'casebook', CASEBOOK_PAYLOAD)
     entity_id = casebook_post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -1627,7 +1675,7 @@ def test_python_module_ctia_positive_casebook_metric(
 
 
 def test_python_module_ctia_positive_coa(
-        module_headers, get_coa_response, coa):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for coa entity of custom threat intelligence python
     module
 
@@ -1653,7 +1701,8 @@ def test_python_module_ctia_positive_coa(
 
     Importance: Critical
     """
-    coa_post_tool_response = get_coa_response
+    coa = get_entity('coa')
+    coa_post_tool_response = get_entity_response('coa', COA_PAYLOAD)
     values = {
         key: coa_post_tool_response[key] for key in [
             'description',
@@ -1691,7 +1740,7 @@ def test_python_module_ctia_positive_coa(
     assert get_tool_response['description'] == 'New COA description'
 
 
-def test_python_module_ctia_positive_coa_search(coa):
+def test_python_module_ctia_positive_coa_search(get_entity):
     """Perform testing for coa/search entity of custom threat
     intelligence python module
 
@@ -1716,6 +1765,7 @@ def test_python_module_ctia_positive_coa_search(coa):
 
     Importance: Critical
     """
+    coa = get_entity('coa')
     # Create new entity using provided payload
     coa_post_tool_response = coa.post(payload=COA_PAYLOAD,
                                       params={'wait_for': 'true'})
@@ -1741,7 +1791,8 @@ def test_python_module_ctia_positive_coa_search(coa):
     assert count_coa_before_deleted != count_coa_after_deleted
 
 
-def test_python_module_ctia_positive_coa_metric(get_coa_response, coa):
+def test_python_module_ctia_positive_coa_metric(
+        get_entity, get_entity_response):
     """Perform testing for coa/metric endpoints of custom threat
     intelligence python module
 
@@ -1764,7 +1815,8 @@ def test_python_module_ctia_positive_coa_metric(get_coa_response, coa):
 
     Importance: Critical
     """
-    post_tool_response = get_coa_response
+    coa = get_entity('coa')
+    post_tool_response = get_entity_response('coa', COA_PAYLOAD)
     entity_id = post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -1787,8 +1839,7 @@ def test_python_module_ctia_positive_coa_metric(get_coa_response, coa):
 
 
 def test_python_module_ctia_positive_data_table(
-        module_headers, module_tool_client, get_data_table_response,
-        data_table):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for data table entity of custom threat intelligence
     python module
 
@@ -1809,8 +1860,9 @@ def test_python_module_ctia_positive_data_table(
 
     Importance: Critical
     """
+    data_table = get_entity('data_table')
     # Create new entity using provided payload
-    post_tool_response = get_data_table_response
+    post_tool_response = get_entity_response('data_table', DATA_TABLE_PAYLOAD)
     values = {
         key: post_tool_response[key] for key in [
             'columns',
@@ -1832,7 +1884,7 @@ def test_python_module_ctia_positive_data_table(
     assert get_tool_response == get_direct_response
 
 
-def test_python_module_ctia_positive_event(event):
+def test_python_module_ctia_positive_event(get_entity):
     """Perform testing for event entity of custom threat intelligence python
     module
 
@@ -1849,6 +1901,7 @@ def test_python_module_ctia_positive_event(event):
 
     Importance: Critical
     """
+    event = get_entity('event')
     entities_list = event.search.get(params={'query': '*'})
     assert len(entities_list) > 0
     entity = random.choice(entities_list)
@@ -1858,7 +1911,7 @@ def test_python_module_ctia_positive_event(event):
     assert get_tool_response['timestamp']
 
 
-def test_python_module_ctia_positive_event_search(event):
+def test_python_module_ctia_positive_event_search(get_entity):
     """Perform testing for event/search entity of custom threat
     intelligence python module
 
@@ -1880,6 +1933,7 @@ def test_python_module_ctia_positive_event_search(event):
 
     Importance: Critical
     """
+    event = get_entity('event')
     # Validate that GET request return same data for direct access and access
     # through custom python module
     event_search = event.search.get()
@@ -1930,9 +1984,7 @@ def test_python_module_ctia_positive_event_search(event):
 
 
 def test_python_module_ctia_positive_feed(
-        module_headers, get_judgement_response, indicator,
-        get_indicator_response, get_relationship_response, feed,
-        get_feed_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for feed entity of custom threat intelligence python
     module
 
@@ -1965,16 +2017,21 @@ def test_python_module_ctia_positive_feed(
 
     Importance: Critical
     """
-    judgement_post_tool_response = get_judgement_response
+    judgement_post_tool_response = get_entity_response(
+        'judgement', JUDGEMENT_PAYLOAD)
     # Prepare data for indicator
-    indicator_post_tool_response = get_indicator_response
+    indicator_post_tool_response = get_entity_response(
+        'indicator', INDICATOR_PAYLOAD)
     # Use created entities for relationship
-    relationship_post_tool_response = get_relationship_response(
+    relationship_post_tool_response = get_entity_response(
+        'relationship', RELATIONSHIP_PAYLOAD,
         dict(source_ref=judgement_post_tool_response['id'],
              target_ref=indicator_post_tool_response['id']))
     assert relationship_post_tool_response['type'] == 'relationship'
     assert relationship_post_tool_response['description'] == 'Test relation'
-    feed_post_tool_response = get_feed_response(
+    feed = get_entity('feed')
+    feed_post_tool_response = get_entity_response(
+        'feed', FEED_PAYLOAD,
         dict(indicator_id=indicator_post_tool_response['id']))
     # Create new entity using provided payload
     values = {
@@ -2024,8 +2081,7 @@ def test_python_module_ctia_positive_feed(
 
 
 def test_python_module_ctia_positive_feedback(
-        module_headers, campaign, get_campaign_response,
-        feedback, get_feedback_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for feedback entity of custom threat intelligence python
     module
 
@@ -2046,13 +2102,14 @@ def test_python_module_ctia_positive_feedback(
 
     Importance: Critical
     """
+    feedback = get_entity('feedback')
     # Create new campaign entity to be used for feedback
-    post_tool_response = get_campaign_response
+    post_tool_response = get_entity_response('campaign', CAMPAIGN_PAYLOAD)
     campaign_entity_id = post_tool_response['id']
     # Create new feedback entity using provided payload with already formed
     # campaign entity
-    post_tool_response = get_feedback_response(
-        dict(entity_id=campaign_entity_id))
+    post_tool_response = get_entity_response(
+        'feedback', FEEDBACK_PAYLOAD, dict(entity_id=campaign_entity_id))
     values = {
         key: post_tool_response[key] for key in [
             'feedback',
@@ -2110,7 +2167,7 @@ def test_python_module_ctia_positive_graphql(module_tool_client):
 
 
 def test_python_module_ctia_positive_identity_assertion(
-        module_headers, identity_assertion, get_identity_assertion_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for identity assertion entity of custom threat
     intelligence python module
 
@@ -2134,8 +2191,10 @@ def test_python_module_ctia_positive_identity_assertion(
 
     Importance: Critical
     """
+    identity_assertion = get_entity('identity_assertion')
     # Create new entity using provided payload
-    post_tool_response = get_identity_assertion_response
+    post_tool_response = get_entity_response(
+        'identity_assertion', IDENTITY_ASSERTION_PAYLOAD)
     values = {
         key: post_tool_response[key] for key in [
             'identity',
@@ -2169,7 +2228,7 @@ def test_python_module_ctia_positive_identity_assertion(
 
 
 def test_python_module_ctia_positive_incident(
-        module_headers, incident, get_incident_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for incident entity of custom threat intelligence python
     module
 
@@ -2199,8 +2258,10 @@ def test_python_module_ctia_positive_incident(
 
     Importance: Critical
     """
+    incident = get_entity('incident')
     # Create new entity using provided payload
-    incident_post_tool_response = get_incident_response
+    incident_post_tool_response = get_entity_response(
+        'incident', INCIDENT_PAYLOAD)
     values = {
         key: incident_post_tool_response[key] for key in [
             'confidence',
@@ -2244,7 +2305,7 @@ def test_python_module_ctia_positive_incident(
     assert get_tool_response['status'] == 'New'
 
 
-def test_python_module_ctia_positive_incident_search(incident):
+def test_python_module_ctia_positive_incident_search(get_entity):
     """Perform testing for incident/search entity of custom threat
     intelligence python module
 
@@ -2269,6 +2330,7 @@ def test_python_module_ctia_positive_incident_search(incident):
 
     Importance: Critical
     """
+    incident = get_entity('incident')
     # Create new entity using provided payload
     post_tool_response = incident.post(payload=INCIDENT_PAYLOAD,
                                        params={'wait_for': 'true'})
@@ -2295,7 +2357,7 @@ def test_python_module_ctia_positive_incident_search(incident):
 
 
 def test_python_module_ctia_positive_incident_metric(
-        incident, get_incident_response):
+        get_entity, get_entity_response):
     """Perform testing for incident/metric endpoints of custom threat
     intelligence python module
 
@@ -2321,8 +2383,10 @@ def test_python_module_ctia_positive_incident_metric(
 
     Importance: Critical
     """
+    incident = get_entity('incident')
     # Create new entity using provided payload
-    incident_post_tool_response = get_incident_response
+    incident_post_tool_response = get_entity_response(
+        'incident', INCIDENT_PAYLOAD)
     entity_id = incident_post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -2345,8 +2409,7 @@ def test_python_module_ctia_positive_incident_metric(
 
 
 def test_python_module_ctia_positive_sightings_incident(
-        module_headers, module_tool_client, get_sighting_response,
-        get_incident_response, incident, get_relationship_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for incident entity of custom threat intelligence
      python module
 
@@ -2370,7 +2433,8 @@ def test_python_module_ctia_positive_sightings_incident(
     Importance: Critical
     """
     # Create new sighting entity using provided payload
-    sighting_post_tool_response = get_sighting_response
+    sighting_post_tool_response = get_entity_response(
+        'sighting', SIGHTING_PAYLOAD)
     values = {
         key: sighting_post_tool_response[key] for key in [
             'count',
@@ -2384,7 +2448,9 @@ def test_python_module_ctia_positive_sightings_incident(
     }
     assert values == SIGHTING_PAYLOAD
     # Create new incident entity using provided payload
-    incident_post_tool_response = get_incident_response
+    incident = get_entity('incident')
+    incident_post_tool_response = get_entity_response(
+        'incident', INCIDENT_PAYLOAD)
     values = {
         key: incident_post_tool_response[key] for key in [
             'confidence',
@@ -2397,7 +2463,8 @@ def test_python_module_ctia_positive_sightings_incident(
     }
     assert values == INCIDENT_PAYLOAD
     # Create new relationship entity using provided payload
-    relationship_post_tool_response = get_relationship_response(
+    relationship_post_tool_response = get_entity_response(
+        'relationship', RELATIONSHIP_PAYLOAD,
         dict(source_ref=sighting_post_tool_response['id'],
              target_ref=incident_post_tool_response['id']))
     assert relationship_post_tool_response['type'] == 'relationship'
@@ -2411,7 +2478,7 @@ def test_python_module_ctia_positive_sightings_incident(
 
 
 def test_python_module_ctia_positive_incident_link(
-        module_headers, module_tool_client, casebook, incident):
+        module_headers, module_tool_client, get_entity):
     """Perform testing for investigation entity of custom threat intelligence
     python module
 
@@ -2437,6 +2504,8 @@ def test_python_module_ctia_positive_incident_link(
 
     Importance: Critical
     """
+    casebook = get_entity('casebook')
+    incident = get_entity('incident')
     # Create casebook entity using provided payload
     casebook_post_tool_response = casebook.post(
         payload=CASEBOOK_PAYLOAD, params={'wait_for': 'true'})
@@ -2487,7 +2556,7 @@ def test_python_module_ctia_positive_incident_link(
 
 
 def test_python_module_ctia_positive_indicator(
-        module_headers, indicator, get_indicator_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for indicator entity of custom threat intelligence
      python module
 
@@ -2513,8 +2582,9 @@ def test_python_module_ctia_positive_indicator(
 
     Importance: Critical
     """
+    indicator = get_entity('indicator')
     # Create new entity using provided payload
-    post_tool_response = get_indicator_response
+    post_tool_response = get_entity_response('indicator', INDICATOR_PAYLOAD)
     values = {
         key: post_tool_response[key] for key in [
             'producer',
@@ -2553,7 +2623,7 @@ def test_python_module_ctia_positive_indicator(
     assert get_tool_response['revision'] == 1
 
 
-def test_python_module_ctia_positive_indicator_search(indicator):
+def test_python_module_ctia_positive_indicator_search(get_entity):
     """Perform testing for indicator/search entity of custom threat
     intelligence python module
 
@@ -2578,6 +2648,7 @@ def test_python_module_ctia_positive_indicator_search(indicator):
 
     Importance: Critical
     """
+    indicator = get_entity('indicator')
     # Create new entity using provided payload
     post_tool_response = indicator.post(payload=INDICATOR_PAYLOAD,
                                         params={'wait_for': 'true'})
@@ -2604,7 +2675,7 @@ def test_python_module_ctia_positive_indicator_search(indicator):
 
 
 def test_python_module_ctia_positive_indicator_metric(
-        indicator, get_indicator_response):
+        get_entity, get_entity_response):
     """Perform testing for indicator/metric endpoints of custom threat
     intelligence python module
 
@@ -2627,8 +2698,9 @@ def test_python_module_ctia_positive_indicator_metric(
 
     Importance: Critical
     """
+    indicator = get_entity('indicator')
     # Create new entity
-    post_tool_response = get_indicator_response
+    post_tool_response = get_entity_response('indicator', INDICATOR_PAYLOAD)
     entity_id = post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -2651,8 +2723,7 @@ def test_python_module_ctia_positive_indicator_metric(
 
 
 def test_python_module_ctia_positive_judgements_indicator(
-        module_headers, get_indicator_response, get_judgement_response,
-        get_relationship_response, indicator):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for indicator entity of custom threat intelligence
      python module
 
@@ -2676,12 +2747,16 @@ def test_python_module_ctia_positive_judgements_indicator(
     Importance: Critical
     """
     # Create new judgement entity using provided payload
-    judgement_post_response = get_judgement_response
+    judgement_post_response = get_entity_response(
+        'judgement', JUDGEMENT_PAYLOAD)
     # Create new indicator using provided payload
-    indicator_post_response = get_indicator_response
+    indicator = get_entity('indicator')
+    indicator_post_response = get_entity_response(
+        'indicator', INDICATOR_PAYLOAD)
     # Use created entities for relationship
     # Create new relationship entity using provided payload
-    relationship_post_tool_response = get_relationship_response(
+    relationship_post_tool_response = get_entity_response(
+        'relationship', RELATIONSHIP_PAYLOAD,
         dict(source_ref=judgement_post_response['id'],
              target_ref=indicator_post_response['id']))
     assert relationship_post_tool_response['description'] == 'Test relation'
@@ -2695,8 +2770,7 @@ def test_python_module_ctia_positive_judgements_indicator(
 
 
 def test_python_module_ctia_positive_sightings_indicator(
-        module_headers, get_indicator_response, get_sighting_response,
-        indicator, get_relationship_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for indicator entity of custom threat intelligence
      python module
 
@@ -2719,7 +2793,8 @@ def test_python_module_ctia_positive_sightings_indicator(
 
     Importance: Critical
     """
-    sighting_post_tool_response = get_sighting_response
+    sighting_post_tool_response = get_entity_response(
+        'sighting', SIGHTING_PAYLOAD)
     values = {
         key: sighting_post_tool_response[key] for key in [
             'count',
@@ -2732,9 +2807,12 @@ def test_python_module_ctia_positive_sightings_indicator(
         ]
     }
     assert values == SIGHTING_PAYLOAD
-    indicator_post_tool_response = get_indicator_response
+    indicator = get_entity('indicator')
+    indicator_post_tool_response = get_entity_response(
+        'indicator', INDICATOR_PAYLOAD)
     # Use created entities for relationship
-    relationship_post_tool_response = get_relationship_response(
+    relationship_post_tool_response = get_entity_response(
+        'relationship', RELATIONSHIP_PAYLOAD,
         dict(source_ref=sighting_post_tool_response['id'],
              target_ref=indicator_post_tool_response['id']))
     assert relationship_post_tool_response['description'] == 'Test relation'
@@ -2749,7 +2827,7 @@ def test_python_module_ctia_positive_sightings_indicator(
 
 
 def test_python_module_ctia_positive_investigation(
-        module_headers, get_investigation_response, investigation):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for investigation entity of custom threat intelligence
     python module
 
@@ -2776,8 +2854,10 @@ def test_python_module_ctia_positive_investigation(
 
     Importance: Critical
     """
+    investigation = get_entity('investigation')
     # Create new entity using provided payload
-    investigation_post_tool_response = get_investigation_response
+    investigation_post_tool_response = get_entity_response(
+        'investigation', INVESTIGATION_PAYLOAD)
     values = {
         key: investigation_post_tool_response[key] for key in [
             'title',
@@ -2814,7 +2894,7 @@ def test_python_module_ctia_positive_investigation(
     assert get_tool_response['title'] == 'New demo investigation'
 
 
-def test_python_module_ctia_positive_investigation_search(investigation):
+def test_python_module_ctia_positive_investigation_search(get_entity):
     """Perform testing for investigation/search entity of custom threat
     intelligence python module
 
@@ -2839,6 +2919,7 @@ def test_python_module_ctia_positive_investigation_search(investigation):
 
     Importance: Critical
     """
+    investigation = get_entity('investigation')
     # Create new entity using provided payload
     investigation_post_tool_response = investigation.post(
         payload=INVESTIGATION_PAYLOAD, params={'wait_for': 'true'})
@@ -2866,7 +2947,7 @@ def test_python_module_ctia_positive_investigation_search(investigation):
 
 
 def test_python_module_ctia_positive_investigation_metric(
-        investigation, get_investigation_response):
+        get_entity, get_entity_response):
     """Perform testing for investigation/metric endpoints of custom threat
     intelligence python module
 
@@ -2889,8 +2970,10 @@ def test_python_module_ctia_positive_investigation_metric(
 
     Importance: Critical
     """
+    investigation = get_entity('investigation')
     # Create new entity using provided payload
-    post_tool_response = get_investigation_response
+    post_tool_response = get_entity_response(
+        'investigation', INVESTIGATION_PAYLOAD)
     entity_id = post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -2913,7 +2996,7 @@ def test_python_module_ctia_positive_investigation_metric(
 
 
 def test_python_module_ctia_positive_judgement(
-        module_headers, get_judgement_response, judgement):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for judgement entity of custom threat intelligence
     python module
 
@@ -2943,8 +3026,9 @@ def test_python_module_ctia_positive_judgement(
 
     Importance: Critical
     """
+    judgement = get_entity('judgement')
     # Create new entity using provided payload
-    post_tool_response = get_judgement_response
+    post_tool_response = get_entity_response('judgement', JUDGEMENT_PAYLOAD)
     values = {
         key: post_tool_response[key] for key in [
             'confidence',
@@ -2996,7 +3080,7 @@ def test_python_module_ctia_positive_judgement(
     assert expired_judgement['reason'] == ' For test'
 
 
-def test_python_module_ctia_positive_judgement_search(judgement):
+def test_python_module_ctia_positive_judgement_search(get_entity):
     """Perform testing for judgement/search entity of custom threat
     intelligence python module
 
@@ -3021,6 +3105,7 @@ def test_python_module_ctia_positive_judgement_search(judgement):
 
     Importance: Critical
     """
+    judgement = get_entity('judgement')
     # Create new entity using provided payload
     post_tool_response = judgement.post(payload=JUDGEMENT_PAYLOAD,
                                         params={'wait_for': 'true'})
@@ -3045,7 +3130,7 @@ def test_python_module_ctia_positive_judgement_search(judgement):
 
 
 def test_python_module_ctia_positive_judgement_metric(
-        judgement, get_judgement_response):
+        get_entity, get_entity_response):
     """Perform testing for judgement/metric endpoints of custom threat
     intelligence python module
 
@@ -3068,8 +3153,9 @@ def test_python_module_ctia_positive_judgement_metric(
 
     Importance: Critical
     """
+    judgement = get_entity('judgement')
     # Create new entity using provided payload
-    post_tool_response = get_judgement_response
+    post_tool_response = get_entity_response('judgement', JUDGEMENT_PAYLOAD)
     entity_id = post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -3092,7 +3178,7 @@ def test_python_module_ctia_positive_judgement_metric(
 
 
 def test_python_module_ctia_positive_malware(
-        module_headers, malware, get_malware_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for malware entity of custom threat intelligence python
     module
 
@@ -3120,8 +3206,9 @@ def test_python_module_ctia_positive_malware(
 
     Importance: Critical
     """
+    malware = get_entity('malware')
     # Create new entity using provided payload
-    post_tool_response = get_malware_response
+    post_tool_response = get_entity_response('malware', MALWARE_PAYLOAD)
     values = {
         key: post_tool_response[key] for key in [
             'title',
@@ -3157,7 +3244,7 @@ def test_python_module_ctia_positive_malware(
     assert get_tool_response['title'] == 'Changed title for test'
 
 
-def test_python_module_ctia_positive_malware_search(malware):
+def test_python_module_ctia_positive_malware_search(get_entity):
     """Perform testing for malware/search entity of custom threat
     intelligence python module
 
@@ -3182,6 +3269,7 @@ def test_python_module_ctia_positive_malware_search(malware):
 
     Importance: Critical
     """
+    malware = get_entity('malware')
     # Create new entity using provided payload
     post_tool_response = malware.post(payload=MALWARE_PAYLOAD,
                                       params={'wait_for': 'true'})
@@ -3208,7 +3296,7 @@ def test_python_module_ctia_positive_malware_search(malware):
 
 
 def test_python_module_ctia_positive_malware_metric(
-        malware, get_malware_response):
+        get_entity, get_entity_response):
     """Perform testing for malware/metric endpoints of custom threat
     intelligence python module
 
@@ -3232,8 +3320,9 @@ def test_python_module_ctia_positive_malware_metric(
 
     Importance: Critical
     """
+    malware = get_entity('malware')
     # Create new entity using provided payload
-    post_tool_response = get_malware_response
+    post_tool_response = get_entity_response('malware', MALWARE_PAYLOAD)
     entity_id = post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -3256,9 +3345,7 @@ def test_python_module_ctia_positive_malware_metric(
 
 
 def test_python_module_ctia_positive_relationship(
-        module_headers, campaign, relationship, indicator,
-        get_campaign_response, get_indicator_response,
-        get_relationship_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for relationship entity of custom threat intelligence
     python module
 
@@ -3288,14 +3375,19 @@ def test_python_module_ctia_positive_relationship(
 
     Importance: Critical
     """
+    relationship = get_entity('relationship')
     # Create new campaign using provided payload
-    campaign_post_tool_response = get_campaign_response
+    campaign_post_tool_response =\
+        get_entity_response('campaign', CAMPAIGN_PAYLOAD)
     # Create new indicator using provided payload
-    indicator_post_tool_response = get_indicator_response
+    indicator_post_tool_response =\
+        get_entity_response('indicator', INDICATOR_PAYLOAD)
     # Create new entity using provided payload
-    relationship_post_tool_response = get_relationship_response(
-        dict(source_ref=campaign_post_tool_response['id'],
-             target_ref=indicator_post_tool_response['id']))
+    relationship_post_tool_response =\
+        get_entity_response('relationship', RELATIONSHIP_PAYLOAD,
+                            dict(source_ref=campaign_post_tool_response['id'],
+                                 target_ref=indicator_post_tool_response['id'])
+                            )
     values = {
         key: relationship_post_tool_response[key] for key in [
             'description',
@@ -3339,8 +3431,7 @@ def test_python_module_ctia_positive_relationship(
 
 
 def test_python_module_ctia_positive_relationship_search(
-        campaign, get_campaign_response, get_indicator_response,
-        module_tool_client):
+        module_tool_client, get_entity, get_entity_response):
     """Perform testing for relationship/search entity of custom threat
     intelligence python module
 
@@ -3370,9 +3461,11 @@ def test_python_module_ctia_positive_relationship_search(
     Importance: Critical
     """
     # Create new campaign using provided payload
-    campaign_post_tool_response = get_campaign_response
+    campaign_post_tool_response = get_entity_response(
+        'campaign', CAMPAIGN_PAYLOAD)
     # Create new indicator using provided payload
-    indicator_post_tool_response = get_indicator_response
+    indicator_post_tool_response = get_entity_response(
+        'indicator', INDICATOR_PAYLOAD)
     # Use created entities for relationship
     relationship = module_tool_client.private_intel.relationship
     payload = {
@@ -3411,8 +3504,7 @@ def test_python_module_ctia_positive_relationship_search(
 
 
 def test_python_module_ctia_positive_relationship_metric(
-        relationship, get_campaign_response, get_indicator_response,
-        get_relationship_response):
+        get_entity, get_entity_response):
     """Perform testing for relationship/metric endpoints of custom threat
     intelligence python module
 
@@ -3440,11 +3532,15 @@ def test_python_module_ctia_positive_relationship_metric(
     Importance: Critical
     """
     # Create new campaign using provided payload
-    campaign_post_tool_response = get_campaign_response
+    campaign_post_tool_response = get_entity_response(
+        'campaign', CAMPAIGN_PAYLOAD)
     # Create new indicator using provided payload
-    indicator_post_tool_response = get_indicator_response
+    indicator_post_tool_response = get_entity_response(
+        'indicator', INDICATOR_PAYLOAD)
     # Create new entity using provided payload
-    relationship_post_tool_response = get_relationship_response(
+    relationship = get_entity('relationship')
+    relationship_post_tool_response = get_entity_response(
+        'relationship', RELATIONSHIP_PAYLOAD,
         dict(source_ref=campaign_post_tool_response['id'],
              target_ref=indicator_post_tool_response['id']))
     entity_id = relationship_post_tool_response['id'].rpartition('/')[-1]
@@ -3470,7 +3566,7 @@ def test_python_module_ctia_positive_relationship_metric(
 
 
 def test_python_module_ctia_positive_sighting(
-        module_headers, get_sighting_response, sighting):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for sighting entity of custom threat intelligence python
     module
 
@@ -3486,7 +3582,7 @@ def test_python_module_ctia_positive_sighting(
         4. Compare results
         5. Validate that GET request of external_id returns number of
          external_id
-        6. Validate that GET sighting request returns observeble and type of
+        6. Validate that GET sighting request returns observable and type of
          created entity
         7. Update sighting entity using custom python module
         8. Repeat GET request using python module and validate that entity was
@@ -3499,8 +3595,10 @@ def test_python_module_ctia_positive_sighting(
 
     Importance: Critical
     """
+    sighting = get_entity('sighting')
     # Create new entity using provided payload
-    sighting_post_tool_response = get_sighting_response
+    sighting_post_tool_response = get_entity_response(
+        'sighting', SIGHTING_PAYLOAD)
     values = {
         key: sighting_post_tool_response[key] for key in [
             'count',
@@ -3542,7 +3640,7 @@ def test_python_module_ctia_positive_sighting(
     assert get_tool_response['confidence'] == 'Low'
 
 
-def test_python_module_ctia_positive_sighting_search(sighting):
+def test_python_module_ctia_positive_sighting_search(get_entity):
     """Perform testing for sighting/search entity of custom threat
     intelligence python module
 
@@ -3567,6 +3665,7 @@ def test_python_module_ctia_positive_sighting_search(sighting):
 
     Importance: Critical
     """
+    sighting = get_entity('sighting')
     # Create new entity using provided payload
     post_sighting_response = sighting.post(
         payload=SIGHTING_PAYLOAD, params={'wait_for': 'true'})
@@ -3593,7 +3692,7 @@ def test_python_module_ctia_positive_sighting_search(sighting):
 
 
 def test_python_module_ctia_positive_sighting_metric(
-        sighting, get_sighting_response):
+        get_entity, get_entity_response):
     """Perform testing for sighting/metric endpoints of custom threat
     intelligence python module
 
@@ -3616,8 +3715,9 @@ def test_python_module_ctia_positive_sighting_metric(
 
     Importance: Critical
     """
+    sighting = get_entity('sighting')
     # Create new entity using provided payload
-    post_sighting_response = get_sighting_response
+    post_sighting_response = get_entity_response('sighting', SIGHTING_PAYLOAD)
     entity_id = post_sighting_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -3640,7 +3740,7 @@ def test_python_module_ctia_positive_sighting_metric(
 
 
 def test_python_module_ctia_positive_target_record(
-        module_headers, get_target_record_response, target_record):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for target_record entity of custom threat intelligence
      python module
 
@@ -3667,8 +3767,10 @@ def test_python_module_ctia_positive_target_record(
 
     Importance: Critical
     """
+    target_record = get_entity('target_record')
     # Create new entity using provided payload
-    post_tool_response = get_target_record_response
+    post_tool_response = get_entity_response(
+        'target_record', TARGET_RECORD_PAYLOAD)
     values = {
         key: post_tool_response[key] for key in [
             'source',
@@ -3703,7 +3805,7 @@ def test_python_module_ctia_positive_target_record(
     assert get_tool_response['source'] == 'Updated source'
 
 
-def test_python_module_ctia_positive_target_record_search(target_record):
+def test_python_module_ctia_positive_target_record_search(get_entity):
     """Perform testing for target_record/search entity of custom threat
     intelligence python module
 
@@ -3728,6 +3830,7 @@ def test_python_module_ctia_positive_target_record_search(target_record):
 
     Importance: Critical
     """
+    target_record = get_entity('target_record')
     # Create new entity using provided payload
     post_tool_response = target_record.post(payload=TARGET_RECORD_PAYLOAD,
                                             params={'wait_for': 'true'})
@@ -3755,7 +3858,7 @@ def test_python_module_ctia_positive_target_record_search(target_record):
 
 
 def test_python_module_ctia_positive_target_record_metric(
-        target_record, get_target_record_response):
+        get_entity, get_entity_response):
     """Perform testing for target_record/metric endpoints of custom threat
     intelligence python module
 
@@ -3778,8 +3881,10 @@ def test_python_module_ctia_positive_target_record_metric(
 
     Importance: Critical
     """
+    target_record = get_entity('target_record')
     # Create new entity using provided payload
-    post_tool_response = get_target_record_response
+    post_tool_response = get_entity_response(
+        'target_record', TARGET_RECORD_PAYLOAD)
     entity_id = post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -3801,7 +3906,7 @@ def test_python_module_ctia_positive_target_record_metric(
     assert metric_cardinality['type'] == 'cardinality'
 
 
-def test_python_module_ctia_positive_status(status):
+def test_python_module_ctia_positive_status(get_entity):
     """Perform testing for status endpoint using custom threat intelligence
     python module
 
@@ -3816,12 +3921,13 @@ def test_python_module_ctia_positive_status(status):
 
     Importance: Critical
     """
+    status = get_entity('status')
     server_status = status.get()
     assert server_status['status'] == 'ok'
 
 
-def test_python_module_ctia_positive_tool(module_headers,
-                                          get_tool_response, tool):
+def test_python_module_ctia_positive_tool(
+        module_headers, get_entity, get_entity_response):
     """Perform testing for tool entity of custom threat intelligence python
     module
 
@@ -3848,7 +3954,8 @@ def test_python_module_ctia_positive_tool(module_headers,
 
     Importance: Critical
     """
-    post_tool_response = get_tool_response
+    tool = get_entity('tool')
+    post_tool_response = get_entity_response('tool', TOOL_PAYLOAD)
     values = {
         key: post_tool_response[key] for key in [
             'labels',
@@ -3883,7 +3990,7 @@ def test_python_module_ctia_positive_tool(module_headers,
     assert get_tool_response['title'] == 'Changed title for test'
 
 
-def test_python_module_ctia_positive_tool_search(tool):
+def test_python_module_ctia_positive_tool_search(get_entity):
     """Perform testing for tool/search entity of custom threat
     intelligence python module
 
@@ -3908,6 +4015,7 @@ def test_python_module_ctia_positive_tool_search(tool):
 
     Importance: Critical
     """
+    tool = get_entity('tool')
     # Create new entity using provided payload
     post_tool_response = tool.post(payload=TOOL_PAYLOAD,
                                    params={'wait_for': 'true'})
@@ -3933,7 +4041,8 @@ def test_python_module_ctia_positive_tool_search(tool):
     assert count_tool_before_deleted != count_tool_after_deleted
 
 
-def test_python_module_ctia_positive_tool_metric(tool, get_tool_response):
+def test_python_module_ctia_positive_tool_metric(
+        get_entity, get_entity_response):
     """Perform testing for tool/metric endpoints of custom threat
     intelligence python module
 
@@ -3956,8 +4065,9 @@ def test_python_module_ctia_positive_tool_metric(tool, get_tool_response):
 
     Importance: Critical
     """
+    tool = get_entity('tool')
     # Create new entity using provided payload
-    post_tool_response = get_tool_response
+    post_tool_response = get_entity_response('tool', TOOL_PAYLOAD)
     entity_id = post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -3980,7 +4090,7 @@ def test_python_module_ctia_positive_tool_metric(tool, get_tool_response):
 
 
 def test_python_module_ctia_positive_verdict(
-        module_headers, get_judgement_response, judgement, verdict):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for verdict entity of custom threat intelligence python
     module
 
@@ -4002,11 +4112,13 @@ def test_python_module_ctia_positive_verdict(
     Importance: Critical
     """
     # Create new judgement entity to be used for verdict
-    judgement_post_tool_response = get_judgement_response
+    judgement_post_tool_response = get_entity_response(
+        'judgement', JUDGEMENT_PAYLOAD)
     observable_type = judgement_post_tool_response['observable']['type']
     observable_value = judgement_post_tool_response['observable']['value']
     # Validate that GET request return same data for direct access and access
     # through custom python module
+    verdict = get_entity('verdict')
     verdict_get_tool_response = verdict.get(observable_type, observable_value)
     assert verdict_get_tool_response['type'] == 'verdict'
     get_direct_response = ctia_get_data(
@@ -4016,7 +4128,7 @@ def test_python_module_ctia_positive_verdict(
     assert verdict_get_tool_response == get_direct_response
 
 
-def test_python_module_ctia_positive_version(version):
+def test_python_module_ctia_positive_version(get_entity):
     """Perform testing for version endpoint using custom threat intelligence
     python module
 
@@ -4031,13 +4143,14 @@ def test_python_module_ctia_positive_version(version):
 
     Importance: Critical
     """
+    version = get_entity('version')
     server_version = version.get()
     assert server_version['base'] == '/ctia'
     assert server_version['ctim-version'] == '1.1.3'
 
 
 def test_python_module_ctia_positive_vulnerability(
-        module_headers, vulnerability, get_vulnerability_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for vulnerability entity of custom threat intelligence
     python module
 
@@ -4063,8 +4176,10 @@ def test_python_module_ctia_positive_vulnerability(
 
     Importance: Critical
     """
+    vulnerability = get_entity('vulnerability')
     # Create new entity using provided payload
-    vulnerability_post_tool_response = get_vulnerability_response
+    vulnerability_post_tool_response = get_entity_response(
+        'vulnerability', VULNERABILITY_PAYLOAD)
     values = {
         key: vulnerability_post_tool_response[key] for key in [
             'description',
@@ -4099,7 +4214,7 @@ def test_python_module_ctia_positive_vulnerability(
     assert get_tool_response['description'] == 'New browser vulnerability'
 
 
-def test_python_module_ctia_positive_vulnerability_search(vulnerability):
+def test_python_module_ctia_positive_vulnerability_search(get_entity):
     """Perform testing for vulnerability/search entity of custom threat
     intelligence python module
 
@@ -4124,6 +4239,7 @@ def test_python_module_ctia_positive_vulnerability_search(vulnerability):
 
     Importance: Critical
     """
+    vulnerability = get_entity('vulnerability')
     # Create new entity using provided payload
     vulnerability_post_tool_response = vulnerability.post(
         payload=VULNERABILITY_PAYLOAD, params={'wait_for': 'true'})
@@ -4151,7 +4267,7 @@ def test_python_module_ctia_positive_vulnerability_search(vulnerability):
 
 
 def test_python_module_ctia_positive_vulnerability_metric(
-        vulnerability, get_vulnerability_response):
+        get_entity, get_entity_response):
     """Perform testing for vulnerability/metric endpoints of custom threat
     intelligence python module
 
@@ -4174,7 +4290,9 @@ def test_python_module_ctia_positive_vulnerability_metric(
 
     Importance: Critical
     """
-    vulnerability_post_tool_response = get_vulnerability_response
+    vulnerability = get_entity('vulnerability')
+    vulnerability_post_tool_response = get_entity_response(
+        'vulnerability', VULNERABILITY_PAYLOAD)
     entity_id = vulnerability_post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
     # through custom python module
@@ -4197,7 +4315,7 @@ def test_python_module_ctia_positive_vulnerability_metric(
 
 
 def test_python_module_ctia_positive_weakness(
-        module_headers, weakness, get_weakness_response):
+        module_headers, get_entity, get_entity_response):
     """Perform testing for weakness entity of custom threat intelligence python
     module
 
@@ -4223,8 +4341,9 @@ def test_python_module_ctia_positive_weakness(
 
     Importance: Critical
     """
+    weakness = get_entity('weakness')
     # Create new entity using provided payload
-    post_tool_response = get_weakness_response
+    post_tool_response = get_entity_response('weakness', WEAKNESS_PAYLOAD)
     values = {
         key: post_tool_response[key] for key in [
             'description',
@@ -4262,7 +4381,7 @@ def test_python_module_ctia_positive_weakness(
     assert get_tool_response['description'] == 'New description'
 
 
-def test_python_module_ctia_positive_weakness_search(weakness):
+def test_python_module_ctia_positive_weakness_search(get_entity):
     """Perform testing for weakness/search entity of custom threat
     intelligence python module
 
@@ -4287,6 +4406,7 @@ def test_python_module_ctia_positive_weakness_search(weakness):
 
     Importance: Critical
     """
+    weakness = get_entity('weakness')
     # Create new entity using provided payload
     post_tool_response = weakness.post(
         payload=WEAKNESS_PAYLOAD, params={'wait_for': 'true'})
@@ -4323,7 +4443,7 @@ def test_python_module_ctia_positive_weakness_search(weakness):
 
 
 def test_python_module_ctia_positive_weakness_metric(
-        weakness, get_weakness_response):
+        get_entity, get_entity_response):
     """Perform testing for weakness/metric endpoints of custom threat
     intelligence python module
 
@@ -4346,8 +4466,9 @@ def test_python_module_ctia_positive_weakness_metric(
 
     Importance: Critical
     """
+    weakness = get_entity('weakness')
     # Create new entity using provided payload
-    post_tool_response = get_weakness_response
+    post_tool_response = get_entity_response('weakness', WEAKNESS_PAYLOAD)
     # Create variable for using it in params for endpoints
     entity_id = post_tool_response['id'].rpartition('/')[-1]
     # Validate that GET request return same data for direct access and access
