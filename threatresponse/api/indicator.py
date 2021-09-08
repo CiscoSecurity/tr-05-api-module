@@ -16,9 +16,10 @@ class IndicatorAPI(IntelEntityAPI):
         return self._get(
             urls.join(
                 '/ctia',
-                observable_type,
                 observable_value,
-                'judgements/indicators'
+                observable_type,
+                'judgements',
+                'indicators'
             ),
             **kwargs
         )
@@ -30,7 +31,8 @@ class IndicatorAPI(IntelEntityAPI):
                 '/ctia',
                 observable_type,
                 observable_value,
-                'sightings/indicators'
+                'sightings',
+                'indicators'
             ),
             **kwargs
         )
