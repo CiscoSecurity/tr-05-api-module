@@ -66,8 +66,8 @@ def get_entity(module_tool_client):
 
 @pytest.fixture(scope='function')
 def get_post_response():
-    def _get_response(entity, payload):
-        post_tool_response = entity.post(
+    def _get_response(entity_object, payload):
+        post_tool_response = entity_object.post(
             payload=payload, params={'wait_for': 'true'})
         return post_tool_response
     return _get_response

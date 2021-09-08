@@ -2767,8 +2767,7 @@ def test_python_module_ctia_positive_judgements_indicator(
     judgement_indicator_response = indicator.judgements.indicators(
             observable_type=observable_type,
             observable_value=observable_value)
-    assert delayed_return(
-        judgement_indicator_response[0] == indicator_post_response['id'])
+    assert judgement_indicator_response[0] == indicator_post_response['id']
 
 
 def test_python_module_ctia_positive_sightings_indicator(
