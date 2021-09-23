@@ -5,6 +5,8 @@ from .api.intel import PrivateIntel, GlobalIntel
 from .api.profile import ProfileAPI
 from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
+from .api.module_type import ModuleTypeAPI
+from .api.module_instance import ModuleInstanceAPI
 from .api.user_mgmt import UserMgmtAPI
 from .exceptions import CredentialsError
 from .request.authorized import ClientAuthorizedRequest, TokenAuthorizedRequest
@@ -63,6 +65,8 @@ class ThreatResponse(object):
         self._global_intel = GlobalIntel(request_for('global_intel'))
         self._commands = CommandsAPI(request_for('visibility'))
         self._user_mgmt = UserMgmtAPI(request_for('visibility'))
+        self._module_type = ModuleTypeAPI(request_for('visibility'))
+        self._module_instance = ModuleInstanceAPI(request_for('visibility'))
 
     @property
     def inspect(self):
@@ -99,3 +103,11 @@ class ThreatResponse(object):
     @property
     def user_mgmt(self):
         return self._user_mgmt
+
+    @property
+    def module_type(self):
+        return self._module_type
+
+    @property
+    def module_instance(self):
+        return self._module_instance
