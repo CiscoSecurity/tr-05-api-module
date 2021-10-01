@@ -7,7 +7,7 @@ from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
 from .api.module_type import ModuleTypeAPI
 from .api.module_instance import ModuleInstanceAPI
-from .api.sse import SSEDeviceAPI, SSETenantAPI, SSEAdminAPI
+from .api.sse import SSEDeviceAPI, SSETenantAPI
 from .api.user_mgmt import UserMgmtAPI
 from .exceptions import CredentialsError
 from .request.authorized import ClientAuthorizedRequest, TokenAuthorizedRequest
