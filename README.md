@@ -398,6 +398,24 @@ Available methods:
 Available methods:
   - metrics.get()
 
+# Module Instance
+    module_instance = client.module_instance
+Available methods:
+- module_instance.get_all()
+- module_instance.get_by_id()
+- module_instance.post()
+- module_instance.patch()
+- module_instance.delete()
+
+# Module Type
+    module_type = client.module_type
+Available methods:
+- module_type.get_all()
+- module_type.get_by_id()
+- module_type.post()
+- module_type.patch()
+- module_type.delete()
+
 # Properties
     properties = client.private_intel.properties
 Available methods:
@@ -439,6 +457,23 @@ Available methods:
   - sighting.metric.histogram()
   - sighting.metric.topn()
   - sighting.metric.cardinality()
+
+# SSE Device
+    sse_device = client.sse_device
+Available methods:
+- sse_device.get_all()
+- sse_device.get_by_id()
+- sse_device.post()
+- sse_device.patch()
+- sse_device.token()
+- sse_device.re_token()
+- sse_device.api_proxy()
+- sse_device.delete()
+
+# SSE Tenant
+    sse_tenant = client.sse_tenant
+Available methods:
+- sse_tenant.get_token()
 
 # Target record
     target_record = client.private_intel.target_record

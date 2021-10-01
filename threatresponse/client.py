@@ -70,7 +70,6 @@ class ThreatResponse(object):
         self._module_instance = ModuleInstanceAPI(request_for('visibility'))
         self._sse_device = SSEDeviceAPI(request_for('visibility'))
         self._sse_tenant = SSETenantAPI(request_for('visibility'))
-        self._sse_admin = SSETenantAPI(request_for('sse'))
 
     @property
     def inspect(self):
