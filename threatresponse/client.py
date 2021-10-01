@@ -7,6 +7,7 @@ from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
 from .api.module_type import ModuleTypeAPI
 from .api.module_instance import ModuleInstanceAPI
+from .api.sse import SSEDeviceAPI, SSETenantAPI, SSEAdminAPI
 from .api.user_mgmt import UserMgmtAPI
 from .exceptions import CredentialsError
 from .request.authorized import ClientAuthorizedRequest, TokenAuthorizedRequest
@@ -67,6 +68,9 @@ class ThreatResponse(object):
         self._user_mgmt = UserMgmtAPI(request_for('visibility'))
         self._module_type = ModuleTypeAPI(request_for('visibility'))
         self._module_instance = ModuleInstanceAPI(request_for('visibility'))
+        self._sse_device = SSEDeviceAPI(request_for('visibility'))
+        self._sse_tenant = SSETenantAPI(request_for('visibility'))
+        self._sse_admin = SSETenantAPI(request_for('sse'))
 
     @property
     def inspect(self):
@@ -111,3 +115,15 @@ class ThreatResponse(object):
     @property
     def module_instance(self):
         return self._module_instance
+
+    @property
+    def sse_device(self):
+        return self._sse_device
+
+    @property
+    def sse_tenant(self):
+        return self._sse_tenant
+
+    @property
+    def sse_admin(self):
+        return self._sse_admin
