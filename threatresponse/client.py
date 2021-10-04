@@ -122,7 +122,3 @@ class ThreatResponse(object):
     @property
     def sse_tenant(self):
         return self._sse_tenant
-
-    @property
-    def sse_admin(self):
-        return self._sse_admin
