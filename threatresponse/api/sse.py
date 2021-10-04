@@ -127,4 +127,3 @@ class SSETenantAPI(API):
             '/iroh/iroh-sse/tenant/token',
             **kwargs
         )
-
