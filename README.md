@@ -290,6 +290,20 @@ Available methods:
   - event.search.get()
   - event.search.delete()
   - event.search.count()
+
+# Feed
+    feed = client.private_intel.feed
+Available methods:
+  - feed.view.txt()
+  - feed.view()
+  - feed.post()
+  - feed.put()
+  - feed.get()
+  - feed.delete()
+  - feed.external_id()
+  - feed.search.get()
+  - feed.search.delete()
+  - feed.search.count()
   
 # Feedback
     feedback = client.private_intel.feedback
