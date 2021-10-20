@@ -305,6 +305,21 @@ Available methods:
 Available methods:
   - graphql.post()
 
+# Identity Assertion
+    identity_assertion = client.private_intel.identity_assertion
+Available methods:
+  - identity_assertion.post()
+  - identity_assertion.get()
+  - identity_assertion.put()
+  - identity_assertion.delete()
+  - identity_assertion.external_id()
+  - identity_assertion.search.get()
+  - identity_assertion.search.delete()
+  - identity_assertion.search.count()
+  - identity_assertion.metric.histogram()
+  - identity_assertion.metric.topn()
+  - identity_assertion.metric.cardinality()
+
 # Incident
     incident = client.private_intel.incident
 Available methods:
