@@ -511,6 +511,14 @@ Available methods:
   - tool.metric.topn()
   - tool.metric.cardinality()
 
+# User Management
+    user_mgmt = client.user_mgmt
+Available methods:
+  - user_mgmt.users.get()
+  - user_mgmt.users.post()
+  - user_mgmt.batch.users()
+  - user_mgmt.search.users()
+
 # Verdict
     verdict = client.private_intel.verdict
 Available methods:
