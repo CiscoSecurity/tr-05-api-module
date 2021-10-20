@@ -417,6 +417,13 @@ Available methods:
 Available methods:
   - metrics.get()
 
+# Profile
+    profile = client.profile
+Available methods:
+  - profile.whoami()
+  - profile.org.get()
+  - profile.org.post()
+
 # Properties
     properties = client.private_intel.properties
 Available methods:
