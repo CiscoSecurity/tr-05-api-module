@@ -417,24 +417,6 @@ Available methods:
 Available methods:
   - metrics.get()
 
-# Module Instance
-    module_instance = client.module_instance
-Available methods:
-- module_instance.get_all()
-- module_instance.get_by_id()
-- module_instance.post()
-- module_instance.patch()
-- module_instance.delete()
-
-# Module Type
-    module_type = client.module_type
-Available methods:
-- module_type.get_all()
-- module_type.get_by_id()
-- module_type.post()
-- module_type.patch()
-- module_type.delete()
-
 # Properties
     properties = client.private_intel.properties
 Available methods:
