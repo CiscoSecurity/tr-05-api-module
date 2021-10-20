@@ -568,6 +568,7 @@ Available methods:
 # Vulnerability
     vulnerability = client.private_intel.vulnerability
 Available methods:
+  - vulnerability.cpe_match_strings()
   - vulnerability.post()
   - vulnerability.get()
   - vulnerability.put()
