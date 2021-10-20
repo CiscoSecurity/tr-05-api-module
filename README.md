@@ -281,25 +281,6 @@ Available methods:
   - enrich.observe.observables()
   - enrich.refer.observables()
 
-# Int
-    int = client.int
-Available methods:
-  - int.integration.get(_id)
-  - int.integration.patch(_id)
-  - int.integration.delete(_id)
-  - int.integration.get()
-  - int.integration.post()
-  - int.module_instance.get(_id)
-  - int.module_instance.patch(_id)
-  - int.module_instance.delete(_id)
-  - int.module_instance.get()
-  - int.module_instance.post()
-  - int.module_type.get(_id)
-  - int.module_type.patch(_id)
-  - int.module_type.delete(_id)
-  - int.module_type.get()
-  - int.module_type.post()
-
 # Event
     event = client.private_intel.event
 Available methods:
@@ -379,6 +360,25 @@ Available methods:
   - investigation.metric.histogram()
   - investigation.metric.topn()
   - investigation.metric.cardinality()
+
+# Int
+    int = client.int
+Available methods:
+  - int.integration.get(_id)
+  - int.integration.patch(_id)
+  - int.integration.delete(_id)
+  - int.integration.get()
+  - int.integration.post()
+  - int.module_instance.get(_id)
+  - int.module_instance.patch(_id)
+  - int.module_instance.delete(_id)
+  - int.module_instance.get()
+  - int.module_instance.post()
+  - int.module_type.get(_id)
+  - int.module_type.patch(_id)
+  - int.module_type.delete(_id)
+  - int.module_type.get()
+  - int.module_type.post()
 
 # Judgment
     judgment = client.private_intel.judgment
