@@ -345,21 +345,6 @@ Available methods:
     inspect = client.inspect
 Available methods:
   - inspect.inspect()
- 
-# Investigation
-    investigation = client.private_intel.investigation
-Available methods:
-  - investigation.post()
-  - investigation.get()
-  - investigation.put()
-  - investigation.delete()
-  - investigation.external_id()
-  - investigation.search.get()
-  - investigation.search.delete()
-  - investigation.search.count()
-  - investigation.metric.histogram()
-  - investigation.metric.topn()
-  - investigation.metric.cardinality()
 
 # Int
     int = client.int
@@ -379,6 +364,21 @@ Available methods:
   - int.module_type.delete(_id)
   - int.module_type.get()
   - int.module_type.post()
+ 
+# Investigation
+    investigation = client.private_intel.investigation
+Available methods:
+  - investigation.post()
+  - investigation.get()
+  - investigation.put()
+  - investigation.delete()
+  - investigation.external_id()
+  - investigation.search.get()
+  - investigation.search.delete()
+  - investigation.search.count()
+  - investigation.metric.histogram()
+  - investigation.metric.topn()
+  - investigation.metric.cardinality()
 
 # Judgment
     judgment = client.private_intel.judgment
