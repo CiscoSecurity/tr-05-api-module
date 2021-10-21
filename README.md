@@ -290,6 +290,20 @@ Available methods:
   - event.search.get()
   - event.search.delete()
   - event.search.count()
+
+# Feed
+    feed = client.private_intel.feed
+Available methods:
+  - feed.view.txt()
+  - feed.view()
+  - feed.post()
+  - feed.put()
+  - feed.get()
+  - feed.delete()
+  - feed.external_id()
+  - feed.search.get()
+  - feed.search.delete()
+  - feed.search.count()
   
 # Feedback
     feedback = client.private_intel.feedback
@@ -304,6 +318,21 @@ Available methods:
     graph = client.private_intel.graphql
 Available methods:
   - graphql.post()
+
+# Identity Assertion
+    identity_assertion = client.private_intel.identity_assertion
+Available methods:
+  - identity_assertion.post()
+  - identity_assertion.get()
+  - identity_assertion.put()
+  - identity_assertion.delete()
+  - identity_assertion.external_id()
+  - identity_assertion.search.get()
+  - identity_assertion.search.delete()
+  - identity_assertion.search.count()
+  - identity_assertion.metric.histogram()
+  - identity_assertion.metric.topn()
+  - identity_assertion.metric.cardinality()
 
 # Incident
     incident = client.private_intel.incident
@@ -539,6 +568,7 @@ Available methods:
 # Vulnerability
     vulnerability = client.private_intel.vulnerability
 Available methods:
+  - vulnerability.cpe_match_strings()
   - vulnerability.post()
   - vulnerability.get()
   - vulnerability.put()
