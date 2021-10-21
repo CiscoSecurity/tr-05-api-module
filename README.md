@@ -477,6 +477,7 @@ Available methods:
     response = client.response
 Available methods:
   - response.respond.observables()
+  - response.respond.sighting()
   - response.respond.trigger()
 
 # Sighting

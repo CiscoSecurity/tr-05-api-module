@@ -18,6 +18,18 @@ class ResponseAPI(API):
             **kwargs
         )
 
+    @route('respond.sighting')
+    def _perform(self, payload, **kwargs):
+        """
+        https://visibility.amp.cisco.com/iroh/iroh-response/index.html#/Response/post_iroh_iroh_response_respond_sighting
+        """
+
+        return self._post(
+            '/iroh/iroh-response/respond/sighting',
+            json=payload,
+            **kwargs
+        )
+
     @route('respond.trigger')
     def _perform(self,
                  module_name,
