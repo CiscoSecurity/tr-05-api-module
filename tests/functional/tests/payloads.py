@@ -327,8 +327,8 @@ VULNERABILITY_PAYLOAD = {
                 "cpe_match": [
                     {
                         "vulnerable": True,
-                        "cpe23Uri": "cpe:2.3:a:microsoft:internet_explorer:"
-                                    "8.0.6001:beta:*:*:*:*:*:*",
+                        "cpe23Uri": "cpe:2.3:a:google:chrome:8.0:"
+                                    "beta:*:*:*:*:*:*",
                     }
                 ],
             }
