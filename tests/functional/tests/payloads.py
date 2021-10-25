@@ -318,22 +318,7 @@ VULNERABILITY_PAYLOAD = {
     'description': 'Browser vulnerability',
     'type': 'vulnerability',
     'schema_version': SERVER_VERSION,
-    'external_ids': ['3'],
-    'configurations': {
-        "CVE_data_version": "string",
-        "nodes": [
-            {
-                "operator": "AND",
-                "cpe_match": [
-                    {
-                        "vulnerable": True,
-                        "cpe23Uri": "cpe:2.3:a:google:chrome:8.0:"
-                                    "beta:*:*:*:*:*:*",
-                    }
-                ],
-            }
-        ]
-    },
+    'external_ids': ['3']
 }
 
 WEAKNESS_PAYLOAD = {

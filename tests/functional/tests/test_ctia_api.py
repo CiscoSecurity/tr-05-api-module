@@ -4350,8 +4350,7 @@ def test_python_module_ctia_positive_vulnerability(
             'description',
             'type',
             'schema_version',
-            'external_ids',
-            'configurations'
+            'external_ids'
         ]
     }
     assert values == VULNERABILITY_PAYLOAD
