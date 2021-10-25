@@ -189,6 +189,7 @@ IDENTITY_ASSERTION_PAYLOAD = {
     'schema_version': SERVER_VERSION,
     'type': 'identity-assertion',
     'source': 'ATQC data',
+    'external_ids': ['3'],
     'assertions': [
         {
             'name': 'severity',
@@ -317,7 +318,22 @@ VULNERABILITY_PAYLOAD = {
     'description': 'Browser vulnerability',
     'type': 'vulnerability',
     'schema_version': SERVER_VERSION,
-    'external_ids': ['3']
+    'external_ids': ['3'],
+    'configurations': {
+        "CVE_data_version": "string",
+        "nodes": [
+            {
+                "operator": "AND",
+                "cpe_match": [
+                    {
+                        "vulnerable": True,
+                        "cpe23Uri": "cpe:2.3:a:microsoft:internet_explorer:"
+                                    "8.0.6001:beta:*:*:*:*:*:*",
+                    }
+                ],
+            }
+        ]
+    },
 }
 
 WEAKNESS_PAYLOAD = {
@@ -390,6 +406,8 @@ FEED_PAYLOAD = {
     "type": "feed",
     "output": "observables",
     "feed_type": "indicator",
+    "external_ids": ['3']
+
 }
 
 FEEDBACK_PAYLOAD = {
