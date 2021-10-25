@@ -290,6 +290,20 @@ Available methods:
   - event.search.get()
   - event.search.delete()
   - event.search.count()
+
+# Feed
+    feed = client.private_intel.feed
+Available methods:
+  - feed.view.txt()
+  - feed.view()
+  - feed.post()
+  - feed.put()
+  - feed.get()
+  - feed.delete()
+  - feed.external_id()
+  - feed.search.get()
+  - feed.search.delete()
+  - feed.search.count()
   
 # Feedback
     feedback = client.private_intel.feedback
@@ -304,6 +318,21 @@ Available methods:
     graph = client.private_intel.graphql
 Available methods:
   - graphql.post()
+
+# Identity Assertion
+    identity_assertion = client.private_intel.identity_assertion
+Available methods:
+  - identity_assertion.post()
+  - identity_assertion.get()
+  - identity_assertion.put()
+  - identity_assertion.delete()
+  - identity_assertion.external_id()
+  - identity_assertion.search.get()
+  - identity_assertion.search.delete()
+  - identity_assertion.search.count()
+  - identity_assertion.metric.histogram()
+  - identity_assertion.metric.topn()
+  - identity_assertion.metric.cardinality()
 
 # Incident
     incident = client.private_intel.incident
@@ -345,6 +374,25 @@ Available methods:
     inspect = client.inspect
 Available methods:
   - inspect.inspect()
+
+# Int
+    int = client.int
+Available methods:
+  - int.integration.get(_id)
+  - int.integration.patch(_id)
+  - int.integration.delete(_id)
+  - int.integration.get()
+  - int.integration.post()
+  - int.module_instance.get(_id)
+  - int.module_instance.patch(_id)
+  - int.module_instance.delete(_id)
+  - int.module_instance.get()
+  - int.module_instance.post()
+  - int.module_type.get(_id)
+  - int.module_type.patch(_id)
+  - int.module_type.delete(_id)
+  - int.module_type.get()
+  - int.module_type.post()
  
 # Investigation
     investigation = client.private_intel.investigation
@@ -398,6 +446,13 @@ Available methods:
 Available methods:
   - metrics.get()
 
+# Profile
+    profile = client.profile
+Available methods:
+  - profile.whoami()
+  - profile.org.get()
+  - profile.org.post()
+
 # Properties
     properties = client.private_intel.properties
 Available methods:
@@ -422,6 +477,7 @@ Available methods:
     response = client.response
 Available methods:
   - response.respond.observables()
+  - response.respond.sighting()
   - response.respond.trigger()
 
 # Sighting
@@ -439,6 +495,23 @@ Available methods:
   - sighting.metric.histogram()
   - sighting.metric.topn()
   - sighting.metric.cardinality()
+
+# SSE Device
+    sse_device = client.sse_device
+Available methods:
+- sse_device.get_all()
+- sse_device.get_by_id()
+- sse_device.post()
+- sse_device.patch()
+- sse_device.token()
+- sse_device.re_token()
+- sse_device.api_proxy()
+- sse_device.delete()
+
+# SSE Tenant
+    sse_tenant = client.sse_tenant
+Available methods:
+- sse_tenant.get_token()
 
 # Target record
     target_record = client.private_intel.target_record
@@ -475,6 +548,14 @@ Available methods:
   - tool.metric.topn()
   - tool.metric.cardinality()
 
+# User Management
+    user_mgmt = client.user_mgmt
+Available methods:
+  - user_mgmt.users.get()
+  - user_mgmt.users.post()
+  - user_mgmt.batch.users()
+  - user_mgmt.search.users()
+
 # Verdict
     verdict = client.private_intel.verdict
 Available methods:
@@ -488,6 +569,7 @@ Available methods:
 # Vulnerability
     vulnerability = client.private_intel.vulnerability
 Available methods:
+  - vulnerability.cpe_match_strings()
   - vulnerability.post()
   - vulnerability.get()
   - vulnerability.put()

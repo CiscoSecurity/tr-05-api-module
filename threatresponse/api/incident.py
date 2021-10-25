@@ -34,7 +34,8 @@ class IncidentAPI(IntelEntityAPI):
                 '/ctia',
                 observable_type,
                 observable_value,
-                'sightings/incidents'
+                'sightings',
+                'incidents'
             ),
             **kwargs
         )

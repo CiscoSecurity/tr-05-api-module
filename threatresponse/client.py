@@ -5,6 +5,7 @@ from .api.intel import PrivateIntel, GlobalIntel
 from .api.profile import ProfileAPI
 from .api.response import ResponseAPI
 from .api.commands import CommandsAPI
+from .api.sse import SSEDeviceAPI, SSETenantAPI
 from .api.user_mgmt import UserMgmtAPI
 from .exceptions import CredentialsError
 from .request.authorized import ClientAuthorizedRequest, TokenAuthorizedRequest
@@ -63,6 +64,8 @@ class ThreatResponse(object):
         self._global_intel = GlobalIntel(request_for('global_intel'))
         self._commands = CommandsAPI(request_for('visibility'))
         self._user_mgmt = UserMgmtAPI(request_for('visibility'))
+        self._sse_device = SSEDeviceAPI(request_for('visibility'))
+        self._sse_tenant = SSETenantAPI(request_for('visibility'))
 
     @property
     def inspect(self):
@@ -99,3 +102,11 @@ class ThreatResponse(object):
     @property
     def user_mgmt(self):
         return self._user_mgmt
+
+    @property
+    def sse_device(self):
+        return self._sse_device
+
+    @property
+    def sse_tenant(self):
+        return self._sse_tenant

@@ -12,6 +12,15 @@ def test_respond_observables_succeeds():
     )
 
 
+def test_respond_sighting_succeeds():
+    request = invoke(ResponseAPI, lambda api: api.respond.sighting(payload))
+    request.perform.assert_called_once_with(
+        'POST',
+        '/iroh/iroh-response/respond/sighting',
+        json=payload
+    )
+
+
 def test_respond_trigger_succeeds():
     params = {'x': 1, 'y': 2, 'z': 3}
 
@@ -73,5 +82,18 @@ def test_respond_observables_fails():
     request.perform.assert_called_once_with(
         'POST',
         '/iroh/iroh-response/respond/observables',
+        json=payload
+    )
+
+
+def test_respond_sighting_fails():
+    request = invoke_with_failure(
+        ResponseAPI,
+        lambda api: api.respond.sighting(payload)
+    )
+
+    request.perform.assert_called_once_with(
+        'POST',
+        '/iroh/iroh-response/respond/sighting',
         json=payload
     )
