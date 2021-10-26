@@ -189,6 +189,7 @@ IDENTITY_ASSERTION_PAYLOAD = {
     'schema_version': SERVER_VERSION,
     'type': 'identity-assertion',
     'source': 'ATQC data',
+    'external_ids': ['3'],
     'assertions': [
         {
             'name': 'severity',
@@ -390,6 +391,8 @@ FEED_PAYLOAD = {
     "type": "feed",
     "output": "observables",
     "feed_type": "indicator",
+    "external_ids": ['3']
+
 }
 
 FEEDBACK_PAYLOAD = {

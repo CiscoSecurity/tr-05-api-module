@@ -2041,7 +2041,8 @@ def test_python_module_ctia_positive_feed(
             'output',
             'type',
             'feed_type',
-            'indicator_id'
+            'indicator_id',
+            'external_ids'
         ]
     }
     assert values == FEED_PAYLOAD
@@ -2055,6 +2056,9 @@ def test_python_module_ctia_positive_feed(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = feed.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         feed.put(
@@ -2078,6 +2082,58 @@ def test_python_module_ctia_positive_feed(
     # Get information from feed view text endpoint
     assert feed.view.txt(entity_id, get_tool_response['secret']) ==\
            judgement_post_tool_response['observable']['value']
+
+
+def test_python_module_ctia_positive_feed_search(get_entity):
+    """Perform testing for feed/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2885 - 8813aaa2-43fc-430d-ab1b-6eb40c2a9394
+
+    Steps:
+
+        1. Send POST request to create new feed entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: feed entity can be created, fetched,
+     counted and deleted using custom python module. Data stored in the entity
+      is the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    feed = get_entity('feed')
+    # Create new entity using provided payload
+    post_tool_response = feed.post(
+        payload=FEED_PAYLOAD, params={'wait_for': 'true'})
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_feed_search = feed.search.get(
+        params={'id': entity_id})
+    assert get_feed_search[0]['type'] == 'feed'
+    assert get_feed_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_feed_before_deleted = feed.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(feed.search.delete(
+        params={'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert feed.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_feed_after_deleted = feed.search.count()
+    # Compare results of count_feed_before_deleted
+    # and count_feed_after_deleted
+    assert count_feed_before_deleted !=\
+           count_feed_after_deleted
 
 
 def test_python_module_ctia_positive_feedback(
@@ -2201,7 +2257,8 @@ def test_python_module_ctia_positive_identity_assertion(
             'assertions',
             'schema_version',
             'source',
-            'type'
+            'type',
+            'external_ids'
         ]
     }
     assert values == IDENTITY_ASSERTION_PAYLOAD
@@ -2215,6 +2272,9 @@ def test_python_module_ctia_positive_identity_assertion(
         **{'headers': module_headers}
     ).json()
     assert get_tool_response == get_direct_response
+    # Validate that GET request of external_id returns number of external_id
+    external_id_result = identity_assertion.external_id(3)
+    assert external_id_result[0]['external_ids'] == ['3']
     # Update entity values
     put_tool_response = delayed_return(
         identity_assertion.put(
@@ -2225,6 +2285,110 @@ def test_python_module_ctia_positive_identity_assertion(
     assert put_tool_response['assertions'][0]['value'] == 'Low'
     get_tool_response = identity_assertion.get(entity_id)
     assert get_tool_response['assertions'][0]['value'] == 'Low'
+
+
+def test_python_module_ctia_positive_identity_assertion_search(get_entity):
+    """Perform testing for identity_assertion/search entity of custom threat
+    intelligence python module
+
+    ID: CCTRI-2885 - d83079e8-28b0-4657-9325-c37e16dd040d
+
+    Steps:
+
+        1. Send POST request to create new identity_assertion entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                entity back.
+        3. Count entities after entity created
+        4. Delete entity from the system
+        5. Repeat GET request using python module and validate that entity was
+            deleted
+        6. Count entities after entity deleted
+        7. Compare the amount of entities after creating and deleting entities
+
+    Expected results: identity_assertion entity can be created, fetched,
+     counted and deleted using custom python module. Data stored in the entity
+      is the same no matter you access it directly or using our tool
+
+    Importance: Critical
+    """
+    identity_assertion = get_entity('identity_assertion')
+    # Create new entity using provided payload
+    post_tool_response = identity_assertion.post(
+        payload=IDENTITY_ASSERTION_PAYLOAD, params={'wait_for': 'true'})
+    entity_id = post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_identity_assertion_search = identity_assertion.search.get(
+        params={'id': entity_id})
+    assert get_identity_assertion_search[0]['type'] == 'identity-assertion'
+    assert get_identity_assertion_search[0]['schema_version'] == '1.1.3'
+    # Count entities after entity created
+    count_identity_assertion_before_deleted = identity_assertion.search.count()
+    # Delete the entity and make attempt to get it back to validate it is
+    # not there anymore
+    delayed_return(identity_assertion.search.delete(
+        params={'id': entity_id, 'REALLY_DELETE_ALL_THESE_ENTITIES': 'true'}))
+    # Repeat GET request and validate that entity was deleted
+    assert identity_assertion.search.get(params={'id': entity_id}) == []
+    # Count entities after entity deleted
+    count_identity_assertion_after_deleted = identity_assertion.search.count()
+    # Compare results of count_identity_assertion_before_deleted
+    # and count_identity_assertion_after_deleted
+    assert count_identity_assertion_before_deleted !=\
+           count_identity_assertion_after_deleted
+
+
+def test_python_module_ctia_positive_identity_assertion_metric(
+        get_entity, get_entity_response):
+    """Perform testing for identity_assertion/metric endpoints of custom threat
+    intelligence python module
+
+    ID: CCTRI-2885 -e8d1f79e-d4f0-4834-9d3c-11f5eb6fabfe
+
+    Steps:
+
+        1. Send POST request to create new identity_assertion entity using
+        custom python module
+        2. Send GET request using custom python module to read just created
+                 entity back.
+        3. Send GET request to get type of metric/histogram endpoint
+        4. Send GET request to get type of metric/topn endpoint
+        5. Send GET request to get type of metric/cardinality endpoint
+        6. Delete created entity
+        7. Repeat GET request using python module and validate that entity was
+            deleted
+
+     Expected results: identity_assertion entity can be created, fetched,
+     researched by metric's endpoints and deleted using custom python module.
+     Data stored in the entity is the same no matter you access it
+     directly or using our tool.
+
+    Importance: Critical
+    """
+    identity_assertion = get_entity('identity_assertion')
+    # Create new entity using provided payload
+    incident_post_tool_response = get_entity_response(
+        'identity_assertion', IDENTITY_ASSERTION_PAYLOAD)
+    entity_id = incident_post_tool_response['id'].rpartition('/')[-1]
+    # Validate that GET request return same data for direct access and access
+    # through custom python module
+    get_created_identity_assertion = identity_assertion.get(entity_id)
+    assert get_created_identity_assertion['type'] == 'identity-assertion'
+    assert get_created_identity_assertion['schema_version'] == '1.1.3'
+    # Send GET request to get type of metric/histogram endpoint
+    data_from = get_created_identity_assertion['timestamp']
+    metric_histogram = identity_assertion.metric.histogram(params={
+        'granularity': 'week', 'from': data_from, 'aggregate-on': 'timestamp'})
+    assert metric_histogram['type'] == 'histogram'
+    # Send GET request to get type of metric/topn endpoint
+    metric_topn = identity_assertion.metric.topn(params={
+        'from': data_from, 'aggregate-on': 'identity.observables.type'})
+    assert metric_topn['type'] == 'topn'
+    # Send GET request to get type of metric/cardinality endpoint
+    metric_cardinality = identity_assertion.metric.cardinality(params={
+        'from': data_from, 'aggregate-on': 'identity.observables.type'})
+    assert metric_cardinality['type'] == 'cardinality'
 
 
 def test_python_module_ctia_positive_incident(
@@ -4203,6 +4367,12 @@ def test_python_module_ctia_positive_vulnerability(
     # Validate that GET request of external_id returns number of external_id
     external_id_result = vulnerability.external_id(3)
     assert external_id_result[0]['external_ids'] == ['3']
+    # Validate that GET request of cpe_match_strings endpoint returns result
+    get_cpe_match_strings_data =\
+        vulnerability.cpe_match_strings(
+            params={'cpe23_match_strings': 'cpe:2.3:a:google:chrome:8.0:'
+                                           'beta:*:*:*:*:*:*'})
+    assert get_cpe_match_strings_data == []
     # Update entity values
     put_tool_response = delayed_return(
         vulnerability.put(
