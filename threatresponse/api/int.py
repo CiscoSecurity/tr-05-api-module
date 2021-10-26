@@ -1,6 +1,7 @@
 from .base import API
 from .routing import Router
 from .entity import EntityAPI
+from .module_type_patch import ModuleTypePatchAPI
 
 
 class IntAPI(API):
@@ -24,6 +25,8 @@ class IntAPI(API):
         self._integration.__doc__ = "https://visibility.amp.cisco.com/iroh/" \
                                     "iroh-int/index.html#/ModuleType"
 
+        self._module_type_patch = ModuleTypePatchAPI(request)
+
     @property
     def integration(self):
         return self._integration
@@ -35,3 +38,7 @@ class IntAPI(API):
     @property
     def module_type(self):
         return self._module_type
+
+    @property
+    def module_type_patch(self):
+        return self._module_type_patch

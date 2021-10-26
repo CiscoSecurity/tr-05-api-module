@@ -393,6 +393,12 @@ Available methods:
   - int.module_type.delete(_id)
   - int.module_type.get()
   - int.module_type.post()
+  - int.module_type_patch.get()
+  - int.module_type_patch.post()
+  - int.module_type_patch.get(_id)
+  - int.module_type_patch.put(_id)
+  - int.module_type_patch.delete(_id)
+  - int.module_type_patch.action_preview(_id)
  
 # Investigation
     investigation = client.private_intel.investigation
