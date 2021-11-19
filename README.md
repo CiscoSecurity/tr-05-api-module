@@ -277,9 +277,16 @@ Available methods:
     enrich = client.enrich
 Available methods:
   - enrich.health()
+  - enrich.health(_id)
   - enrich.deliberate.observables()
+  - enrich.deliberate.sighting()
+  - enrich.deliberate.sighting_ref()
   - enrich.observe.observables()
+  - enrich.observe.sighting()
+  - enrich.observe.sighting_ref()
   - enrich.refer.observables()
+  - enrich.refer.sighting()
+  - enrich.refer.sighting_ref()
 
 # Event
     event = client.private_intel.event
